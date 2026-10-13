@@ -33,7 +33,7 @@ const CANNON = window.CANNON;
    ===================================================================== */
 const CFG = {
   fixedDt: 1 / 120,          // fysik-tidsskridt (120 Hz giver stram kollision på små platforme)
-  maxSteps: 8,               // maks. fysikskridt pr. frame (beskytter mod "spiral of death")
+  maxSteps: 12,              // maks. fysikskridt pr. frame (fuld fart ned til 10 FPS, beskytter mod "spiral of death")
   gravity: 24,               // m/s² – kraftigere end jordens for et snappy parkour-feel
   lavaY: -50,                // lavaens overflade
   deathY: -49.2,             // spillerens fødder rører lavaen her
@@ -66,10 +66,11 @@ const CFG = {
     maxSpeed: 30,
     releaseBoost: 6.5,       // ekstra opdrift når man slipper med mellemrum
     assistAngle: THREE.MathUtils.degToRad(9), // sigtehjælp mod krogpunkter
+    lockCos: Math.cos(THREE.MathUtils.degToRad(35)), // automatisk lås på krogpunkter foran spilleren
   },
   bounceDefault: 18,
   coinValue: 5,
-  camera: { dist: 7.2, height: 1.45, minPitch: -1.05, maxPitch: 1.3, sens: 0.0026, fov: 70 },
+  camera: { dist: 7.4, height: 2.15, minPitch: -1.05, maxPitch: 1.3, sens: 0.0026, fov: 70 },
 };
 
 const SHOP_ITEMS = [
@@ -110,7 +111,6 @@ const T = {
   toastChalk: 'Kridt på hænderne! Bedre greb og højere hop',
   toastChalkCd: (s) => `Kridtet genoplades … ${s.toFixed(1)} s`,
   toastRopeNoTarget: 'Intet mål inden for rækkevidde',
-  toastRopeHook: 'Rebet sidder fast!',
   toastNoAbility: 'Ingen evne valgt – køb evner i butikken (B)',
   toastDeath: 'Du faldt i lavaen! Banen starter forfra.',
   toastCoin: (n) => `+${n} mønter`,
@@ -119,20 +119,17 @@ const T = {
   toastRopeHint: 'Tip: Vælg rebet (scroll), sigt på det lysende krogpunkt og venstreklik. Sving med W, hop af med mellemrum.',
   toastSound: (on) => (on ? 'Lyd: til' : 'Lyd: fra'),
   toastBought: (name) => `Du købte: ${name}`,
-  toastEquip: (name) => `Valgt evne: ${name}`,
   shopBuy: 'Køb',
   shopOwned: 'Ejet ✓',
   shopMissing: (n) => `Mangler ${n}`,
   shopRequires: (name) => `Kræver: ${name}`,
   soundBtn: (on) => `Lyd: ${on ? 'Til' : 'Fra'}`,
   continueBtn: (n) => `Fortsæt – bane ${n}`,
-  replayBtn: 'Spil igen fra bane 1',
   tipChalk: 'Tip: Kridt (60 mønter) gør det meget lettere at holde balancen på glatis.',
   tipRope: 'Tip: Fra bane 8 er rebet (150 mønter) nødvendigt for at krydse de store huller.',
   tipRopeOwned: 'Næste bane har enorme huller – husk at vælge rebet med scrollhjulet.',
   tipFinal: 'Sidste bane! Små platforme, gigantiske huller og ingen nåde. Held og lykke.',
   levelBanner: (n) => `BANE ${n}`,
-  allLevels: 'Alle baner gennemført!',
 };
 
 /* =====================================================================
@@ -935,7 +932,7 @@ function buildMaterials() {
    ===================================================================== */
 const canvas = $('game-canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
@@ -1072,7 +1069,7 @@ const LAVA_FRAG = /* glsl */`
   float fbm(vec2 p) {
     float v = 0.0, a = 0.5;
     mat2 r = mat2(0.8, -0.6, 0.6, 0.8);
-    for (int i = 0; i < 5; i++) { v += a * noise(p); p = r * p * 2.03; a *= 0.5; }
+    for (int i = 0; i < 4; i++) { v += a * noise(p); p = r * p * 2.03; a *= 0.5; }
     return v;
   }
   void main() {
@@ -1084,7 +1081,7 @@ const LAVA_FRAG = /* glsl */`
     float c2 = fbm(p * 3.1 + q * 2.5 - t * 0.5);
     float crack = 1.0 - smoothstep(0.0, 0.035, abs(c2 - 0.5));    // tynde glødende revner i skorpen
     float pulse = 0.8 + 0.2 * sin(uTime * 1.7 + n * 24.0);
-    vec3 crust = vec3(0.07, 0.016, 0.006) * (0.7 + 0.6 * fbm(p * 7.0));
+    vec3 crust = vec3(0.07, 0.016, 0.006) * (0.6 + 0.8 * noise(p * 7.0));
     vec3 hot = mix(vec3(1.0, 0.22, 0.02) * 1.6, vec3(1.0, 0.62, 0.16) * 2.6, smoothstep(0.62, 0.78, n));
     vec3 col = mix(crust, hot * pulse, heat);
     col += vec3(1.0, 0.3, 0.04) * 1.4 * crack * (1.0 - heat) * pulse;
@@ -1165,9 +1162,7 @@ const lavaLight = new THREE.DirectionalLight('#ff6a2a', 0.9);
 scene.add(lavaLight, lavaLight.target);
 const sunDir = new THREE.Vector3();
 
-let currentTheme = null;
 function applyTheme(theme) {
-  currentTheme = theme;
   skyUniforms.uTop.value.set(theme.top);
   skyUniforms.uHorizon.value.set(theme.horizon);
   skyUniforms.uBottom.value.set(theme.bottom);
@@ -1360,9 +1355,10 @@ const PORTAL_FRAG = /* glsl */`
     float a = atan(c.y, c.x);
     float sw = sin(a * 5.0 + r * 11.0 - uTime * 4.5) * 0.5 + 0.5;
     float sw2 = sin(a * 3.0 - r * 7.0 + uTime * 3.0) * 0.5 + 0.5;
-    vec3 col = mix(uColA, uColB, sw * 0.7 + sw2 * 0.3) * (0.7 + 1.6 * (1.0 - r));
-    float alpha = smoothstep(1.0, 0.82, r) * (0.55 + 0.45 * sw);
-    gl_FragColor = vec4(col * 1.6, alpha);
+    vec3 col = mix(uColA, uColB, sw * 0.7 + sw2 * 0.3) * (0.45 + 0.75 * (1.0 - r));
+    col += vec3(0.9, 0.95, 1.0) * pow(1.0 - r, 6.0) * 0.6;
+    float alpha = smoothstep(1.0, 0.82, r) * (0.35 + 0.4 * sw);
+    gl_FragColor = vec4(col, alpha);
   }`;
 
 class Level {
@@ -1602,9 +1598,9 @@ class Level {
     const disk = new THREE.Mesh(this.geo(new THREE.CircleGeometry(R, 48)), diskMat);
     group.add(disk);
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: TEX.glow, color: '#6fd8ff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.7,
+      map: TEX.glow, color: '#4fb8ff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.32,
     }));
-    glow.scale.set(9, 9, 1);
+    glow.scale.set(8, 8, 1);
     this.disposables.push(glow.material);
     group.add(glow);
     // Partikler der kredser om portalen
@@ -1782,7 +1778,7 @@ class Level {
       P.ring.rotation.z = -elapsed * 0.4;
       P.sparks.rotation.z = elapsed * 0.7;
       const pulse = 1 + Math.sin(elapsed * 3) * 0.05;
-      P.glow.scale.set(9 * pulse, 9 * pulse, 1);
+      P.glow.scale.set(8 * pulse, 8 * pulse, 1);
       P.light.intensity = 36 + Math.sin(elapsed * 5) * 8;
     }
   }
@@ -2373,6 +2369,8 @@ function updateCamera(dt) {
   cam.curDist = want < cam.curDist ? want : damp(cam.curDist, want, 4, dt);
   camera.position.copy(cam.target).addScaledVector(_camDir, cam.curDist);
   camera.lookAt(cam.target);
+  // Skjul figuren, hvis kameraet presses helt ind på den (så den ikke blokerer udsynet)
+  player.model.inner.visible = cam.curDist > 1.6;
   if (cam.shake > 0) {
     cam.shake = Math.max(0, cam.shake - dt);
     const s = cam.shake * 0.25;
@@ -2465,6 +2463,22 @@ function findRopeTarget() {
     if (a.pos.distanceTo(_chest) > range) continue;
     const ang = _aimTmp.copy(a.pos).sub(origin).angleTo(_aimDir);
     if (ang < bestAng) { bestAng = ang; best = a; }
+  }
+  if (best) return { anchor: best, plat: null, point: best.pos.clone() };
+  // Automatisk lås på et krogpunkt, der ligger nogenlunde foran (så man ikke skal sigte stejlt op)
+  const hl = Math.hypot(_aimDir.x, _aimDir.z) || 1;
+  const fx = _aimDir.x / hl, fz = _aimDir.z / hl;
+  let bestScore = Infinity;
+  for (const a of level.anchors) {
+    const dx = a.pos.x - _chest.x, dy = a.pos.y - _chest.y, dz = a.pos.z - _chest.z;
+    const hd = Math.hypot(dx, dz) || 0.001;
+    const dist = Math.hypot(hd, dy);
+    if (dist > range || dist < 1.5) continue;
+    const cosYaw = (dx * fx + dz * fz) / hd;
+    const elev = Math.atan2(dy, hd);
+    if (cosYaw < CFG.rope.lockCos || elev < -0.35 || elev > 1.4) continue;
+    const score = (1 - cosYaw) * 12 + dist * 0.02;
+    if (score < bestScore) { bestScore = score; best = a; }
   }
   if (best) return { anchor: best, plat: null, point: best.pos.clone() };
   const tStart = Math.max(0, _aimTmp.copy(_chest).sub(origin).dot(_aimDir));
@@ -3048,6 +3062,7 @@ function fixedStep(dt) {
 }
 
 const simulateStates = new Set(['playing', 'dead', 'portal', 'menu', 'complete', 'victory']);
+const debug = { freeze: false, freeCam: false }; // kun til automatiske tests/skærmbilleder (?debug)
 let lastT = performance.now(), acc = 0, elapsed = 0;
 
 function frame(now) {
@@ -3057,7 +3072,7 @@ function frame(now) {
   elapsed += dt;
   const s = game.state;
   const simulate = simulateStates.has(s) || (s === 'shop' && (game.shopReturn === 'menu' || game.shopReturn === 'complete'));
-  if (simulate && level) {
+  if (simulate && level && !debug.freeze) {
     acc += dt;
     let n = 0;
     while (acc >= CFG.fixedDt && n < CFG.maxSteps) { fixedStep(CFG.fixedDt); acc -= CFG.fixedDt; n++; }
@@ -3078,7 +3093,8 @@ function frame(now) {
   level.update(dt, elapsed);
   updatePlayerVisual(dt, elapsed);
   particles.update(dt);
-  if (s === 'menu' || (s === 'shop' && game.shopReturn === 'menu')) updateMenuCamera(elapsed);
+  if (debug.freeCam) { /* kameraet styres udefra */ }
+  else if (s === 'menu' || (s === 'shop' && game.shopReturn === 'menu')) updateMenuCamera(elapsed);
   else updateCamera(dt);
   abilities.target = s === 'playing' && abilities.selected === 'rope' && !abilities.rope ? findRopeTarget() : null;
   updateRopeVisual(dt);
@@ -3174,7 +3190,8 @@ function boot() {
       get level() { return level; },
       buildLevelData, startLevel, loadLevel, completeLevel, die, fireRope, releaseRope, findRopeTarget,
       useAbility, selectAbility, openShop, setState, renderShop, renderHotbar, toast, saveGame, applySave,
-      fixedStep, respawnPlayer, onKeyPress, updateCamera, camera, renderer, scene, world,
+      fixedStep, respawnPlayer, onKeyPress, updateCamera, camera, renderer, scene, world, debug, particles,
+      emitChalk, enterPortal, restartLevel,
     };
   }
 }
