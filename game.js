@@ -3179,6 +3179,8 @@ function boot() {
   audio.enabled = game.sound;
   loadLevel(clamp(game.savedLevel, 0, LEVELS.length - 1));
   refreshMenu();
+  // Spillet kræver tastatur og mus – sig det på rene touch-enheder
+  if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) $('touch-note').classList.remove('hidden');
   $('screen-loading').classList.add('hidden');
   setState('menu');
   requestAnimationFrame((t) => { lastT = t; frame(t); });

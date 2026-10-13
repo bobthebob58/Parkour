@@ -4,6 +4,7 @@
    ========================================================= */
 
 :root {
+  color-scheme: dark; /* bevidst ét mørkt udtryk – spillet foregår altid i skyerne over lava */
   --ink: #f4f7ff;
   --ink-dim: rgba(234, 240, 255, 0.72);
   --panel: rgba(10, 16, 32, 0.58);
@@ -353,6 +354,7 @@ body.looking #game-canvas { cursor: none; }
 .logo.small { font-size: 40px; }
 .tagline { font-size: 17px; margin: 14px auto 22px; max-width: 460px; }
 .fineprint { font-size: 13px; margin: 18px 0 0; }
+.touch-note { color: var(--gold) !important; font-weight: 500; }
 
 .menu-buttons { display: flex; flex-direction: column; gap: 10px; align-items: stretch; margin-top: 8px; }
 .menu-buttons.row { flex-direction: row; justify-content: center; }
