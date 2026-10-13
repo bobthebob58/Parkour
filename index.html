@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skyhøj Parkour</title>
+  <meta name="description" content="Skyhøj Parkour – et 3D-parkourspil i skyerne over et hav af lava. 10 baner, kridt og reb.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Biblioteker hentes fra CDN: Three.js (grafik) og cannon-es (fysik) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="game-canvas" tabindex="0"></canvas>
+
+  <!-- ===================== HUD ===================== -->
+  <div id="hud" class="hidden">
+    <div id="hud-level" class="panel">
+      <div class="hud-level-top">
+        <span class="hud-label">BANE</span>
+        <span id="hud-level-num">1</span><span class="hud-level-of">/10</span>
+      </div>
+      <div id="hud-level-name">Første skridt</div>
+      <div class="hud-stats">
+        <div class="hud-stat" title="Mønter">
+          <span class="coin-icon"></span>
+          <span id="hud-coins">0</span>
+          <span id="hud-level-coins" class="hud-sub"></span>
+        </div>
+        <div class="hud-stat" title="Tid på banen">
+          <svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span id="hud-time">00:00</span>
+        </div>
+        <div class="hud-stat" title="Dødsfald">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M12 2c-4.4 0-8 3.3-8 7.6 0 2.6 1.3 4.6 3 5.8V19h2v-2h2v2h2v-2h2v2h2v-3.6c1.7-1.2 3-3.2 3-5.8C20 5.3 16.4 2 12 2zm-3.5 10a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6zm7 0a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z" fill="currentColor"/></svg>
+          <span id="hud-deaths">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="hud-ability" class="panel">
+      <div class="hud-label">EVNE</div>
+      <div id="hud-ability-name">Ingen</div>
+      <div id="hud-ability-status">Venstreklik for at bruge</div>
+      <div id="hud-ability-bar"><div id="hud-ability-fill"></div></div>
+    </div>
+
+    <div id="crosshair"><div class="ch-ring"></div><div class="ch-dot"></div></div>
+
+    <div id="hotbar"></div>
+
+    <div id="toasts"></div>
+    <div id="level-banner" class="hidden">
+      <div id="level-banner-num">BANE 1</div>
+      <div id="level-banner-name">Første skridt</div>
+    </div>
+
+    <div id="help-hint" class="panel">
+      <b>WASD</b> bevæg · <b>Mellemrum</b> hop · <b>Højreklik</b> (hold) kamera · <b>Venstreklik</b> evne · <b>Scroll</b> skift evne · <b>B</b> butik · <b>P</b> pause · <b>H</b> skjul
+    </div>
+  </div>
+
+  <div id="flash"></div>
+  <div id="fade"></div>
+
+  <!-- ===================== SKÆRME ===================== -->
+  <div id="screen-loading" class="screen">
+    <div class="card card-narrow">
+      <div class="logo small">SKYHØJ <span>PARKOUR</span></div>
+      <div class="spinner"></div>
+      <p id="loading-status">Henter 3D-motor og fysik…</p>
+    </div>
+  </div>
+
+  <div id="screen-error" class="screen hidden">
+    <div class="card card-narrow">
+      <h2>Noget gik galt</h2>
+      <p id="error-text">Kunne ikke hente Three.js og cannon-es fra internettet. Tjek din forbindelse og genindlæs siden.</p>
+      <button class="btn btn-primary" onclick="location.reload()">Prøv igen</button>
+    </div>
+  </div>
+
+  <div id="screen-menu" class="screen hidden">
+    <div class="card card-menu">
+      <div class="logo">SKYHØJ <span>PARKOUR</span></div>
+      <p class="tagline">Løb, hop og sving dig gennem 10 baner – højt over et glødende hav af lava.</p>
+      <div class="menu-buttons">
+        <button id="btn-continue" class="btn btn-primary hidden">Fortsæt</button>
+        <button id="btn-new" class="btn btn-primary">Nyt spil</button>
+        <button id="btn-menu-shop" class="btn">Butik</button>
+      </div>
+      <div class="controls-grid">
+        <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div><div>Bevæg dig</div>
+        <div><kbd class="wide">Mellemrum</kbd></div><div>Hop (hold for højere hop)</div>
+        <div><kbd class="wide">Højreklik</kbd> hold</div><div>Drej kameraet / se dig omkring</div>
+        <div><kbd class="wide">Venstreklik</kbd></div><div>Brug den valgte evne</div>
+        <div><kbd class="wide">Scrollhjul</kbd> <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></div><div>Skift evne</div>
+        <div><kbd>B</kbd> <kbd>P</kbd> <kbd>R</kbd> <kbd>M</kbd></div><div>Butik · Pause · Genstart bane · Lyd</div>
+      </div>
+      <p class="fineprint">Tjen mønter ved at nå portalen for enden af hver bane. Rør du lavaen, starter banen forfra.</p>
+    </div>
+  </div>
+
+  <div id="screen-pause" class="screen hidden">
+    <div class="card card-narrow">
+      <h2>Pause</h2>
+      <div class="menu-buttons">
+        <button id="btn-resume" class="btn btn-primary">Fortsæt</button>
+        <button id="btn-pause-shop" class="btn">Butik</button>
+        <button id="btn-restart" class="btn">Genstart bane</button>
+        <button id="btn-sound" class="btn">Lyd: Til</button>
+        <button id="btn-quit" class="btn btn-ghost">Hovedmenu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-complete" class="screen hidden">
+    <div class="card card-narrow">
+      <div class="badge">BANE <span id="complete-level">1</span> FULDFØRT!</div>
+      <h2 id="complete-name">Første skridt</h2>
+      <div class="result-rows">
+        <div class="result-row"><span>Tid</span><b id="complete-time">00:00</b></div>
+        <div class="result-row"><span>Banebelønning</span><b id="complete-reward">+0</b></div>
+        <div class="result-row"><span>Bonusmønter</span><b id="complete-bonus">+0</b></div>
+        <div class="result-row total"><span>Mønter i alt</span><b id="complete-total">0</b></div>
+      </div>
+      <p id="complete-tip" class="tip"></p>
+      <div class="menu-buttons">
+        <button id="btn-next" class="btn btn-primary">Næste bane →</button>
+        <button id="btn-complete-shop" class="btn">Åbn butikken</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-shop" class="screen hidden">
+    <div class="card card-shop">
+      <div class="shop-head">
+        <h2>Butik</h2>
+        <div class="shop-coins"><span class="coin-icon"></span><span id="shop-coins">0</span> mønter</div>
+      </div>
+      <div id="shop-items"></div>
+      <div class="menu-buttons row">
+        <button id="btn-shop-back" class="btn btn-primary">Tilbage</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-victory" class="screen hidden">
+    <div class="card card-narrow">
+      <div class="logo small">TILLYKKE!</div>
+      <p class="tagline">Du har gennemført alle 10 baner i Skyhøj Parkour og overlevet lavaen.</p>
+      <div class="result-rows">
+        <div class="result-row"><span>Samlet tid</span><b id="victory-time">00:00</b></div>
+        <div class="result-row"><span>Dødsfald</span><b id="victory-deaths">0</b></div>
+        <div class="result-row total"><span>Mønter</span><b id="victory-coins">0</b></div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-replay" class="btn btn-primary">Spil igen fra bane 1</button>
+        <button id="btn-victory-menu" class="btn">Hovedmenu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indlæser bibliotekerne som ES-moduler, og starter derefter game.js.
+       game.js er et klassisk script, så spillet også virker, når index.html
+       åbnes direkte fra disken (file://). -->
+  <script type="module">
+    const status = document.getElementById('loading-status');
+    const fail = (msg) => {
+      document.getElementById('screen-loading').classList.add('hidden');
+      document.getElementById('screen-error').classList.remove('hidden');
+      if (msg) document.getElementById('error-text').textContent = msg;
+    };
+    try {
+      const [THREE, CANNON] = await Promise.all([import('three'), import('cannon-es')]);
+      window.THREE = THREE;
+      window.CANNON = CANNON;
+      status.textContent = 'Bygger verdenen…';
+      const script = document.createElement('script');
+      script.src = 'game.js';
+      script.onerror = () => fail('Kunne ikke indlæse game.js. Ligger filen i samme mappe som index.html?');
+      document.body.appendChild(script);
+    } catch (err) {
+      console.error(err);
+      fail();
+    }
+  </script>
+</body>
+</html>
