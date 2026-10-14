@@ -457,7 +457,7 @@ kbd.wide { min-width: 70px; }
 
 #shop-items {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 14px;
   margin: 18px 0 20px;
 }
@@ -501,4 +501,75 @@ kbd.wide { min-width: 70px; }
   .logo { font-size: 40px; }
   .card { padding: 22px 18px; }
   .controls-grid { font-size: 13px; }
+}
+
+/* ---------------- Greb, dobbelthop og banevalg ---------------- */
+#hud-grip {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 34px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+}
+.grip-label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; color: var(--ink-dim); }
+.grip-bar { width: 120px; height: 7px; border-radius: 4px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
+#hud-grip-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ffd27a, #fff3d0); transition: width 0.08s linear; }
+#hud-grip.low #hud-grip-fill { background: linear-gradient(90deg, var(--bad), #ff9a7a); }
+#hud-grip.low { animation: grip-pulse 0.5s ease-in-out infinite alternate; }
+#hud-grip.chalked #hud-grip-fill { background: linear-gradient(90deg, #ffffff, #e9f1ff); box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); }
+@keyframes grip-pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.06); } }
+
+#hud-dbl {
+  position: absolute;
+  left: calc(50% + 140px);
+  bottom: 26px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+#hud-dbl svg { width: 20px; height: 20px; }
+#hud-dbl.dbl-off { display: none; }
+#hud-dbl.dbl-ready { color: var(--cyan); border-color: rgba(103, 227, 255, 0.55); }
+#hud-dbl.dbl-used { color: var(--ink-dim); opacity: 0.55; }
+
+#level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 18px 0 20px;
+}
+.level-tile {
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+.level-tile:hover { background: rgba(255, 255, 255, 0.14); }
+.level-tile:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.level-tile.locked { opacity: 0.4; cursor: not-allowed; }
+.lt-num { font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; }
+.lt-name { font-size: 14px; font-weight: 700; }
+.lt-best { font-size: 12px; color: var(--ink-dim); min-height: 15px; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  #hud-dbl { left: auto; right: 12px; bottom: 90px; }
 }

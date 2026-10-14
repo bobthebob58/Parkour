@@ -55,8 +55,33 @@ const CFG = {
     jumpCut: 0.5,            // slipper man mellemrum tidligt, bliver hoppet lavere
     maxFall: 42,
   },
-  grip: { normal: 1, ice: 0.11 },
-  chalk: { duration: 5, cooldown: 10, cooldownUpgraded: 5, jumpMul: 1.3, gripMul: 4, gripMax: 1.5 },
+  grip: { normal: 1, ice: 0.11 },  // friktion mod underlaget (is er glat)
+  // Hænderne: auto-greb af kanter og stænger, greb (udholdenhed), klatring
+  hang: {
+    drop: 1.72,              // hændernes højde over kroppens centrum, når man hænger
+    wallGap: 0.47,           // kroppens afstand fra væggen
+    reach: 0.95,             // vandret rækkevidde for at gribe en kant
+    window: 0.55,            // lodret vindue for at gribe en kant
+    barReach: 0.65,          // vandret rækkevidde for at gribe en stang
+    shimmy: 1.7,             // sidelæns fart langs en kant (m/s)
+    barShimmy: 2.2,          // fart langs en stang (hånd over hånd)
+    climbTime: 0.42,
+    drain: 1 / 4.2,          // greb brugt pr. sekund ved en kant (≈ 4 s)
+    barDrain: 1 / 5.5,       // stænger er lidt nemmere at hænge i
+    iceMul: 2,               // isglatte kanter tærer dobbelt så hurtigt på grebet
+    moveMul: 1.3,            // det koster ekstra greb at flytte sig
+    regen: 1.6,              // greb genvindes pr. sekund på fast grund
+    cooldown: 0.28,          // pause før man kan gribe igen efter at have sluppet
+  },
+  // Kridt påvirker KUN hænderne
+  chalk: { duration: 8, cooldown: 12, cooldownUpgraded: 6, drainMul: 0.25, reachBonus: 0.4, windowBonus: 0.35 },
+  gloves: 1.5,               // klatrehandsker: grebet holder 50 % længere
+  dbl: { vel: 9.8, steer: 0.65 },
+  vent: { power: 30, maxUp: 9.5 },
+  skate: {
+    push: 7, maxPush: 13, brake: 14, roll: 0.25, maxSpeed: 30,
+    turn: 1.8, airTurn: 0.9, lateral: 10, ollie: 8.6, grindFriction: 0.08,
+  },
   rope: {
     range: 32,
     rangeUpgraded: 45,
@@ -77,17 +102,27 @@ const SHOP_ITEMS = [
   {
     id: 'chalk', kind: 'EVNE', price: 60, icon: 'chalk',
     name: 'Kridt',
-    desc: 'Venstreklik: 5 sekunder med markant bedre greb og 30 % højere hop. Uundværligt på glatis.',
+    desc: 'Venstreklik: frisk kridt på hænderne. Grebet fyldes op, og i 8 sekunder holder du fire gange så længe og griber kanter længere væk.',
+  },
+  {
+    id: 'double', kind: 'EVNE', price: 120, icon: 'double',
+    name: 'Dobbelthop',
+    desc: 'Tryk på mellemrum igen i luften for at hoppe en ekstra gang og skifte retning. Virker automatisk.',
   },
   {
     id: 'rope', kind: 'EVNE', price: 150, icon: 'rope',
     name: 'Reb (entrehage)',
-    desc: 'Skyd rebet mod en platform eller et lysende krogpunkt og sving dig over store huller. Hold venstreklik for at hale dig ind, tryk mellemrum for at hoppe af.',
+    desc: 'Skyd rebet mod et lysende krogpunkt og sving dig over kløfter. Hold venstreklik for at hale ind, mellemrum for at hoppe af.',
+  },
+  {
+    id: 'gloves', kind: 'OPGRADERING', price: 90, icon: 'gloves',
+    name: 'Klatrehandsker',
+    desc: 'Grebet holder 50 % længere, når du hænger i kanter og stænger.',
   },
   {
     id: 'chalkbag', kind: 'OPGRADERING', price: 100, icon: 'bag', requires: 'chalk',
     name: 'Kridtpose',
-    desc: 'Kridtet genoplades dobbelt så hurtigt (5 s i stedet for 10 s).',
+    desc: 'Kridtet genoplades dobbelt så hurtigt (6 s i stedet for 12 s).',
   },
   {
     id: 'longrope', kind: 'OPGRADERING', price: 160, icon: 'longrope', requires: 'rope',
@@ -108,7 +143,7 @@ const T = {
   ropeAttached: 'Hold venstreklik: hal ind · Mellemrum: hop af',
   ropeAim: 'Sigt på en platform eller et krogpunkt',
   ropeTarget: 'Mål fundet – venstreklik!',
-  toastChalk: 'Kridt på hænderne! Bedre greb og højere hop',
+  toastChalk: 'Kridt på hænderne! Grebet holder meget længere',
   toastChalkCd: (s) => `Kridtet genoplades … ${s.toFixed(1)} s`,
   toastRopeNoTarget: 'Intet mål inden for rækkevidde',
   toastNoAbility: 'Ingen evne valgt – køb evner i butikken (B)',
@@ -125,7 +160,23 @@ const T = {
   shopRequires: (name) => `Kræver: ${name}`,
   soundBtn: (on) => `Lyd: ${on ? 'Til' : 'Fra'}`,
   continueBtn: (n) => `Fortsæt – bane ${n}`,
-  tipChalk: 'Tip: Kridt (60 mønter) gør det meget lettere at holde balancen på glatis.',
+  tipChalk: 'Tip: Kridt (60 mønter) får hænderne til at holde meget længere – især på isglatte kanter.',
+  tipDouble: 'Tip: Dobbelthop (120 mønter) gør de næste baner meget lettere – og nogle senere baner kræver det.',
+  tipSkate: 'Næste bane køres på skateboard! W: fart · A/D: styr · S: brems · Mellemrum: ollie.',
+  toastNeedDouble: 'Denne bane kræver dobbelthop! Tryk B for at åbne butikken.',
+  toastGrabHint: 'Du hænger i hænderne! W/mellemrum: klatr op · A/D: flyt dig · S: giv slip',
+  toastBarHint: 'Du hænger i en stang! WASD: flyt dig langs den · Mellemrum: hop af',
+  toastZipHint: 'Svævebane! Du glider ned – tryk mellemrum for at hoppe af',
+  toastSlip: 'Du mistede grebet!',
+  toastGripLow: 'Grebet glipper – klatr op eller brug kridt!',
+  toastSkate: 'Skateboard! W: sæt fart · A/D: styr · S: brems · Mellemrum: ollie',
+  toastGrind: 'Grind!',
+  toastDoubleOwned: 'Dobbelthop: tryk mellemrum igen i luften',
+  skateAbility: 'Skateboard',
+  skateStatus: (kmh) => `${kmh} km/t`,
+  gripLabel: 'GREB',
+  levelSelect: 'Vælg bane',
+  locked: 'Låst',
   tipRope: 'Tip: Fra bane 8 er rebet (150 mønter) nødvendigt for at krydse de store huller.',
   tipRopeOwned: 'Næste bane har enorme huller – husk at vælge rebet med scrollhjulet.',
   tipFinal: 'Sidste bane! Små platforme, gigantiske huller og ingen nåde. Held og lykke.',
@@ -921,6 +972,15 @@ function buildMaterials() {
   MAT.hub = std({ color: '#2e3540', roughness: 0.35, metalness: 0.9 });
   MAT.coin = std({ color: '#ffcc40', roughness: 0.22, metalness: 1, emissive: '#7a4a00', emissiveIntensity: 0.35 });
   MAT.anchor = std({ color: '#ffd24a', roughness: 0.3, metalness: 0.8, emissive: '#ff9d00', emissiveIntensity: 0.9 });
+  // Faste signaler, der ser ens ud i alle verdener
+  MAT.anchorRing = std({ color: '#8ff4ff', roughness: 0.25, metalness: 0.4, emissive: '#19d6ff', emissiveIntensity: 1.8 });
+  MAT.gripTape = std({ color: '#f4f2ec', roughness: 0.95, metalness: 0 });
+  const lip = (color, opacity) => new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+  });
+  MAT.lipFaint = lip('#f6f3ea', 0.32);
+  MAT.lipGrab = lip('#ffffff', 0.8);
+  MAT.lipIcy = lip('#a8ecff', 0.9);
   MAT.rope = std({ color: '#c8a46a', roughness: 0.85 });
   MAT.hook = std({ color: '#9aa4b2', roughness: 0.3, metalness: 1 });
   MAT.portalRing = std({ color: '#7cf0ff', roughness: 0.2, metalness: 0.6, emissive: '#36c8ff', emissiveIntensity: 2.2 });
@@ -1185,7 +1245,9 @@ function applyTheme(theme) {
   lavaUniforms.uGlow.value = 0.85 + theme.lavaGlow * 0.15;
   starMat.opacity = theme.stars;
   renderer.toneMappingExposure = theme.exposure;
-  for (const m of cloudMats) m.color.set(theme.cloud);
+  const clouds = theme.clouds ?? 1; // 0 = ingen skyer (fx i rummet)
+  cloudMats.forEach((m, i) => { m.color.set(theme.cloud); m.opacity = (i < 3 ? 0.9 : 0.6) * clouds; });
+  cloudGroup.visible = clouds > 0.01;
   MAT.stoneTop.color.set(theme.stone);
   MAT.rock.color.set(theme.stone).lerp(new THREE.Color('#ffffff'), 0.25);
   if (envRT) envRT.dispose();
@@ -1218,6 +1280,7 @@ const G_PLAYER = 1, G_STATIC = 2, G_KINEMATIC = 4;
    ===================================================================== */
 const fwdVec = (h) => ({ x: Math.sin(h), z: -Math.cos(h) });   // heading 0 = mod -Z
 const rightVec = (h) => ({ x: Math.cos(h), z: Math.sin(h) });
+const AXIS_X = new THREE.Vector3(1, 0, 0), AXIS_Y = new THREE.Vector3(0, 1, 0);
 
 // Hvor langt rækker platformens fodaftryk i retningen (dx, dz)?
 function footprintSupport(p, dx, dz) {
@@ -1240,30 +1303,75 @@ function moveOffset(m, t, out) {
   return out;
 }
 
+// Pendul: platformen hænger i kæder fra et ophæng og svinger i en bue (men forbliver vandret)
+function makeSwing(s, heading) {
+  const f = fwdVec(heading), r = rightVec(heading);
+  const axis = s.ax === 'z' ? [f.x, 0, f.z] : [r.x, 0, r.z];
+  return { axis, len: s.len ?? 8, amp: (s.amp ?? 28) * DEG, per: s.per ?? 4, ph: s.ph ?? 0 };
+}
+function swingOffset(m, t, out) {
+  const a = Math.sin((t / m.per + m.ph) * Math.PI * 2) * m.amp;
+  const side = Math.sin(a) * m.len, up = (1 - Math.cos(a)) * m.len;
+  out.x = m.axis[0] * side; out.y = up; out.z = m.axis[2] * side;
+  return out;
+}
+
+// Typer, man ikke kan gribe fat i kanten af (skateboard-elementer)
+const NO_LEDGE = new Set(['ramp', 'rail', 'boost']);
+
 function buildLevelData(def) {
-  const plats = [], anchors = [], coins = [];
-  let heading = 0, prev = null;
+  const plats = [], anchors = [], coins = [], bars = [], winds = [], zips = [], gusts = [];
+  let heading = 0, prev = null, seed = 7;
   for (const s of def.segs) {
     const t = s.t || 'p';
-    if (t === 'anchor' || t === 'coin') {
+    if (t === 'anchor' || t === 'coin' || t === 'bar' || t === 'wind' || t === 'zip' || t === 'gust') {
       const f = fwdVec(heading), r = rightVec(heading);
       const e = footprintSupport(prev, f.x, f.z), lat = s.x || 0;
-      const item = {
-        x: prev.x + f.x * (e + s.at) + r.x * lat,
-        y: prev.top + s.y,
-        z: prev.z + f.z * (e + s.at) + r.z * lat,
-        move: s.ax ? makeMove(s, heading) : null,
-      };
-      (t === 'anchor' ? anchors : coins).push(item);
+      const bx = prev.x + f.x * (e + (s.at ?? 0)) + r.x * lat;
+      const bz = prev.z + f.z * (e + (s.at ?? 0)) + r.z * lat;
+      if (t === 'bar') {
+        // Hængestang: starter "at" meter ud fra forrige kant og løber "len" meter (ang = drejning ift. banen)
+        const yaw = heading + (s.ang || 0) * DEG, dv = fwdVec(yaw), len = s.len ?? 4;
+        bars.push({
+          x: bx + dv.x * len / 2, y: prev.top + (s.y ?? 2.6), z: bz + dv.z * len / 2,
+          dx: dv.x, dz: dv.z, yaw, len, r: s.r ?? 0.06, v: s.v || null, index: bars.length,
+          move: s.mv ? makeMove(s.mv, heading) : null, // stang, der flytter sig (fx under et luftskib)
+          // Trapez: stangen hænger i reb og svinger som et pendul
+          swing: s.sw ? makeSwing({ ax: s.sw.ax || 'z', len: s.sw.len ?? 5, amp: s.sw.amp ?? 30, per: s.sw.per ?? 3, ph: s.sw.ph ?? 0 }, heading) : null,
+        });
+      } else if (t === 'zip') {
+        // Svævebane: et skråt kabel, man griber fat i og glider ned ad
+        const yaw = heading + (s.ang || 0) * DEG, dv = fwdVec(yaw), len = s.len ?? 16, drop = s.drop ?? 4;
+        const ay = prev.top + (s.y ?? 3.2);
+        zips.push({
+          ax: bx, ay, az: bz, bx: bx + dv.x * len, by: ay - drop, bz: bz + dv.z * len,
+          len, drop, dx: dv.x, dz: dv.z, yaw, v: s.v || null, index: zips.length,
+        });
+      } else if (t === 'gust') {
+        // Vindstød: et område, der med mellemrum skubber spilleren sidelæns
+        const yaw = heading + (s.ang ?? 90) * DEG, dv = fwdVec(yaw);
+        gusts.push({
+          x: bx, y: prev.top + (s.y ?? -2), z: bz, w: s.w ?? 8, d: s.d ?? 10, h: s.h ?? 12, yaw: heading,
+          dx: dv.x, dz: dv.z, power: s.pow ?? 14, per: s.per ?? 4, duty: s.duty ?? 0.5, ph: s.ph ?? 0,
+        });
+      } else if (t === 'wind') {
+        // Opvind (søjle af luft/damp), der løfter spilleren
+        winds.push({ x: bx, y: prev.top + (s.y ?? -8), z: bz, r: s.r ?? 1.8, h: s.h ?? 12, power: s.pow ?? CFG.vent.power });
+      } else {
+        const item = { x: bx, y: prev.top + s.y, z: bz, move: s.ax ? makeMove(s, heading) : null };
+        (t === 'anchor' ? anchors : coins).push(item);
+      }
       continue;
     }
     if (s.turn) heading += s.turn * DEG;
-    const shape = t === 'spin' ? 'cyl' : (s.shape || 'box');
-    const w = s.w ?? 4;
+    const shape = t === 'spin' || t === 'rot' ? 'cyl' : (s.shape || 'box');
+    const w = t === 'rail' ? 0.16 : (s.w ?? 4);
+    const d = shape === 'cyl' ? w : (t === 'ramp' || t === 'rail' ? (s.len ?? s.d ?? 6) : (s.d ?? w));
+    seed = (seed * 16807) % 2147483647;
     const p = {
-      type: t, shape, w, d: shape === 'cyl' ? w : (s.d ?? w),
-      yaw: heading + (s.yaw || 0) * DEG, heading, index: plats.length,
-      gap: s.g ?? 3, rope: !!s.rope,
+      type: t, shape, w, d, yaw: heading + (s.yaw || 0) * DEG, heading, index: plats.length,
+      gap: s.g ?? 3, rope: !!s.rope, grab: !!s.grab, dbl: !!s.dbl, v: s.v || null, seed,
+      slick: !!s.slick, lip: s.lip ?? true,
     };
     if (!prev) { p.x = 0; p.z = 0; p.top = 0; }
     else {
@@ -1273,24 +1381,55 @@ function buildLevelData(def) {
       p.z = prev.z + f.z * dist + r.z * (s.x || 0);
       p.top = prev.top + (s.dy || 0);
     }
-    p.h = s.h || (t === 'start' || t === 'finish' ? 2.4 : clamp(Math.min(p.w, p.d) * 0.4, 0.7, 1.6));
+    p.h = s.h || (t === 'start' || t === 'finish' ? 2.4 : t === 'rail' ? 0.12 : t === 'ramp' ? 0.6 : t === 'boost' ? 0.6
+      : clamp(Math.min(p.w, p.d) * 0.4, 0.7, 1.6));
+    if (t === 'ramp') {
+      // Skrå rampe: toppen går fra top0 til top over den vandrette længde d
+      p.rise = s.rise ?? 2;
+      p.top0 = p.top;
+      p.top = p.top0 + p.rise;
+      p.pitch = Math.atan2(p.rise, p.d);
+      p.slopeLen = Math.hypot(p.d, p.rise);
+    }
+    // Enhver platform kan bevæge sig (mv) eller svinge (sw); 'move'/'swing' er de klassiske metalplader
     if (t === 'move') p.move = makeMove(s, heading);
+    else if (s.mv) p.move = makeMove(s.mv, heading);
+    if (t === 'swing') p.swing = makeSwing(s, heading);
+    else if (s.sw) p.swing = makeSwing(s.sw, heading);
+    p.kin = !!(p.move || p.swing || t === 'rot');
     if (t === 'spin') { p.spd = s.spd ?? 2; p.cross = !!s.cross; p.bar = s.bar ?? p.w * 0.94; }
     if (t === 'bounce') p.pow = s.pow ?? CFG.bounceDefault;
+    if (t === 'conveyor') { p.belt = s.spd ?? 3; p.beltAx = s.ax === 'x' ? 'x' : 'z'; }
+    if (t === 'rot') p.spd = s.spd ?? 0.6;
+    if (t === 'vent') { p.lift = s.lift ?? 9; p.power = s.pow ?? CFG.vent.power; p.pulse = s.pulse || 0; p.duty = s.duty ?? 0.5; p.ph = s.ph ?? 0; }
+    if (t === 'boost') p.boost = s.spd ?? 22;
     plats.push(p);
-    if (s.coin) coins.push({ x: p.x, y: p.top + 1.3, z: p.z, plat: p.index });
+    if (s.coin) coins.push({ x: p.x, y: (p.top0 !== undefined ? (p.top0 + p.top) / 2 : p.top) + 1.3, z: p.z, plat: p.index });
     prev = p;
   }
   let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-  for (const p of plats) {
+  for (const p of [...plats, ...bars]) {
     minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
     minZ = Math.min(minZ, p.z); maxZ = Math.max(maxZ, p.z);
   }
   const bounds = {
     cx: (minX + maxX) / 2, cz: (minZ + maxZ) / 2,
     radius: Math.hypot(maxX - minX, maxZ - minZ) / 2 + 20,
+    minY: Math.min(...plats.map((p) => p.top)), maxY: Math.max(...plats.map((p) => p.top)),
   };
-  return { plats, anchors, coins, startHeading: plats[1] ? plats[1].heading : 0, bounds };
+  return { plats, anchors, coins, bars, winds, zips, gusts, startHeading: plats[1] ? plats[1].heading : 0, bounds };
+}
+
+// Platformens fysiske placering: centrum af kollisionsboksen og dens rotation
+function platformPose(p) {
+  const quat = new THREE.Quaternion().setFromAxisAngle(AXIS_Y, -p.yaw);
+  if (p.type === 'ramp') {
+    quat.multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_X, p.pitch));
+    const n = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
+    const pos = new THREE.Vector3(p.x, (p.top0 + p.top) / 2, p.z).addScaledVector(n, -p.h / 2);
+    return { pos, quat };
+  }
+  return { pos: new THREE.Vector3(p.x, p.top - p.h / 2, p.z), quat };
 }
 
 // Geometri med UV'er skaleret til verdensmeter, så teksturer ikke strækkes
@@ -1344,6 +1483,147 @@ function rockGeometry(radius, depth, seed) {
 }
 
 /* =====================================================================
+   9b. VERDENS-SÆT (world kits)
+   Hver bane kan have sit eget udseende. Et sæt er ren grafik: fysikken er
+   altid kasser/cylindre, som banebyggeren bestemmer. Kontrakten:
+     WORLD_KITS[id] = { id, name, create(ctx) -> {
+       platform(p) -> Object3D   (påkrævet; lokalt koordinatsystem, se nedenfor)
+       bar(b)      -> Object3D   (valgfri; stang langs lokal X, længde b.len)
+       anchor()    -> Object3D   (valgfri; krogpunkt til rebet)
+       decor(data) -> Object3D   (valgfri; baggrund i verdenskoordinater)
+       update(dt, t)             (valgfri; animation hver frame)
+       ventColor                 (valgfri; farve på opvindens partikler)
+     } }
+   platform(p): origo = centrum af kollisionslegemet. Kasse: p.w langs X,
+   p.h langs Y (top i +p.h/2), p.d langs Z (banens retning er -Z). Cylinder:
+   diameter p.w. Rampe: kasse p.w x p.h x p.slopeLen (motoren hælder den).
+   Mesh'er, der viser selve det faste legeme, markeres userData.solid = true.
+   Intet må stikke mere end 4 cm op over toppen inden for fodaftrykket.
+   ===================================================================== */
+const WORLD_KITS = {};
+window.SKYHOJ_KITS = WORLD_KITS;
+window.SKYHOJ_THEMES = THEMES;
+const SHARED_GPU = new Set(); // delte materialer/teksturer, der aldrig må frigives sammen med en bane
+
+function markSharedGpu() {
+  for (const m of Object.values(MAT)) SHARED_GPU.add(m);
+  for (const t of Object.values(TEX)) (Array.isArray(t) ? t : [t]).forEach((x) => SHARED_GPU.add(x));
+}
+
+function makeKitContext(level) {
+  return {
+    THREE, TEX, MAT, DEG, clamp, lerp, damp, mulberry32,
+    rng: mulberry32(4242 + level.index * 131),
+    boxGeometry, cylGeometry, rockGeometry, makeCanvas, toTexture, paintPixels, tileNoise, textTexture,
+    fwdVec, rightVec,
+    theme: level.theme,
+    levelIndex: level.index,
+    levelName: level.def.name,
+    track: (o) => { level.disposables.push(o); return o; },
+  };
+}
+
+// Standard-sættet: svævende stenøer (bruges også som reserve for alt, et sæt ikke tegner)
+WORLD_KITS.sten = {
+  id: 'sten',
+  name: 'Svævende sten',
+  create(ctx) {
+    const { THREE, MAT, TEX } = ctx;
+    // Transportbånd: gummibånd med pile (tekstur rulles i update)
+    let beltTex = null, beltMat = null, grateMat = null;
+    const belt = () => {
+      if (beltMat) return beltMat;
+      const c = ctx.makeCanvas(128, 256), g = c.getContext('2d');
+      g.fillStyle = '#26292e'; g.fillRect(0, 0, 128, 256);
+      g.fillStyle = '#3a3f46';
+      for (let y = 0; y < 256; y += 16) g.fillRect(0, y, 128, 3);
+      g.fillStyle = '#f2b705';
+      for (const y0 of [40, 168]) {
+        g.beginPath(); g.moveTo(64, y0); g.lineTo(104, y0 + 40); g.lineTo(84, y0 + 40); g.lineTo(64, y0 + 20);
+        g.lineTo(44, y0 + 40); g.lineTo(24, y0 + 40); g.closePath(); g.fill();
+      }
+      beltTex = ctx.track(ctx.toTexture(c));
+      beltMat = ctx.track(new THREE.MeshStandardMaterial({ map: beltTex, roughness: 0.85 }));
+      return beltMat;
+    };
+    const grate = () => {
+      if (grateMat) return grateMat;
+      const c = ctx.makeCanvas(128), g = c.getContext('2d');
+      g.fillStyle = '#1b1f24'; g.fillRect(0, 0, 128, 128);
+      g.fillStyle = '#8a95a3';
+      for (let i = 0; i < 128; i += 16) { g.fillRect(i, 0, 5, 128); g.fillRect(0, i, 128, 5); }
+      grateMat = ctx.track(new THREE.MeshStandardMaterial({ map: ctx.track(ctx.toTexture(c)), roughness: 0.5, metalness: 0.7 }));
+      return grateMat;
+    };
+    const belts = [];
+    return {
+      ventColor: '#ffffff',
+      platform(p) {
+        const group = new THREE.Group();
+        let top = MAT.stoneTop, side = MAT.rock, bottom = MAT.rock, tile = 3, tileTop = true, sideTile = 3;
+        switch (p.type) {
+          case 'ice': top = MAT.iceTop; side = MAT.iceSide; bottom = MAT.iceSide; break;
+          case 'crumble': top = MAT.crumble; side = MAT.crumble; bottom = MAT.crumble; tile = 2.5; sideTile = 2.5; break;
+          case 'move': case 'swing': top = MAT.metalTop; side = MAT.metalSide; bottom = MAT.metalSide; tileTop = false; sideTile = p.h; break;
+          case 'bounce': top = MAT.bounceTop; side = MAT.bounceSide; bottom = MAT.bounceSide; tileTop = false; break;
+          case 'conveyor': top = belt(); side = MAT.metalSide; bottom = MAT.metalSide; tile = 2; sideTile = p.h; break;
+          case 'vent': top = grate(); side = MAT.metalSide; bottom = MAT.metalSide; tile = 1; sideTile = p.h; break;
+          case 'rot': side = MAT.hub; break;
+          case 'ramp': case 'rail': case 'boost': top = MAT.metalTop; side = MAT.hub; bottom = MAT.hub; tileTop = false; break;
+          default: break;
+        }
+        const depth = p.type === 'ramp' ? p.slopeLen : p.d;
+        let main;
+        if (p.shape === 'cyl') main = new THREE.Mesh(ctx.track(ctx.cylGeometry(p.w / 2, p.h, tile, { tileTop })), [side, top, bottom]);
+        else main = new THREE.Mesh(ctx.track(ctx.boxGeometry(p.w, p.h, depth, tile, { tileTop, sideTile })), [side, side, top, bottom, side, side]);
+        main.userData.solid = true;
+        group.add(main);
+        if (p.type === 'conveyor') belts.push(p);
+        const minDim = Math.min(p.w, p.d);
+        if (['p', 'start', 'finish', 'ice', 'spin', 'rot'].includes(p.type) && minDim >= 2.4) {
+          const r = minDim * 0.5, dep = ctx.clamp(minDim * 1.2, 2, 10);
+          const rock = new THREE.Mesh(ctx.track(ctx.rockGeometry(r, dep, p.seed)), p.type === 'ice' ? MAT.iceSide : MAT.rock);
+          rock.position.y = -p.h / 2 - dep / 2 + 0.02;
+          if (p.shape !== 'cyl') rock.scale.set((p.w / minDim) * 0.97, 1, (p.d / minDim) * 0.97);
+          group.add(rock);
+        }
+        if (p.type === 'move' || p.type === 'swing') { // antigrav-glød under svævende metalplader
+          const glow = new THREE.Mesh(ctx.track(new THREE.PlaneGeometry(1, 1)), ctx.track(new THREE.MeshBasicMaterial({
+            map: TEX.glow, color: '#59d8ff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+          })));
+          glow.rotation.x = Math.PI / 2;
+          glow.scale.set(p.w * 1.3, p.d * 1.3, 1);
+          glow.position.y = -p.h / 2 - 0.15;
+          glow.userData.noCastShadow = true;
+          group.add(glow);
+        }
+        if (p.type === 'spin') {
+          const hub = new THREE.Mesh(ctx.track(new THREE.CylinderGeometry(0.22, 0.3, 0.8, 16)), MAT.hub);
+          hub.position.y = p.h / 2 + 0.4;
+          group.add(hub);
+        }
+        return group;
+      },
+      bar(b) {
+        const m = new THREE.Mesh(ctx.track(new THREE.CylinderGeometry(b.r, b.r, b.len, 12)), MAT.hook);
+        m.rotation.z = Math.PI / 2;
+        const g = new THREE.Group();
+        g.add(m);
+        for (const sx of [-1, 1]) { // ophæng i enderne
+          const cap = new THREE.Mesh(ctx.track(new THREE.SphereGeometry(b.r * 1.8, 10, 8)), MAT.hub);
+          cap.position.x = (sx * b.len) / 2;
+          g.add(cap);
+        }
+        return g;
+      },
+      update(dt) {
+        if (beltTex && belts.length) beltTex.offset.y -= dt * (belts[0].belt / 2);
+      },
+    };
+  },
+};
+
+/* =====================================================================
    10. BANEOBJEKTER I DRIFT
    ===================================================================== */
 const PORTAL_FRAG = /* glsl */`
@@ -1361,19 +1641,31 @@ const PORTAL_FRAG = /* glsl */`
     gl_FragColor = vec4(col, alpha);
   }`;
 
+const _tq = new THREE.Quaternion();
+
 class Level {
-  constructor(index) {
+  constructor(index, defOverride) {
     this.index = index;
-    this.def = LEVELS[index];
+    this.def = defOverride || LEVELS[index];
     this.data = buildLevelData(this.def);
+    this.theme = THEMES[this.def.theme] || THEMES.day;
     this.group = new THREE.Group();
     this.platforms = [];
     this.anchors = [];
     this.coins = [];
-    this.rayMeshes = [];      // kamera-kollision og reb-sigte
+    this.bars = [];
+    this.zips = [];
+    this.gusts = [];
+    this.winds = [];
+    this.vents = [];
+    this.chains = [];
+    this.rayMeshes = [];      // kamera-kollision, reb-sigte og skygge
     this.disposables = [];
     this.time = 0;
     this.bodyToPlat = new Map();
+    const ctx = makeKitContext(this);
+    this.kit = (WORLD_KITS[this.def.kit] || WORLD_KITS.sten).create(ctx);
+    this.fallbackKit = this.def.kit && this.def.kit !== 'sten' ? WORLD_KITS.sten.create(ctx) : this.kit;
     this.build();
     scene.add(this.group);
   }
@@ -1381,90 +1673,81 @@ class Level {
   geo(g) { this.disposables.push(g); return g; }
 
   build() {
-    const rng = mulberry32(1000 + this.index * 77);
-    for (const p of this.data.plats) this.buildPlatform(p, rng);
+    for (const p of this.data.plats) this.buildPlatform(p);
+    for (const b of this.data.bars) this.buildBar(b);
+    for (const w of this.data.winds) this.winds.push({ def: w, emit: 0 });
+    for (const z of this.data.zips) this.buildZip(z);
+    for (const g of this.data.gusts) this.gusts.push({ def: g, emit: 0, f: fwdVec(g.yaw), r: rightVec(g.yaw) });
     for (const a of this.data.anchors) this.buildAnchor(a);
     for (const c of this.data.coins) this.buildCoin(c);
+    if (this.kit.decor) {
+      const d = this.kit.decor(this.data);
+      if (d) this.group.add(d);
+    }
     this.buildStartDecor();
     this.buildPortal();
   }
 
-  buildPlatform(p, rng) {
+  // Lad sættet tegne objektet; sæt skygger og registrér de faste flader
+  adopt(obj, plat) {
+    let solids = 0;
+    obj.traverse((o) => {
+      if (!o.isMesh) return;
+      if (!o.userData.noCastShadow) o.castShadow = true;
+      o.receiveShadow = true;
+      if (o.userData.solid) {
+        solids++;
+        if (plat) { o.userData.plat = plat; this.rayMeshes.push(o); }
+      }
+    });
+    return solids;
+  }
+
+  buildPlatform(p) {
     const plat = {
-      def: p, type: p.type, mesh: null, body: null, grip: p.type === 'ice' ? CFG.grip.ice : CFG.grip.normal,
-      base: new CANNON.Vec3(p.x, p.top - p.h / 2, p.z), state: 'solid', timer: 0, fallVel: 0,
-      squash: 0, coins: [],
+      def: p, type: p.type, mesh: null, body: null,
+      grip: p.type === 'ice' ? CFG.grip.ice : CFG.grip.normal,
+      icy: p.type === 'ice' || p.v === 'ice' || p.slick, // glatte kanter: grebet slipper dobbelt så hurtigt
+      state: 'solid', timer: 0, fallVel: 0, squash: 0,
     };
-    const yawQ = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -p.yaw);
-    let top, side, bottom, tile = 3, tileTop = true, sideTile = 3;
-    switch (p.type) {
-      case 'ice': top = MAT.iceTop; side = MAT.iceSide; bottom = MAT.iceSide; break;
-      case 'crumble': top = MAT.crumble; side = MAT.crumble; bottom = MAT.crumble; tile = 2.5; sideTile = 2.5; break;
-      case 'move': top = MAT.metalTop; side = MAT.metalSide; bottom = MAT.metalSide; tileTop = false; sideTile = p.h; break;
-      case 'bounce': top = MAT.bounceTop; side = MAT.bounceSide; bottom = MAT.bounceSide; tileTop = false; break;
-      default: top = MAT.stoneTop; side = MAT.rock; bottom = MAT.rock;
-    }
+    const pose = platformPose(p);
+    const visual = this.kit.platform(p) || this.fallbackKit.platform(p);
     const mesh = new THREE.Group();
-    let main;
-    if (p.shape === 'cyl') {
-      main = new THREE.Mesh(this.geo(cylGeometry(p.w / 2, p.h, tile, { tileTop })), [side, top, bottom]);
-    } else {
-      main = new THREE.Mesh(this.geo(boxGeometry(p.w, p.h, p.d, tile, { tileTop, sideTile })), [side, side, top, bottom, side, side]);
+    mesh.add(visual);
+    if (!this.adopt(visual, plat)) {
+      // Sættet glemte at markere en fast flade: tilføj en usynlig, så kamera og reb stadig virker
+      const g = p.shape === 'cyl' ? new THREE.CylinderGeometry(p.w / 2, p.w / 2, p.h, 16)
+        : new THREE.BoxGeometry(p.w, p.h, p.type === 'ramp' ? p.slopeLen : p.d);
+      const hidden = new THREE.Mesh(this.geo(g), new THREE.MeshBasicMaterial({ visible: false }));
+      hidden.userData.solid = true;
+      hidden.userData.plat = plat;
+      mesh.add(hidden);
+      this.rayMeshes.push(hidden);
     }
-    main.castShadow = true;
-    main.receiveShadow = true;
-    main.userData.plat = plat;
-    mesh.add(main);
-    this.rayMeshes.push(main);
-    plat.main = main;
-
-    // Pynt under platformen
-    const minDim = Math.min(p.w, p.d);
-    if ((p.type === 'p' || p.type === 'start' || p.type === 'finish' || p.type === 'ice' || p.type === 'spin') && minDim >= 2.4) {
-      const r = minDim * 0.5;
-      const depth = clamp(minDim * 1.2, 2, 10);
-      const rock = new THREE.Mesh(this.geo(rockGeometry(r, depth, Math.floor(rng() * 1e6))), p.type === 'ice' ? MAT.iceSide : MAT.rock);
-      rock.position.y = -p.h / 2 - depth / 2 + 0.02;
-      if (p.shape !== 'cyl') rock.scale.set((p.w / minDim) * 0.97, 1, (p.d / minDim) * 0.97);
-      rock.castShadow = true;
-      mesh.add(rock);
-    }
-    if (p.type === 'move') { // antigrav-glød under bevægelige platforme
-      const glow = new THREE.Mesh(this.geo(new THREE.PlaneGeometry(1, 1)), new THREE.MeshBasicMaterial({
-        map: TEX.glow, color: '#59d8ff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      }));
-      glow.rotation.x = Math.PI / 2;
-      glow.scale.set(p.w * 1.3, p.d * 1.3, 1);
-      glow.position.y = -p.h / 2 - 0.15;
-      mesh.add(glow);
-      this.disposables.push(glow.material);
-    }
-    if (p.type === 'spin') {
-      const hub = new THREE.Mesh(this.geo(new THREE.CylinderGeometry(0.22, 0.3, 0.8, 16)), MAT.hub);
-      hub.position.y = p.h / 2 + 0.4;
-      hub.castShadow = true;
-      mesh.add(hub);
-    }
-
-    mesh.position.set(p.x, p.top - p.h / 2, p.z);
-    mesh.quaternion.copy(yawQ);
+    this.buildLip(p, plat, mesh);
+    mesh.position.copy(pose.pos);
+    mesh.quaternion.copy(pose.quat);
     this.group.add(mesh);
     plat.mesh = mesh;
+    plat.baseQuat = pose.quat.clone();
 
     // Fysik
+    const kin = p.kin;
     const body = new CANNON.Body({
       mass: 0,
-      type: p.type === 'move' ? CANNON.Body.KINEMATIC : CANNON.Body.STATIC,
+      type: kin ? CANNON.Body.KINEMATIC : CANNON.Body.STATIC,
       material: MAT_WORLD,
-      collisionFilterGroup: p.type === 'move' ? G_KINEMATIC : G_STATIC,
+      collisionFilterGroup: kin ? G_KINEMATIC : G_STATIC,
       collisionFilterMask: G_PLAYER,
     });
     if (p.shape === 'cyl') body.addShape(new CANNON.Cylinder(p.w / 2, p.w / 2, p.h, 20));
-    else body.addShape(new CANNON.Box(new CANNON.Vec3(p.w / 2, p.h / 2, p.d / 2)));
-    body.position.copy(plat.base);
-    body.quaternion.setFromEuler(0, -p.yaw, 0);
+    else body.addShape(new CANNON.Box(new CANNON.Vec3(p.w / 2, p.h / 2, (p.type === 'ramp' ? p.slopeLen : p.d) / 2)));
+    body.position.set(pose.pos.x, pose.pos.y, pose.pos.z);
+    body.quaternion.set(pose.quat.x, pose.quat.y, pose.quat.z, pose.quat.w);
+    if (p.type === 'rot') body.angularVelocity.set(0, p.spd, 0);
     world.addBody(body);
     plat.body = body;
+    plat.base = body.position.clone();
     this.bodyToPlat.set(body.id, plat);
 
     // Vindmøllearm(e)
@@ -1476,9 +1759,10 @@ class Level {
       });
       const arms = p.cross ? 2 : 1;
       for (let i = 0; i < arms; i++) {
-        const bar = new THREE.Mesh(this.geo(boxGeometry(p.bar, 0.36, 0.45, 2)), MAT.stripes);
+        // Sættet kan tegne sin egen arm (lokal X langs armen, 0,36 høj og 0,45 dyb)
+        const bar = (this.kit.spinArm && this.kit.spinArm(p)) || new THREE.Mesh(this.geo(boxGeometry(p.bar, 0.36, 0.45, 2)), MAT.stripes);
         bar.rotation.y = (i * Math.PI) / 2;
-        bar.castShadow = true;
+        bar.traverse((o) => { if (o.isMesh) o.castShadow = true; });
         armGroup.add(bar);
         const q = new CANNON.Quaternion().setFromEuler(0, (i * Math.PI) / 2, 0);
         barBody.addShape(new CANNON.Box(new CANNON.Vec3(p.bar / 2, 0.18, 0.225)), new CANNON.Vec3(), q);
@@ -1491,17 +1775,150 @@ class Level {
       plat.bar = { body: barBody, mesh: armGroup };
       this.bodyToPlat.set(barBody.id, { type: 'bar', parent: plat, body: barBody });
     }
+    // Kæder fra pendulplatformens hjørner op til ophænget
+    if (p.swing) {
+      const cw = p.w * 0.42, cd = p.d * 0.42;
+      for (const [cx, cz] of [[-cw, -cd], [cw, -cd], [-cw, cd], [cw, cd]]) {
+        const local = new THREE.Vector3(cx, p.h / 2, cz).applyQuaternion(plat.baseQuat);
+        const chain = new THREE.Mesh(this.geo(new THREE.CylinderGeometry(0.035, 0.035, 1, 6, 1, true).translate(0, 0.5, 0)), MAT.hub);
+        chain.castShadow = true;
+        this.group.add(chain);
+        this.chains.push({ plat, local, pivot: new THREE.Vector3(plat.base.x + local.x, plat.base.y + local.y + p.swing.len, plat.base.z + local.z), mesh: chain });
+      }
+    }
+    if (p.type === 'vent') this.vents.push({ plat, emit: 0 });
     this.platforms.push(plat);
   }
 
+  // Kalkhvid, slidt kant på alt, man kan gribe fat i (blå frostkant, hvis den er glat)
+  buildLip(p, plat, mesh) {
+    if (NO_LEDGE.has(p.type) || !p.lip || Math.min(p.w, p.d) < 0.5) return;
+    const mat = plat.icy ? (this.kit.slickColor && !(p.type === 'ice' || p.v === 'ice') ? this.slickMat() : MAT.lipIcy) : p.grab ? MAT.lipGrab : MAT.lipFaint;
+    const strong = plat.icy || p.grab;
+    const tw = strong ? 0.16 : 0.1, drop = strong ? 0.14 : 0.08, y0 = p.h / 2 + 0.008;
+    let g;
+    if (p.shape === 'cyl') {
+      const R = p.w / 2;
+      const ring = new THREE.RingGeometry(Math.max(0.05, R - tw), R + 0.01, 48, 1).rotateX(-Math.PI / 2).translate(0, y0, 0);
+      const band = new THREE.CylinderGeometry(R + 0.012, R + 0.012, drop, 48, 1, true).translate(0, y0 - drop / 2, 0);
+      const lipG = new THREE.Group();
+      lipG.add(new THREE.Mesh(this.geo(ring), mat), new THREE.Mesh(this.geo(band), mat));
+      lipG.traverse((o) => { o.userData.noCastShadow = true; });
+      mesh.add(lipG);
+      return;
+    }
+    const hw = p.w / 2, hd = p.d / 2, e = 0.012, pos = [];
+    const quad = (a, b, c, d) => pos.push(...a, ...b, ...c, ...a, ...c, ...d);
+    // Top-ramme: forkant/bagkant i fuld længde, siderne afkortet så hjørnerne ikke overlapper
+    quad([-hw, y0, -hd], [hw, y0, -hd], [hw, y0, -hd + tw], [-hw, y0, -hd + tw]);
+    quad([-hw, y0, hd - tw], [hw, y0, hd - tw], [hw, y0, hd], [-hw, y0, hd]);
+    quad([-hw, y0, -hd + tw], [-hw + tw, y0, -hd + tw], [-hw + tw, y0, hd - tw], [-hw, y0, hd - tw]);
+    quad([hw - tw, y0, -hd + tw], [hw, y0, -hd + tw], [hw, y0, hd - tw], [hw - tw, y0, hd - tw]);
+    // Smalle bånd ned ad siderne
+    const yb = y0 - drop;
+    quad([-hw, yb, -hd - e], [hw, yb, -hd - e], [hw, y0, -hd - e], [-hw, y0, -hd - e]);
+    quad([hw, yb, hd + e], [-hw, yb, hd + e], [-hw, y0, hd + e], [hw, y0, hd + e]);
+    quad([-hw - e, yb, hd], [-hw - e, yb, -hd], [-hw - e, y0, -hd], [-hw - e, y0, hd]);
+    quad([hw + e, yb, -hd], [hw + e, yb, hd], [hw + e, y0, hd], [hw + e, y0, -hd]);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    const m = new THREE.Mesh(this.geo(geo), mat);
+    m.userData.noCastShadow = true;
+    mesh.add(m);
+  }
+
+  slickMat() {
+    if (!this._slickMat) {
+      this._slickMat = MAT.lipIcy.clone();
+      this._slickMat.color.set(this.kit.slickColor);
+      this.disposables.push(this._slickMat);
+    }
+    return this._slickMat;
+  }
+
+  buildBar(b) {
+    const visual = (this.kit.bar && this.kit.bar(b)) || this.fallbackKit.bar(b);
+    this.adopt(visual, null);
+    // Hvide gribebånd: samme signal på alle stænger i alle verdener
+    if (b.len >= 0.6) {
+      const tapeGeo = this.geo(new THREE.CylinderGeometry(b.r + 0.014, b.r + 0.014, 0.11, 12).rotateZ(Math.PI / 2));
+      const n = Math.max(2, Math.round(b.len / 0.7));
+      for (let i = 0; i < n; i++) {
+        const tape = new THREE.Mesh(tapeGeo, MAT.gripTape);
+        tape.position.x = -b.len / 2 + (b.len * (i + 0.5)) / n;
+        visual.add(tape);
+      }
+    }
+    visual.position.set(b.x, b.y, b.z);
+    visual.rotation.y = Math.atan2(-b.dz, b.dx); // lokal X langs stangen
+    this.group.add(visual);
+    const bar = {
+      def: b, mesh: visual,
+      a0: new THREE.Vector3(b.x - (b.dx * b.len) / 2, b.y, b.z - (b.dz * b.len) / 2),
+      a: new THREE.Vector3(b.x - (b.dx * b.len) / 2, b.y, b.z - (b.dz * b.len) / 2),
+      dir: new THREE.Vector3(b.dx, 0, b.dz),
+      vel: new THREE.Vector3(), ropes: [],
+    };
+    if (b.swing) { // trapezets reb op til ophænget
+      for (const e of [0.15, 0.85]) {
+        const rope = new THREE.Mesh(this.geo(new THREE.CylinderGeometry(0.025, 0.025, 1, 6, 1, true).translate(0, 0.5, 0)), MAT.rope);
+        this.group.add(rope);
+        bar.ropes.push({ e, mesh: rope, pivot: new THREE.Vector3(bar.a0.x + b.dx * b.len * e, b.y + b.swing.len, bar.a0.z + b.dz * b.len * e) });
+      }
+    }
+    this.bars.push(bar);
+  }
+
+  buildZip(z) {
+    let visual = this.kit.zip && this.kit.zip(z);
+    if (!visual) {
+      visual = new THREE.Group();
+      const len3 = Math.hypot(z.len, z.drop);
+      const cable = new THREE.Mesh(this.geo(new THREE.CylinderGeometry(0.03, 0.03, len3, 6)), MAT.hook);
+      cable.position.set((z.bx - z.ax) / 2, (z.by - z.ay) / 2, (z.bz - z.az) / 2);
+      cable.quaternion.setFromUnitVectors(AXIS_Y, new THREE.Vector3(z.bx - z.ax, z.by - z.ay, z.bz - z.az).normalize());
+      visual.add(cable);
+      for (const [px, py, pz] of [[0, 0, 0], [z.bx - z.ax, z.by - z.ay, z.bz - z.az]]) {
+        const pole = new THREE.Mesh(this.geo(new THREE.CylinderGeometry(0.1, 0.12, 3, 10)), MAT.hub);
+        pole.position.set(px, py + 0.2, pz);
+        visual.add(pole);
+      }
+      visual.position.set(z.ax, z.ay, z.az);
+    }
+    this.adopt(visual, null);
+    this.group.add(visual);
+    const handle = new THREE.Mesh(this.geo(new THREE.TorusGeometry(0.16, 0.035, 8, 16)), MAT.anchor);
+    this.group.add(handle);
+    const d3 = new THREE.Vector3(z.bx - z.ax, z.by - z.ay, z.bz - z.az);
+    const len3 = d3.length();
+    this.zips.push({ def: z, mesh: visual, handle, a: new THREE.Vector3(z.ax, z.ay, z.az), dir3: d3.divideScalar(len3), len3, dir: new THREE.Vector3(z.dx, 0, z.dz), s: 0.3 });
+  }
+
+  ventActive(plat) {
+    const d = plat.def;
+    return !d.pulse || ((this.time / d.pulse + d.ph) % 1) < d.duty;
+  }
+  gustActive(g) {
+    const d = g.def;
+    return ((this.time / d.per + d.ph) % 1) < d.duty;
+  }
+
   buildAnchor(a) {
+    // Ankerpunktet har altid en lysende cyan ring; sættet bestemmer, hvad der sidder i midten
     const group = new THREE.Group();
-    const ring = new THREE.Mesh(this.geo(new THREE.TorusGeometry(0.55, 0.11, 12, 32)), MAT.anchor);
+    if (!this._anchorRingGeo) this._anchorRingGeo = this.geo(new THREE.TorusGeometry(0.62, 0.09, 12, 36));
+    const ring = new THREE.Mesh(this._anchorRingGeo, MAT.anchorRing);
     group.add(ring);
-    const inner = new THREE.Mesh(this.geo(new THREE.SphereGeometry(0.18, 16, 12)), MAT.anchor);
-    group.add(inner);
+    const custom = this.kit.anchor && this.kit.anchor(a);
+    if (custom) {
+      this.adopt(custom, null);
+      group.add(custom);
+    } else {
+      const inner = new THREE.Mesh(this.geo(new THREE.SphereGeometry(0.2, 16, 12)), MAT.anchor);
+      group.add(inner);
+    }
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: TEX.glow, color: '#ffc23a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8,
+      map: TEX.glow, color: '#4fe6ff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8,
     }));
     glow.scale.set(3.2, 3.2, 1);
     group.add(glow);
@@ -1523,7 +1940,7 @@ class Level {
     glow.scale.set(1.8, 1.8, 1);
     group.add(glow);
     this.disposables.push(glow.material);
-    const obj = { def: c, mesh: group, collected: false, plat: c.plat !== undefined ? this.platforms[c.plat] : null, pos: new THREE.Vector3(c.x, c.y, c.z), spin: Math.random() * 6 };
+    const obj = { def: c, mesh: group, collected: false, plat: c.plat !== undefined ? this.platforms[c.plat] : null, pos: new THREE.Vector3(c.x, c.y, c.z), spin: (c.x * 7.13 + c.z * 3.71) % 6 };
     if (obj.plat) obj.offset = new THREE.Vector3(c.x - obj.plat.base.x, c.y - obj.plat.base.y, c.z - obj.plat.base.z);
     group.position.copy(obj.pos);
     this.group.add(group);
@@ -1569,8 +1986,7 @@ class Level {
     // Skiltet står foran til venstre og vender mod spilleren
     const lateral = -(p.w / 2 - 1.9), ahead = p.d / 2 - 1.2;
     sign.position.set(p.x + f.x * ahead + r.x * lateral, p.top, p.z + f.z * ahead + r.z * lateral);
-    sign.rotation.y = -p.yaw + Math.PI;
-    sign.rotation.y += 0.35;
+    sign.rotation.y = -p.yaw + Math.PI + 0.35;
     this.group.add(sign);
   }
 
@@ -1642,10 +2058,14 @@ class Level {
   reset() {
     this.time = 0;
     for (const plat of this.platforms) {
-      if (plat.type === 'move') {
-        const o = moveOffset(plat.def.move, 0, { x: 0, y: 0, z: 0 });
-        plat.body.position.set(plat.base.x + o.x, plat.base.y + o.y, plat.base.z + o.z);
+      if (plat.def.move || plat.def.swing) {
+        plat.body.position.copy(plat.base);
         plat.body.velocity.set(0, 0, 0);
+      }
+      if (plat.type === 'rot') {
+        const q = plat.baseQuat;
+        plat.body.quaternion.set(q.x, q.y, q.z, q.w);
+        plat.body.angularVelocity.set(0, plat.def.spd, 0);
       }
       if (plat.type === 'crumble' && plat.state !== 'solid') this.restoreCrumble(plat);
       if (plat.bar) {
@@ -1664,7 +2084,7 @@ class Level {
     plat.fallVel = 0;
     if (!plat.body.world) world.addBody(plat.body);
     plat.mesh.position.set(plat.base.x, plat.base.y, plat.base.z);
-    plat.mesh.rotation.set(0, -plat.def.yaw, 0);
+    plat.mesh.quaternion.copy(plat.baseQuat);
     plat.mesh.visible = true;
     plat.mesh.scale.setScalar(1);
   }
@@ -1692,12 +2112,14 @@ class Level {
     const t = this.time;
     const o = { x: 0, y: 0, z: 0 };
     for (const plat of this.platforms) {
-      if (plat.type === 'move') {
-        moveOffset(plat.def.move, t, o);
+      if ((plat.def.move || plat.def.swing) && plat.state === 'solid') {
+        if (plat.def.move) moveOffset(plat.def.move, t, o);
+        else swingOffset(plat.def.swing, t, o);
         const tx = plat.base.x + o.x, ty = plat.base.y + o.y, tz = plat.base.z + o.z;
         if (dt > 0) plat.body.velocity.set((tx - plat.body.position.x) / dt, (ty - plat.body.position.y) / dt, (tz - plat.body.position.z) / dt);
         else plat.body.position.set(tx, ty, tz);
-      } else if (plat.type === 'crumble' && plat.state !== 'solid') {
+      }
+      if (plat.type === 'crumble' && plat.state !== 'solid') {
         plat.timer -= dt;
         if (plat.state === 'shaking' && plat.timer <= 0) {
           plat.state = 'falling';
@@ -1707,6 +2129,7 @@ class Level {
         } else if (plat.state === 'falling' && plat.timer <= 0) {
           // Kommer kun tilbage, hvis spilleren ikke står i vejen
           const pb = player.body.position;
+          if (plat.def.kin) { plat.body.position.copy(plat.base); plat.body.velocity.set(0, 0, 0); }
           const near = Math.abs(pb.x - plat.base.x) < plat.def.w / 2 + 1 && Math.abs(pb.z - plat.base.z) < plat.def.d / 2 + 1 &&
             Math.abs(pb.y - plat.def.top) < 2.5;
           if (!near) this.restoreCrumble(plat);
@@ -1715,17 +2138,27 @@ class Level {
       }
     }
     for (const a of this.anchors) this.anchorPos(a, t, a.pos, a.vel);
+    for (const bar of this.bars) {
+      if (bar.def.swing) swingOffset(bar.def.swing, t, o);
+      else if (bar.def.move) moveOffset(bar.def.move, t, o);
+      else continue;
+      const nx = bar.a0.x + o.x, ny = bar.a0.y + o.y, nz = bar.a0.z + o.z;
+      if (dt > 0) bar.vel.set((nx - bar.a.x) / dt, (ny - bar.a.y) / dt, (nz - bar.a.z) / dt);
+      bar.a.set(nx, ny, nz);
+    }
   }
 
   // Kaldes hver frame (grafik)
   update(dt, elapsed) {
     for (const plat of this.platforms) {
-      if (plat.type === 'move') {
+      if (plat.def.kin && plat.state === 'solid') {
         plat.mesh.position.copy(plat.body.position);
+        if (plat.type === 'rot') plat.mesh.quaternion.copy(plat.body.quaternion);
       } else if (plat.type === 'crumble') {
         if (plat.state === 'shaking') {
           const k = 0.06 * (1 - plat.timer / 0.55 + 0.3);
-          plat.mesh.position.set(plat.base.x + (Math.random() - 0.5) * k, plat.base.y + (Math.random() - 0.5) * k * 0.5, plat.base.z + (Math.random() - 0.5) * k);
+          const c = plat.body.position;
+          plat.mesh.position.set(c.x + (Math.random() - 0.5) * k, c.y + (Math.random() - 0.5) * k * 0.5, c.z + (Math.random() - 0.5) * k);
         } else if (plat.state === 'falling') {
           plat.fallVel += 22 * dt;
           plat.mesh.position.y -= plat.fallVel * dt;
@@ -1741,6 +2174,76 @@ class Level {
       if (plat.bar) {
         plat.bar.mesh.position.copy(plat.bar.body.position);
         plat.bar.mesh.quaternion.copy(plat.bar.body.quaternion);
+      }
+    }
+    // Pendulernes kæder
+    for (const c of this.chains) {
+      const bp = c.plat.body.position;
+      const from = _v3a.set(bp.x + c.local.x, bp.y + c.local.y, bp.z + c.local.z);
+      const dir = _v3b.copy(c.pivot).sub(from);
+      const len = dir.length();
+      c.mesh.position.copy(from);
+      c.mesh.quaternion.setFromUnitVectors(AXIS_Y, dir.divideScalar(len || 1));
+      c.mesh.scale.set(1, len, 1);
+    }
+    for (const bar of this.bars) {
+      if (!bar.def.swing && !bar.def.move) continue;
+      const b = bar.def;
+      bar.mesh.position.set(bar.a.x + (b.dx * b.len) / 2, bar.a.y, bar.a.z + (b.dz * b.len) / 2);
+      for (const r of bar.ropes) {
+        const from = _v3a.set(bar.a.x + b.dx * b.len * r.e, bar.a.y, bar.a.z + b.dz * b.len * r.e);
+        const dir = _v3b.copy(r.pivot).sub(from);
+        const len = dir.length();
+        r.mesh.position.copy(from);
+        r.mesh.quaternion.setFromUnitVectors(AXIS_Y, dir.divideScalar(len || 1));
+        r.mesh.scale.set(1, len, 1);
+      }
+    }
+    for (const z of this.zips) {
+      const riding = player.hang && player.hang.kind === 'zip' && player.hang.zip === z;
+      const s = riding ? player.hang.s3 : z.s;
+      z.handle.position.copy(z.a).addScaledVector(z.dir3, s);
+      z.handle.position.y -= 0.18;
+      z.handle.rotation.y = -Math.atan2(z.dir.z, z.dir.x);
+    }
+    // Opvind: damp/luft der stiger op
+    if (dt > 0) {
+      const col = this.kit.ventColor || '#ffffff';
+      const cam = camera.position;
+      for (const g of this.gusts) {
+        const d = g.def;
+        if (!this.gustActive(g) || Math.abs(d.x - cam.x) > 90 || Math.abs(d.z - cam.z) > 90) continue;
+        g.emit += dt * 40;
+        while (g.emit > 1) {
+          g.emit--;
+          const a = (Math.random() - 0.5) * d.d, b = (Math.random() - 0.5) * d.w;
+          particles.emit(d.x + g.f.x * a + g.r.x * b - d.dx * d.w * 0.4, d.y + Math.random() * d.h, d.z + g.f.z * a + g.r.z * b - d.dz * d.w * 0.4,
+            d.dx * 14, 0, d.dz * 14, '#e8f4ff', 0.18, 0.7, 0, 0);
+        }
+      }
+      for (const v of this.vents) {
+        const bp = v.plat.body.position, d = v.plat.def;
+        if (!this.ventActive(v.plat)) continue;
+        if (Math.abs(bp.x - cam.x) > 90 || Math.abs(bp.z - cam.z) > 90) continue;
+        v.emit += dt * 26;
+        const r = Math.min(d.w, d.d) * 0.4;
+        while (v.emit > 1) {
+          v.emit--;
+          const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * r;
+          particles.emit(bp.x + Math.cos(a) * rr, bp.y + d.h / 2 + 0.1, bp.z + Math.sin(a) * rr,
+            0, 4 + Math.random() * 4, 0, col, 0.35 + Math.random() * 0.4, d.lift / 7, 0, 0.3);
+        }
+      }
+      for (const w of this.winds) {
+        const d = w.def;
+        if (Math.abs(d.x - cam.x) > 90 || Math.abs(d.z - cam.z) > 90) continue;
+        w.emit += dt * 30;
+        while (w.emit > 1) {
+          w.emit--;
+          const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * d.r;
+          particles.emit(d.x + Math.cos(a) * rr, d.y + Math.random() * 2, d.z + Math.sin(a) * rr,
+            0, 5 + Math.random() * 4, 0, col, 0.3 + Math.random() * 0.35, d.h / 8, 0, 0.3);
+        }
       }
     }
     for (const a of this.anchors) {
@@ -1764,8 +2267,11 @@ class Level {
         continue;
       }
       if (c.plat) {
-        c.pos.copy(c.plat.mesh.position).add(c.offset);
-        if (c.plat.state === 'falling') c.pos.y = c.plat.mesh.position.y + c.offset.y;
+        if (c.plat.type === 'rot') {
+          c.pos.copy(c.offset).applyQuaternion(_tq.copy(c.plat.mesh.quaternion).multiply(_tq2.copy(c.plat.baseQuat).invert())).add(c.plat.mesh.position);
+        } else {
+          c.pos.copy(c.plat.mesh.position).add(c.offset);
+        }
       }
       c.mesh.position.copy(c.pos);
       c.mesh.position.y += Math.sin(elapsed * 2.2 + c.spin) * 0.12;
@@ -1781,6 +2287,7 @@ class Level {
       P.glow.scale.set(8 * pulse, 8 * pulse, 1);
       P.light.intensity = 36 + Math.sin(elapsed * 5) * 8;
     }
+    if (this.kit.update) this.kit.update(dt, elapsed);
   }
 
   dispose() {
@@ -1789,9 +2296,22 @@ class Level {
       if (plat.bar) world.removeBody(plat.bar.body);
     }
     scene.remove(this.group);
-    for (const d of this.disposables) d.dispose();
+    // Frigiv alt GPU-indhold, sættet har lavet (men aldrig de delte materialer/teksturer)
+    const seen = new Set(this.disposables);
+    this.group.traverse((o) => {
+      if (o.geometry) seen.add(o.geometry);
+      const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+      for (const m of mats) {
+        seen.add(m);
+        for (const k of ['map', 'bumpMap', 'normalMap', 'roughnessMap', 'emissiveMap', 'alphaMap', 'aoMap', 'metalnessMap']) {
+          if (m[k]) seen.add(m[k]);
+        }
+      }
+    });
+    for (const d of seen) if (d && d.dispose && !SHARED_GPU.has(d)) d.dispose();
   }
 }
+const _v3a = new THREE.Vector3(), _v3b = new THREE.Vector3(), _tq2 = new THREE.Quaternion();
 
 /* =====================================================================
    11. SPILLEREN
@@ -1894,29 +2414,59 @@ class Particles {
     this.aSize.needsUpdate = true;
   }
 }
-const particles = new Particles(900);
+const particles = new Particles(1600);
 
 const player = {
   body: null, model: null, blob: null,
-  grounded: false, wasGrounded: false, groundPlat: null, groundVel: new THREE.Vector3(),
+  grounded: false, wasGrounded: false, groundPlat: null, groundVel: new THREE.Vector3(), groundNormal: new THREE.Vector3(0, 1, 0),
   coyote: 0, jumpBuffer: 0, jumpCooldown: 0, jumping: false, knockCooldown: 0,
   facing: 0, runPhase: 0, squash: 0, lastVy: 0, stepTimer: 0,
   deathPos: new CANNON.Vec3(),
+  hang: null,          // hænger i en kant eller stang
+  grip: 1,             // grebets udholdenhed (0..1)
+  grabCooldown: 0,
+  airJumps: 0,         // dobbelthop tilbage i luften
+  flipT: -1,           // salto ved dobbelthop (0..1)
+  skate: null,         // skateboard-tilstand på skatebanen
+  hints: { grab: 0, bar: 0 },
+  cs: {},              // tilstand til figurens animation
 };
 
-// Parkourløberen bygges af simple former (ingen eksterne modeller)
+/* ---------------------------------------------------------------------
+   Figuren (løberen). Kontrakten mellem motoren og figuren:
+     CHARACTER.build() -> rig med
+       root   : Group, placeres i kollisionskuglens centrum (fødderne er 0.42 m under)
+       inner  : Group, motoren sætter rotation.y (retning; figuren kigger mod -Z),
+                rotation.x (hældning på skateboard; rækkefølge 'YXZ') og visible
+       hands  : [venstre, højre] Object3D (rebet sidder i højre hånd, kridtstøv fra begge)
+       setChalk(k): gør hænderne hvide (0..1)
+       board  : skateboard-gruppe (eller null); figuren viser den selv i skate-tilstand
+     CHARACTER.animate(rig, s, dt) med s = {
+       mode: 'idle'|'run'|'air'|'hang'|'climb'|'rope'|'skate'|'grind',
+       speed, vy, grounded, runPhase, time, squash, flipT, chalk,
+       hangKind: 'ledge'|'bar'|'zip', shimmy (-1..1), climbT (0..1),
+       push (bool), lean (-1..1), crouch (0..1),
+       grip (0..1 udholdenhed), gripLocal {x,y,z} + gripTangent {x,y,z}: hvor hænderne
+         holder (midtpunkt og retning langs kant/stang) i figurens lokale ramme (inner),
+       ropeDir {x,y,z}: retning mod rebets krog i lokal ramme (eller null),
+       turnRate (rad/s), surface: 'ice'|'conveyor'|null, aimLocal {x,y,z}: kameraets sigte i lokal ramme,
+       gear: { gloves, chalk, rope, helmet } – udstyr, spilleren har (vises på figuren) }
+   --------------------------------------------------------------------- */
 function buildCharacter() {
   const M = (c, r = 0.7, m = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m });
   const skin = M('#efc19c', 0.6), hoodie = M('#e4472d', 0.78), pants = M('#26334d', 0.85);
   const shoe = M('#f4f4f4', 0.5), sole = M('#1f1f1f', 0.8), hair = M('#3b2a1d', 0.9);
   const band = M('#ffcf33', 0.55), eye = M('#111111', 0.3), stripe = M('#ffffff', 0.7);
-  const handMat = M('#efc19c', 0.6); // egen kopi, så kridtet kan gøre hænderne hvide
+  const handMat = M('#efc19c', 0.6);
   const root = new THREE.Group();
   const inner = new THREE.Group();
-  inner.position.y = -CFG.player.radius;
+  inner.rotation.order = 'YXZ';
   root.add(inner);
+  const lift = new THREE.Group(); // fødderne står i y = -radius
+  lift.position.y = -CFG.player.radius;
+  inner.add(lift);
   const torsoG = new THREE.Group();
-  inner.add(torsoG);
+  lift.add(torsoG);
   const add = (parent, geo, mat, x, y, z) => {
     const m = new THREE.Mesh(geo, mat);
     m.position.set(x, y, z);
@@ -1954,8 +2504,74 @@ function buildCharacter() {
     return g;
   };
   const armL = arm(-1), armR = arm(1), legL = leg(-1), legR = leg(1);
-  return { root, inner, torsoG, head, armL, armR, legL, legR, hands, handMat };
+  const board = new THREE.Group();
+  const deck = add(board, new THREE.BoxGeometry(0.22, 0.03, 0.82), M('#2b2b2b', 0.8), 0, 0.1, 0);
+  deck.receiveShadow = true;
+  for (const z of [-0.28, 0.28]) for (const x of [-0.08, 0.08]) add(board, new THREE.CylinderGeometry(0.032, 0.032, 0.03, 12), M('#f0e6c8', 0.5), x, 0.035, z).rotation.z = Math.PI / 2;
+  board.visible = false;
+  lift.add(board);
+  const white = new THREE.Color('#ffffff'), skinC = new THREE.Color('#efc19c');
+  return {
+    root, inner, lift, torsoG, head, armL, armR, legL, legR, hands, handMat, board,
+    setChalk(k) { handMat.color.copy(skinC).lerp(white, k); },
+  };
 }
+
+function animateCharacter(m, s, dt) {
+  const k = 16;
+  let lL = 0, lR = 0, aL = 0, aR = 0, aLz = 0.1, aRz = -0.1, lean = 0, yaw = 0, bob = 0;
+  const blend = s.mode === 'run' ? clamp(s.speed / CFG.move.speed, 0, 1) : 0;
+  switch (s.mode) {
+    case 'run': case 'idle': {
+      const p = Math.sin(s.runPhase);
+      lL = p * 0.95 * blend; lR = -p * 0.95 * blend; aL = -p * 0.85 * blend; aR = p * 0.85 * blend;
+      lean = 0.2 * blend; bob = Math.abs(p) * 0.06 * blend;
+      if (blend < 0.05) { aL = Math.sin(s.time * 1.6) * 0.04; aR = -aL; }
+      break;
+    }
+    case 'hang': {
+      const sh = Math.sin(s.time * 9) * Math.abs(s.shimmy);
+      aL = 3.0 + sh * 0.2; aR = 3.0 - sh * 0.2; aLz = -0.12; aRz = 0.12;
+      lL = 0.25 + Math.sin(s.time * 2) * 0.08; lR = 0.05;
+      break;
+    }
+    case 'climb':
+      aL = aR = 3.0 - s.climbT * 1.8; lL = 1.4 * Math.sin(s.climbT * Math.PI); lR = 0.6 * s.climbT; lean = 0.4 * s.climbT;
+      break;
+    case 'rope':
+      aR = 2.95; aL = 2.7; aLz = -0.15; aRz = 0.15;
+      lL = 0.35 + Math.sin(s.time * 3) * 0.25; lR = 0.1 - Math.sin(s.time * 3) * 0.25;
+      break;
+    case 'skate': case 'grind':
+      yaw = Math.PI / 2; lL = 0.25 + s.crouch * 0.4; lR = -0.2 - s.crouch * 0.3; aLz = 1.1 + s.lean * 0.3; aRz = -1.1 + s.lean * 0.3;
+      lean = 0.15 + s.crouch * 0.3; bob = 0.12;
+      if (s.push && s.grounded) { lR = -0.2 + Math.sin(s.time * 10) * 0.7; }
+      break;
+    default: {
+      const up = clamp(s.vy / 10, -1, 1);
+      lL = 0.75 - up * 0.2; lR = -0.35 + up * 0.25; aL = 0.4 + up * 0.9; aR = 0.2 + up * 0.7; aLz = 0.6; aRz = -0.6; lean = 0.08;
+    }
+  }
+  m.legL.rotation.x = damp(m.legL.rotation.x, lL, k, dt);
+  m.legR.rotation.x = damp(m.legR.rotation.x, lR, k, dt);
+  m.armL.rotation.x = damp(m.armL.rotation.x, aL, k, dt);
+  m.armR.rotation.x = damp(m.armR.rotation.x, aR, k, dt);
+  m.armL.rotation.z = damp(m.armL.rotation.z, -aLz, k, dt);
+  m.armR.rotation.z = damp(m.armR.rotation.z, -aRz, k, dt);
+  m.torsoG.rotation.y = damp(m.torsoG.rotation.y, yaw, 12, dt);
+  if (s.flipT >= 0) { // enkel krøl-figur under dobbelthoppet (den realistiske figur laver en salto)
+    m.legL.rotation.x = m.legR.rotation.x = 1.4;
+    m.armL.rotation.x = m.armR.rotation.x = 1.2;
+  }
+  m.torsoG.rotation.x = damp(m.torsoG.rotation.x, -lean, 10, dt);
+  const sq = s.squash;
+  m.lift.scale.set(1 + sq * 0.25, 1 - sq * 0.35, 1 + sq * 0.25);
+  m.lift.position.y = -CFG.player.radius + bob;
+  m.board.visible = s.mode === 'skate' || s.mode === 'grind';
+  m.setChalk(s.chalk);
+}
+
+let CHARACTER = { build: buildCharacter, animate: animateCharacter };
 
 function createPlayer() {
   const b = new CANNON.Body({
@@ -1967,7 +2583,8 @@ function createPlayer() {
   b.updateMassProperties();
   world.addBody(b);
   player.body = b;
-  player.model = buildCharacter();
+  player.model = CHARACTER.build();
+  player.model.inner.rotation.order = 'YXZ';
   scene.add(player.model.root);
   player.blob = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), new THREE.MeshBasicMaterial({
     map: TEX.blob, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4,
@@ -1975,6 +2592,17 @@ function createPlayer() {
   player.blob.rotation.x = -Math.PI / 2;
   player.blob.renderOrder = 2;
   scene.add(player.blob);
+}
+
+// Skift figuren ud (bruges af udviklerværktøjerne)
+function replaceCharacter(impl) {
+  if (impl) CHARACTER = impl;
+  const old = player.model;
+  scene.remove(old.root);
+  old.root.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+  player.model = CHARACTER.build();
+  player.model.inner.rotation.order = 'YXZ';
+  scene.add(player.model.root);
 }
 
 function respawnPlayer() {
@@ -1985,7 +2613,9 @@ function respawnPlayer() {
   Object.assign(player, {
     grounded: false, wasGrounded: false, groundPlat: null, coyote: 0, jumpBuffer: 0,
     jumpCooldown: 0, jumping: false, knockCooldown: 0, squash: 0, lastVy: 0,
+    hang: null, grip: 1, grabCooldown: 0, airJumps: 0, flipT: -1,
   });
+  player.skate = level.def.skate ? { heading: level.data.startHeading, grind: null, pushT: 0, lean: 0, crouch: 0, boostT: 0 } : null;
   player.groundVel.set(0, 0, 0);
   player.facing = -level.data.startHeading;
   player.model.root.visible = true;
@@ -2004,19 +2634,23 @@ function readWish() {
   return wish;
 }
 
+// Underlagets friktion (is er glat). Kridt påvirker IKKE fødderne – kun hænderne.
 function currentGrip() {
-  const base = player.groundPlat && player.groundPlat.grip !== undefined ? player.groundPlat.grip : CFG.grip.normal;
-  return abilities.chalkActive > 0 ? Math.min(base * CFG.chalk.gripMul, CFG.chalk.gripMax) : base;
+  return player.groundPlat && player.groundPlat.grip !== undefined ? player.groundPlat.grip : CFG.grip.normal;
 }
 
-// Kører før hvert fysikskridt: løb, luftkontrol, hop og reb
+// Kører før hvert fysikskridt
 function playerControl(dt) {
   const b = player.body, v = b.velocity, M = CFG.move;
   player.coyote -= dt;
   player.jumpBuffer -= dt;
   player.jumpCooldown -= dt;
   player.knockCooldown -= dt;
+  player.grabCooldown -= dt;
+  if (player.flipT >= 0) { player.flipT += dt / 0.5; if (player.flipT >= 1) player.flipT = -1; }
   const w = readWish();
+  if (player.hang) { if (player.hang.age !== undefined) player.hang.age += dt; hangControl(dt, w); return; }
+  if (player.skate) { skateControl(dt); applyAirflow(dt); return; }
   const hasInput = w.x !== 0 || w.z !== 0;
 
   if (abilities.rope) {
@@ -2046,19 +2680,22 @@ function playerControl(dt) {
     v.x *= k; v.z *= k;
   }
 
-  // Hop (kun fra jorden eller lige efter kanten – ingen uendelige hop)
-  if (player.jumpBuffer > 0 && (player.grounded || player.coyote > 0) && player.jumpCooldown <= 0 && !abilities.rope) {
-    const mul = abilities.chalkActive > 0 ? CFG.chalk.jumpMul : 1;
-    v.y = M.jumpVel * mul + Math.max(0, player.groundVel.y);
-    player.grounded = false;
-    player.coyote = 0;
-    player.jumpBuffer = 0;
-    player.jumpCooldown = 0.12;
-    player.jumping = true;
-    audio.play('jump');
-    const p = b.position;
-    particles.burst(p.x, p.y - CFG.player.radius + 0.05, p.z, 6, { color: '#d9d2c4', speed: 2, up: 0.3, size: 0.3, life: 0.5, grav: 0 });
-    if (abilities.chalkActive > 0) emitChalk(8);
+  // Hop: kun fra jorden (eller lige efter kanten) – og ét dobbelthop i luften, hvis det er købt
+  if (player.jumpBuffer > 0 && player.jumpCooldown <= 0 && !abilities.rope) {
+    if (player.grounded || player.coyote > 0) {
+      v.y = M.jumpVel + Math.max(0, player.groundVel.y);
+      player.grounded = false;
+      player.coyote = 0;
+      player.jumpBuffer = 0;
+      player.jumpCooldown = 0.12;
+      player.jumping = true;
+      player.airJumps = abilities.owned.double ? 1 : 0;
+      audio.play('jump');
+      const p = b.position;
+      particles.burst(p.x, p.y - CFG.player.radius + 0.05, p.z, 6, { color: '#d9d2c4', speed: 2, up: 0.3, size: 0.3, life: 0.5, grav: 0 });
+    } else if (player.airJumps > 0) {
+      doubleJump(w);
+    }
   }
   // Variabel hophøjde
   if (player.jumping && !input.keys.Space && v.y > 0) {
@@ -2068,16 +2705,416 @@ function playerControl(dt) {
   if (v.y <= 0) player.jumping = false;
 
   if (abilities.rope) applyRope(dt, w);
+  applyAirflow(dt);
   if (v.y < -M.maxFall) v.y = -M.maxFall;
 }
 
-// Kører efter hvert fysikskridt: jordkontakt, springpuder, smuldren, lava, mønter og portal
-const _r = new CANNON.Vec3(), _w = new CANNON.Vec3();
+function doubleJump(w) {
+  const v = player.body.velocity, D = CFG.dbl;
+  v.y = D.vel;
+  const hs = Math.hypot(v.x, v.z);
+  if (w.x || w.z) { // skift retning i luften, men behold farten
+    const sp = Math.max(hs, CFG.move.speed * 0.8);
+    v.x = v.x * (1 - D.steer) + w.x * sp * D.steer;
+    v.z = v.z * (1 - D.steer) + w.z * sp * D.steer;
+  }
+  player.airJumps--;
+  player.jumpBuffer = 0;
+  player.jumpCooldown = 0.12;
+  player.jumping = true;
+  player.flipT = 0;
+  audio.play('dbl');
+  const p = player.body.position;
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    particles.emit(p.x, p.y - 0.3, p.z, Math.cos(a) * 4, -0.5, Math.sin(a) * 4, '#dff4ff', 0.28, 0.45, 0, 3);
+  }
+}
+
+// Opvind fra ventiler og vindsøjler: løfter, til man svæver i toppen
+function applyAirflow(dt) {
+  const b = player.body, p = b.position, v = b.velocity;
+  let accel = 0;
+  const feet = p.y - CFG.player.radius;
+  for (const vt of level.vents) {
+    if (!level.ventActive(vt.plat)) continue;
+    const d = vt.plat.def, bp = vt.plat.body.position;
+    if (Math.hypot(p.x - bp.x, p.z - bp.z) > Math.min(d.w, d.d) / 2) continue;
+    const yy = feet - (bp.y + d.h / 2);
+    if (yy < -0.3 || yy > d.lift * 1.6) continue;
+    accel = Math.max(accel, CFG.gravity + d.power * (1 - yy / d.lift));
+  }
+  for (const wd of level.winds) {
+    const d = wd.def;
+    if (Math.hypot(p.x - d.x, p.z - d.z) > d.r) continue;
+    const yy = feet - d.y;
+    if (yy < 0 || yy > d.h * 1.6) continue;
+    accel = Math.max(accel, CFG.gravity + d.power * (1 - yy / d.h));
+  }
+  for (const g of level.gusts) { // sidevind
+    if (!level.gustActive(g)) continue;
+    const d = g.def, rx = p.x - d.x, rz = p.z - d.z;
+    if (Math.abs(rx * g.f.x + rz * g.f.z) > d.d / 2 || Math.abs(rx * g.r.x + rz * g.r.z) > d.w / 2) continue;
+    if (p.y < d.y || p.y > d.y + d.h) continue;
+    const k = player.grounded ? 0.35 : 1; // står man fast, skubber vinden mindre
+    v.x += d.dx * d.power * k * dt;
+    v.z += d.dz * d.power * k * dt;
+  }
+  if (accel > 0) {
+    v.y += accel * dt;
+    v.y *= Math.max(0, 1 - 1.4 * dt);
+    if (v.y > CFG.vent.maxUp) v.y = CFG.vent.maxUp;
+    player.jumping = false;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Hænderne: kanter og stænger
+   --------------------------------------------------------------------- */
+const _hf = { hx: 0, hy: 0, hz: 0, nx: 0, nz: 0, tx: 0, tz: 0, vx: 0, vy: 0, vz: 0 };
+const _hq = new THREE.Quaternion(), _hv = new THREE.Vector3(), _hn = new THREE.Vector3();
+const _hw = new CANNON.Vec3(), _hr = new CANNON.Vec3();
+const smooth01 = (x) => { const t = clamp(x, 0, 1); return t * t * (3 - 2 * t); };
+
+function gripDrain(base) {
+  return (base / (abilities.owned.gloves ? CFG.gloves : 1)) * (abilities.chalkActive > 0 ? CFG.chalk.drainMul : 1);
+}
+
+function tryGrab() {
+  if (player.grabCooldown > 0 || player.grip <= 0.02 || abilities.rope || player.skate) return false;
+  const b = player.body, p = b.position, H = CFG.hang;
+  if (b.velocity.y > 3.5) return false;
+  const chalk = abilities.chalkActive > 0;
+  const reach = H.reach + (chalk ? CFG.chalk.reachBonus : 0);
+  const win = H.window + (chalk ? CFG.chalk.windowBonus : 0);
+  const handY = p.y + H.drop;
+  let best = null, bestScore = Infinity;
+  for (const plat of level.platforms) {
+    if (NO_LEDGE.has(plat.type) || plat.state === 'falling' || !plat.body.world) continue;
+    const d = plat.def, bp = plat.body.position;
+    const dy = bp.y + d.h / 2 - handY;
+    if (dy < -win || dy > win * 0.8) continue;
+    const half = (d.shape === 'cyl' ? d.w / 2 : Math.hypot(d.w, d.d) / 2) + reach + 0.3;
+    const rx = p.x - bp.x, rz = p.z - bp.z;
+    if (Math.abs(rx) > half || Math.abs(rz) > half) continue;
+    _hq.set(plat.body.quaternion.x, plat.body.quaternion.y, plat.body.quaternion.z, plat.body.quaternion.w).invert();
+    _hv.set(rx, 0, rz).applyQuaternion(_hq);
+    const lx = _hv.x, lz = _hv.z;
+    let c;
+    if (d.shape === 'cyl') {
+      const dist = Math.hypot(lx, lz) - d.w / 2;
+      if (dist <= 0.05 || dist > reach) continue;
+      c = { shape: 'cyl', ang: Math.atan2(lz, lx), dist };
+    } else {
+      const ox = Math.abs(lx) - d.w / 2, oz = Math.abs(lz) - d.d / 2;
+      if (ox <= 0.05 && oz <= 0.05) continue; // står over platformen – så lander man i stedet
+      const dist = Math.hypot(Math.max(ox, 0), Math.max(oz, 0));
+      if (dist > reach) continue;
+      if (ox >= oz) {
+        const m = Math.min(0.25, d.d / 2);
+        c = { shape: 'box', axis: 'x', side: Math.sign(lx) || 1, t: clamp(lz, -d.d / 2 + m, d.d / 2 - m), dist };
+      } else {
+        const m = Math.min(0.25, d.w / 2);
+        c = { shape: 'box', axis: 'z', side: Math.sign(lz) || 1, t: clamp(lx, -d.w / 2 + m, d.w / 2 - m), dist };
+      }
+    }
+    const score = c.dist + Math.abs(dy) * 0.6;
+    if (score < bestScore) { bestScore = score; best = { kind: 'ledge', plat, ...c }; }
+  }
+  const barReach = H.barReach + (chalk ? CFG.chalk.reachBonus * 0.6 : 0);
+  for (const bar of level.bars) {
+    const dy = bar.a.y - handY;
+    if (dy < -win || dy > win * 0.8) continue;
+    let s = (p.x - bar.a.x) * bar.dir.x + (p.z - bar.a.z) * bar.dir.z;
+    if (s < -barReach || s > bar.def.len + barReach) continue;
+    s = clamp(s, 0.25, bar.def.len - 0.25);
+    const hd = Math.hypot(p.x - (bar.a.x + bar.dir.x * s), p.z - (bar.a.z + bar.dir.z * s));
+    if (hd > barReach) continue;
+    const score = hd + Math.abs(dy) * 0.6 - 0.15;
+    if (score < bestScore) { bestScore = score; best = { kind: 'bar', bar, s }; }
+  }
+  for (const z of level.zips) {
+    const d = z.def;
+    let sh = (p.x - z.a.x) * z.dir.x + (p.z - z.a.z) * z.dir.z; // vandret afstand langs kablet
+    if (sh < -barReach || sh > d.len - 1) continue;
+    sh = clamp(sh, 0.3, d.len - 1);
+    const cy = d.ay - (d.drop * sh) / d.len;
+    const dy = cy - handY;
+    if (dy < -win || dy > win * 0.8) continue;
+    const hd = Math.hypot(p.x - (z.a.x + z.dir.x * sh), p.z - (z.a.z + z.dir.z * sh));
+    if (hd > barReach) continue;
+    const score = hd + Math.abs(dy) * 0.6 - 0.2;
+    if (score < bestScore) { bestScore = score; best = { kind: 'zip', zip: z, s3: (sh / d.len) * z.len3, speed: Math.max(5, Math.hypot(b.velocity.x, b.velocity.z) * 0.8) }; }
+  }
+  if (!best) return false;
+  startHang(best);
+  return true;
+}
+
+function startHang(c) {
+  player.hang = { ...c, climb: null, shimmy: 0, warned: false, age: 0 };
+  player.jumping = false;
+  player.jumpBuffer = 0;
+  player.coyote = 0;
+  player.airJumps = abilities.owned.double ? 1 : 0;
+  player.flipT = -1;
+  audio.play('grab');
+  const F = hangFrame(player.hang);
+  particles.burst(F.hx, F.hy + 0.05, F.hz, 6, { color: abilities.chalkActive > 0 ? '#ffffff' : '#cfc6b8', speed: 1.2, up: 0.4, size: 0.18, life: 0.5, grav: 2 });
+  if (c.kind === 'bar' && player.hints.bar < 2) { player.hints.bar++; toast(T.toastBarHint, 'gold', 3400); }
+  if (c.kind === 'zip' && !player.hints.zip) { player.hints.zip = 1; toast(T.toastZipHint, 'gold', 3000); audio.play('zip'); }
+  if (c.kind === 'ledge' && player.hints.grab < 2) { player.hints.grab++; toast(T.toastGrabHint, 'gold', 3400); }
+  pinHang();
+}
+
+// Hvor sidder hænderne lige nu (verdenskoordinater), og hvilken vej vender kanten?
+function hangFrame(h) {
+  const F = _hf;
+  if (h.kind === 'bar') {
+    const bar = h.bar;
+    F.hx = bar.a.x + bar.dir.x * h.s; F.hy = bar.a.y; F.hz = bar.a.z + bar.dir.z * h.s;
+    F.nx = 0; F.nz = 0; F.tx = bar.dir.x; F.tz = bar.dir.z; F.vx = bar.vel.x; F.vy = bar.vel.y; F.vz = bar.vel.z;
+    return F;
+  }
+  if (h.kind === 'zip') {
+    const z = h.zip;
+    F.hx = z.a.x + z.dir3.x * h.s3; F.hy = z.a.y + z.dir3.y * h.s3; F.hz = z.a.z + z.dir3.z * h.s3;
+    F.nx = 0; F.nz = 0; F.tx = z.dir.x; F.tz = z.dir.z;
+    F.vx = z.dir3.x * h.speed; F.vy = z.dir3.y * h.speed; F.vz = z.dir3.z * h.speed;
+    return F;
+  }
+  const plat = h.plat, d = plat.def, body = plat.body;
+  let lx, lz, nx, nz, tx, tz;
+  if (h.shape === 'cyl') {
+    const R = d.w / 2, ca = Math.cos(h.ang), sa = Math.sin(h.ang);
+    lx = ca * R; lz = sa * R; nx = ca; nz = sa; tx = -sa; tz = ca;
+  } else if (h.axis === 'x') {
+    lx = (h.side * d.w) / 2; lz = h.t; nx = h.side; nz = 0; tx = 0; tz = 1;
+  } else {
+    lx = h.t; lz = (h.side * d.d) / 2; nx = 0; nz = h.side; tx = 1; tz = 0;
+  }
+  _hq.set(body.quaternion.x, body.quaternion.y, body.quaternion.z, body.quaternion.w);
+  _hv.set(lx, d.h / 2, lz).applyQuaternion(_hq);
+  F.hx = body.position.x + _hv.x; F.hy = body.position.y + _hv.y; F.hz = body.position.z + _hv.z;
+  _hn.set(nx, 0, nz).applyQuaternion(_hq); F.nx = _hn.x; F.nz = _hn.z;
+  _hn.set(tx, 0, tz).applyQuaternion(_hq); F.tx = _hn.x; F.tz = _hn.z;
+  _hr.set(_hv.x, _hv.y, _hv.z);
+  body.angularVelocity.cross(_hr, _hw);
+  F.vx = body.velocity.x + _hw.x; F.vy = body.velocity.y + _hw.y; F.vz = body.velocity.z + _hw.z;
+  return F;
+}
+
+// Hold kroppen fast under hænderne (kører både før og efter fysikskridtet)
+function pinHang() {
+  const h = player.hang;
+  if (!h) return;
+  const F = hangFrame(h), b = player.body, H = CFG.hang;
+  if (h.climb) { placeClimb(F); return; }
+  b.position.set(F.hx + F.nx * H.wallGap, F.hy - H.drop, F.hz + F.nz * H.wallGap);
+  b.velocity.set(F.vx, F.vy, F.vz);
+  if (h.kind === 'ledge') player.facing = Math.atan2(F.nx, F.nz);
+  else if (Math.abs(h.shimmy) > 0.2) player.facing = Math.atan2(-F.tx * Math.sign(h.shimmy), -F.tz * Math.sign(h.shimmy));
+}
+
+function hangControl(dt, w) {
+  const h = player.hang, H = CFG.hang;
+  if (h.plat && (h.plat.state === 'falling' || !h.plat.body.world)) { releaseHang('fall'); return; }
+  const F = hangFrame(h);
+  if (h.climb) {
+    h.climb.t = Math.min(1, h.climb.t + dt / H.climbTime);
+    placeClimb(F);
+    if (h.climb.t >= 1) { player.hang = null; player.grabCooldown = 0.2; player.coyote = 0; }
+    return;
+  }
+  if (h.kind === 'zip') { // svævebanen: glid automatisk nedad, slip med mellemrum eller i bunden
+    const z = h.zip;
+    h.speed = Math.min(20, h.speed + CFG.gravity * Math.max(0.15, -z.dir3.y) * dt);
+    h.s3 += h.speed * dt;
+    player.facing = Math.atan2(-z.dir.x, -z.dir.z);
+    player.grip = Math.max(0.05, player.grip - gripDrain(H.barDrain * 0.4) * dt);
+    if (h.s3 >= z.len3 - 0.4 || player.jumpBuffer > 0) {
+      const jump = player.jumpBuffer > 0;
+      player.jumpBuffer = 0;
+      const v = player.body.velocity;
+      player.hang = null;
+      player.grabCooldown = 0.5;
+      v.set(z.dir3.x * h.speed, z.dir3.y * h.speed + (jump ? 7 : 2.5), z.dir3.z * h.speed);
+      if (jump) { player.jumping = true; audio.play('jump'); }
+      return;
+    }
+    pinHang();
+    return;
+  }
+  const along = w.x * F.tx + w.z * F.tz;
+  const toward = -(w.x * F.nx + w.z * F.nz);
+  let rate = h.kind === 'bar' ? H.barDrain : H.drain;
+  if (h.plat && h.plat.icy) rate *= H.iceMul;
+  if (Math.abs(along) > 0.3) rate *= H.moveMul;
+  player.grip -= gripDrain(rate) * dt;
+  if (player.grip <= 0) {
+    player.grip = 0;
+    releaseHang('slip');
+    toast(T.toastSlip, 'bad', 1600);
+    audio.play('slip');
+    return;
+  }
+  if (player.grip < 0.3 && !h.warned) { h.warned = true; toast(T.toastGripLow, 'bad', 1800); }
+  h.shimmy = 0;
+  if (h.kind === 'bar') {
+    if (Math.abs(along) > 0.2) {
+      h.s = clamp(h.s + along * H.barShimmy * dt, 0.25, h.bar.def.len - 0.25);
+      h.shimmy = along;
+    }
+    if (player.jumpBuffer > 0) { player.jumpBuffer = 0; jumpOffBar(w); return; }
+  } else {
+    if (Math.abs(along) > 0.3 && Math.abs(toward) < 0.6) {
+      const d = h.plat.def, step = along * H.shimmy * dt;
+      if (h.shape === 'cyl') h.ang += step / (d.w / 2);
+      else {
+        const len = h.axis === 'x' ? d.d : d.w;
+        const lim = len / 2 - Math.min(0.25, len / 2);
+        h.t = clamp(h.t + step, -lim, lim);
+      }
+      h.shimmy = along;
+    }
+    if (player.jumpBuffer > 0 || toward > 0.6) {
+      if (h.age >= 0.18) { player.jumpBuffer = 0; startClimb(); return; }
+    } else if (toward < -0.6) { releaseHang('drop'); return; }
+  }
+  pinHang();
+}
+
+function startClimb() {
+  player.hang.climb = { t: 0 };
+  audio.play('climb');
+}
+
+// Klatring: først op langs væggen, så ind over kanten
+function placeClimb(F) {
+  const H = CFG.hang, b = player.body, k = player.hang.climb.t;
+  const up = smooth01(k / 0.6), inn = smooth01((k - 0.6) / 0.4);
+  const y = F.hy - H.drop + (H.drop + CFG.player.radius + 0.06) * up;
+  const out = H.wallGap * (1 - inn) - 0.6 * inn;
+  b.position.set(F.hx + F.nx * out, y, F.hz + F.nz * out);
+  b.velocity.set(F.vx, F.vy, F.vz);
+  player.facing = Math.atan2(F.nx, F.nz);
+}
+
+function releaseHang(reason) {
+  const h = player.hang;
+  if (!h) return;
+  const F = hangFrame(h);
+  player.hang = null;
+  player.grabCooldown = reason === 'jump' ? 0.3 : reason === 'drop' ? 0.5 : reason === 'slip' ? 0.8 : CFG.hang.cooldown;
+  const v = player.body.velocity;
+  if (reason === 'drop') v.set(F.vx + F.nx * 1.5, Math.min(F.vy, 0) - 1, F.vz + F.nz * 1.5);
+  else if (reason === 'slip' || reason === 'fall') v.set(F.vx + F.nx * 0.8, -2, F.vz + F.nz * 0.8);
+}
+
+function jumpOffBar(w) {
+  let dx = w.x, dz = w.z;
+  if (!dx && !dz) { dx = -Math.sin(cam.yaw); dz = -Math.cos(cam.yaw); }
+  // Stangens egen fart (trapez/bevægelig stang) følger med, så man kan kaste sig langt
+  const F = hangFrame(player.hang), bvx = F.vx, bvy = F.vy, bvz = F.vz;
+  releaseHang('jump');
+  player.body.velocity.set(dx * 5.5 + bvx, 7.5 + Math.max(0, bvy) * 0.6, dz * 5.5 + bvz);
+  player.jumping = true;
+  audio.play('jump');
+}
+
+/* ---------------------------------------------------------------------
+   Skateboard
+   --------------------------------------------------------------------- */
+function skateControl(dt) {
+  const b = player.body, v = b.velocity, S = CFG.skate, k = input.keys, sk = player.skate;
+  const steer = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
+  const pushing = !!(k.KeyW || k.ArrowUp), braking = !!(k.KeyS || k.ArrowDown);
+  sk.lean = damp(sk.lean, steer, 8, dt);
+  sk.pushT = Math.max(0, sk.pushT - dt);
+  sk.crouch = Math.max(0, sk.crouch - dt * 2.5);
+  sk.boostT = Math.max(0, sk.boostT - dt);
+  if (sk.grind) { grindControl(dt); return; }
+  const gv = player.groundVel;
+  if (player.grounded) {
+    const spd0 = Math.hypot(v.x - gv.x, v.z - gv.z);
+    sk.heading += steer * S.turn * clamp(0.5 + spd0 / 14, 0.5, 1) * dt;
+    const f = fwdVec(sk.heading);
+    const rx = v.x - gv.x, rz = v.z - gv.z;
+    let along = rx * f.x + rz * f.z;
+    let lx = rx - f.x * along, lz = rz - f.z * along;
+    if (along < -2.5) { sk.heading += Math.PI; along = -along; lx = -lx; lz = -lz; } // lander baglæns: vend brættet
+    const f2 = fwdVec(sk.heading);
+    if (pushing && along < S.maxPush) { along = Math.min(S.maxPush, along + S.push * dt); sk.pushT = 0.35; }
+    if (braking) along = Math.max(0, along - S.brake * dt);
+    along -= Math.min(Math.max(along, 0), S.roll * dt);
+    const plat = player.groundPlat;
+    if (plat && plat.type === 'boost' && along < plat.def.boost) {
+      along = plat.def.boost;
+      if (sk.boostT <= 0) { sk.boostT = 0.6; audio.play('boost'); particles.burst(b.position.x, b.position.y - 0.3, b.position.z, 16, { color: '#7dfcff', speed: 4, up: 0.3, size: 0.3, life: 0.5, grav: 0 }); }
+    }
+    const kd = Math.exp(-S.lateral * dt);
+    lx *= kd; lz *= kd;
+    along = Math.min(along, S.maxSpeed);
+    v.x = gv.x + f2.x * along + lx;
+    v.z = gv.z + f2.z * along + lz;
+  } else {
+    const dh = steer * S.airTurn * dt;
+    sk.heading += dh;
+    const c = Math.cos(dh * 0.6), s = Math.sin(dh * 0.6);
+    const vx = v.x * c - v.z * s, vz = v.x * s + v.z * c;
+    v.x = vx; v.z = vz;
+  }
+  if (player.jumpBuffer > 0 && player.jumpCooldown <= 0 && (player.grounded || player.coyote > 0)) {
+    v.y = S.ollie + Math.max(0, gv.y);
+    player.jumpBuffer = 0;
+    player.jumpCooldown = 0.15;
+    player.grounded = false;
+    player.coyote = 0;
+    sk.crouch = 1;
+    audio.play('ollie');
+  }
+  if (v.y < -CFG.move.maxFall) v.y = -CFG.move.maxFall;
+}
+
+function startGrind(plat) {
+  const sk = player.skate, v = player.body.velocity;
+  const q = plat.body.quaternion;
+  _hq.set(q.x, q.y, q.z, q.w);
+  _hn.set(0, 0, -1).applyQuaternion(_hq);
+  const along = v.x * _hn.x + v.z * _hn.z;
+  sk.grind = { plat, ax: _hn.x, az: _hn.z, dir: along >= 0 ? 1 : -1, speed: Math.max(7, Math.abs(along)) };
+  audio.play('grind');
+  if (!sk.grindHint) { sk.grindHint = true; toast(T.toastGrind, 'gold', 1000); }
+}
+
+function grindControl(dt) {
+  const sk = player.skate, g = sk.grind, b = player.body, d = g.plat.def, bp = g.plat.body.position;
+  const s = (b.position.x - bp.x) * g.ax + (b.position.z - bp.z) * g.az;
+  if (Math.abs(s) > d.d / 2 + 0.05) { sk.grind = null; return; } // kørte ud over enden
+  g.speed = Math.max(5, g.speed - CFG.skate.grindFriction * g.speed * dt);
+  b.position.set(bp.x + g.ax * s, bp.y + d.h / 2 + CFG.player.radius + 0.01, bp.z + g.az * s);
+  b.velocity.set(g.ax * g.dir * g.speed, 0, g.az * g.dir * g.speed);
+  sk.heading = Math.atan2(g.ax * g.dir, -g.az * g.dir);
+  if (Math.random() < dt * 40) {
+    particles.emit(b.position.x, b.position.y - 0.4, b.position.z, (Math.random() - 0.5) * 3, 1.5 + Math.random() * 2, (Math.random() - 0.5) * 3, '#ffd27a', 0.12, 0.35, 12, 0);
+  }
+  if (player.jumpBuffer > 0) {
+    player.jumpBuffer = 0;
+    sk.grind = null;
+    b.velocity.y = CFG.skate.ollie;
+    player.jumpCooldown = 0.2;
+    sk.crouch = 1;
+    audio.play('ollie');
+  }
+}
+
+// Kører efter hvert fysikskridt: jordkontakt, transportbånd, springpuder, smuldren, greb, lava, mønter og portal
+const _r = new CANNON.Vec3(), _w = new CANNON.Vec3(), _beltDir = new THREE.Vector3();
 function postStep(dt, playing) {
   const b = player.body;
   const prevVy = player.lastVy;
   player.wasGrounded = player.grounded;
-  let grounded = false, gInfo = null, gBody = null, bestY = 0.5;
+  let grounded = false, gInfo = null, gBody = null, bestY = 0.5, gnx = 0, gny = 1, gnz = 0;
   for (const c of world.contacts) {
     let other, nx, ny, nz, r;
     if (c.bi === b) { other = c.bj; nx = -c.ni.x; ny = -c.ni.y; nz = -c.ni.z; r = c.rj; }
@@ -2089,21 +3126,32 @@ function postStep(dt, playing) {
       if (playing) knockback(other, nx, nz, r);
       continue;
     }
-    if (ny > bestY) { bestY = ny; grounded = true; gInfo = info; gBody = other; _r.copy(r); }
+    if (ny > bestY) { bestY = ny; grounded = true; gInfo = info; gBody = other; _r.copy(r); gnx = nx; gny = ny; gnz = nz; }
   }
-  if (player.jumpCooldown > 0) grounded = false;
+  if (player.jumpCooldown > 0 || player.hang) grounded = false;
   player.grounded = grounded;
   player.groundPlat = grounded ? (gInfo.type === 'bar' ? gInfo.parent : gInfo) : null;
   if (grounded) {
     // Underlagets hastighed i kontaktpunktet (v + ω × r) – så man følger med bevægelige platforme
     gBody.angularVelocity.cross(_r, _w);
     player.groundVel.set(gBody.velocity.x + _w.x, gBody.velocity.y + _w.y, gBody.velocity.z + _w.z);
+    const gp = player.groundPlat;
+    if (gp.type === 'conveyor') { // transportbånd
+      _beltDir.set(gp.def.beltAx === 'x' ? 1 : 0, 0, gp.def.beltAx === 'x' ? 0 : -1).applyQuaternion(gp.mesh.quaternion);
+      player.groundVel.x += _beltDir.x * gp.def.belt;
+      player.groundVel.z += _beltDir.z * gp.def.belt;
+    }
+    player.groundNormal.set(gnx, gny, gnz);
     player.coyote = CFG.move.coyote;
+    player.airJumps = abilities.owned.double ? 1 : 0;
+    player.grip = Math.min(1, player.grip + CFG.hang.regen * dt);
   } else {
     player.groundVel.multiplyScalar(0.98);
+    player.groundNormal.set(0, 1, 0);
   }
   player.lastVy = b.velocity.y;
 
+  if (player.hang) pinHang();
   if (!playing) return;
   if (grounded && !player.wasGrounded) onLand(prevVy);
   if (grounded) {
@@ -2119,7 +3167,11 @@ function postStep(dt, playing) {
     } else if (plat.type === 'crumble' && plat.state === 'solid') {
       level.triggerCrumble(plat);
       particles.burst(b.position.x, b.position.y - 0.4, b.position.z, 10, { color: '#c49a62', speed: 2.5, up: 0.4, size: 0.22, life: 0.7, grav: 8 });
+    } else if (plat.type === 'rail' && player.skate && !player.skate.grind && player.jumpCooldown <= 0) {
+      startGrind(plat);
     }
+  } else if (!player.hang && !abilities.rope) {
+    tryGrab();
   }
 
   // Lava!
@@ -2141,12 +3193,14 @@ function postStep(dt, playing) {
 function onLand(vy) {
   if (vy < -5) {
     player.squash = clamp(-vy / 30, 0.12, 0.45);
+    if (player.skate) player.skate.crouch = Math.min(1, -vy / 14);
     audio.play('land', clamp(-vy / 25, 0.2, 1));
     const p = player.body.position;
     particles.burst(p.x, p.y - CFG.player.radius + 0.05, p.z, Math.floor(clamp(-vy, 4, 14)), {
-      color: player.groundPlat && player.groundPlat.type === 'ice' ? '#e6f7ff' : '#d8cfbf', speed: 2.6, up: 0.25, size: 0.3, life: 0.55, grav: 0, drag: 3,
+      color: player.groundPlat && player.groundPlat.icy ? '#e6f7ff' : '#d8cfbf', speed: 2.6, up: 0.25, size: 0.3, life: 0.55, grav: 0, drag: 3,
     });
   }
+  player.flipT = -1;
 }
 
 function knockback(barBody, nx, nz, r) {
@@ -2180,72 +3234,98 @@ function emitChalk(n) {
   }
 }
 
-// Animation af figuren (kører hver frame)
+// Figurens tilstand og animation (kører hver frame)
 const _bp = new THREE.Vector3(), _down = new THREE.Vector3(0, -1, 0), _blobRay = new THREE.Raycaster();
 function updatePlayerVisual(dt, elapsed) {
-  const m = player.model, b = player.body;
+  const m = player.model, b = player.body, s = player.cs;
   m.root.position.set(b.position.x, b.position.y, b.position.z);
   const relX = b.velocity.x - player.groundVel.x, relZ = b.velocity.z - player.groundVel.z;
   const sp = Math.hypot(relX, relZ);
-  if (sp > 0.7) player.facing = angleDamp(player.facing, Math.atan2(-relX, -relZ), 14, dt);
+  const sk = player.skate;
+  if (sk) player.facing = angleDamp(player.facing, -sk.heading, 18, dt);
+  else if (player.hang) { /* retningen sættes af pinHang */ }
+  else if (sp > 0.7) player.facing = angleDamp(player.facing, Math.atan2(-relX, -relZ), 14, dt);
   else if (game.state === 'playing' && (wish.x || wish.z)) player.facing = angleDamp(player.facing, Math.atan2(-wish.x, -wish.z), 10, dt);
   m.inner.rotation.y = player.facing;
+  // På skateboardet følger brættet underlagets hældning
+  let pitch = 0;
+  if (sk && player.grounded) {
+    const f = fwdVec(sk.heading), n = player.groundNormal;
+    pitch = Math.asin(clamp(-(n.x * f.x + n.z * f.z), -0.8, 0.8));
+  }
+  m.inner.rotation.x = damp(m.inner.rotation.x, pitch, 12, dt);
 
-  const blend = player.grounded ? clamp(sp / CFG.move.speed, 0, 1) : 0;
-  let lL, lR, aL, aR, aLz = 0.1, aRz = -0.1, lean;
-  if (abilities.rope) {
-    aR = 2.95; aL = 2.7; aLz = -0.15; aRz = 0.15;
-    const sw = Math.sin(elapsed * 3) * 0.25;
-    lL = 0.35 + sw; lR = 0.1 - sw; lean = 0;
-  } else if (player.grounded) {
+  let mode;
+  if (sk) mode = sk.grind ? 'grind' : 'skate';
+  else if (player.hang) mode = player.hang.climb ? 'climb' : 'hang';
+  else if (abilities.rope) mode = 'rope';
+  else if (player.grounded) mode = sp > 0.6 ? 'run' : 'idle';
+  else mode = 'air';
+  if (mode === 'run' || mode === 'idle') {
     player.runPhase += dt * (3 + sp * 1.3);
-    const s = Math.sin(player.runPhase);
-    lL = s * 0.95 * blend; lR = -s * 0.95 * blend;
-    aL = -s * 0.85 * blend; aR = s * 0.85 * blend;
-    lean = 0.2 * blend;
-    if (blend < 0.05) { aL = Math.sin(elapsed * 1.6) * 0.04; aR = -aL; }
-    // fodtrin
-    if (blend > 0.3 && game.state === 'playing') {
+    if (mode === 'run' && sp > 2.5 && game.state === 'playing') {
       player.stepTimer -= dt * (sp / 4);
       if (player.stepTimer <= 0) { player.stepTimer = 1; audio.play('step'); }
     }
-  } else {
-    const up = clamp(b.velocity.y / 10, -1, 1);
-    lL = 0.75 - up * 0.2; lR = -0.35 + up * 0.25;
-    aL = 0.4 + up * 0.9; aR = 0.2 + up * 0.7;
-    aLz = 0.6; aRz = -0.6;
-    lean = 0.08;
   }
-  const k = 16;
-  m.legL.rotation.x = damp(m.legL.rotation.x, lL, k, dt);
-  m.legR.rotation.x = damp(m.legR.rotation.x, lR, k, dt);
-  m.armL.rotation.x = damp(m.armL.rotation.x, aL, k, dt);
-  m.armR.rotation.x = damp(m.armR.rotation.x, aR, k, dt);
-  m.armL.rotation.z = damp(m.armL.rotation.z, -aLz, k, dt);
-  m.armR.rotation.z = damp(m.armR.rotation.z, -aRz, k, dt);
-  m.torsoG.rotation.x = damp(m.torsoG.rotation.x, -lean, 10, dt);
   player.squash = Math.max(0, player.squash - dt * 3.2);
-  const sq = player.squash;
-  m.inner.scale.set(1 + sq * 0.25, 1 - sq * 0.35, 1 + sq * 0.25);
-  m.inner.position.y = -CFG.player.radius + Math.abs(Math.sin(player.runPhase)) * 0.06 * blend;
-
-  // Kridt gør hænderne hvide
-  const chalkT = abilities.chalkActive > 0 ? 1 : 0;
-  m.handMat.color.lerp(chalkT ? new THREE.Color('#ffffff') : new THREE.Color('#efc19c'), 1 - Math.exp(-8 * dt));
-  if (chalkT && Math.random() < dt * 14) emitChalk(1);
+  s.mode = mode;
+  s.speed = sk ? Math.hypot(b.velocity.x, b.velocity.z) : sp;
+  s.vy = b.velocity.y;
+  s.grounded = player.grounded;
+  s.runPhase = player.runPhase;
+  s.time = elapsed;
+  s.squash = player.squash;
+  s.flipT = player.flipT;
+  s.chalk = damp(s.chalk || 0, abilities.chalkActive > 0 ? 1 : 0, 8, dt);
+  s.hangKind = player.hang ? player.hang.kind : null;
+  s.shimmy = player.hang ? player.hang.shimmy : 0;
+  s.climbT = player.hang && player.hang.climb ? player.hang.climb.t : 0;
+  s.push = !!(sk && sk.pushT > 0);
+  s.lean = sk ? sk.lean : 0;
+  s.crouch = sk ? sk.crouch : 0;
+  // Ekstra oplysninger til en mere levende figur (IK for hænderne, vejrtrækning, udstyr …)
+  s.grip = player.grip;
+  const prevFacing = s._facing ?? player.facing;
+  s.turnRate = dt > 0 ? Math.atan2(Math.sin(player.facing - prevFacing), Math.cos(player.facing - prevFacing)) / dt : 0;
+  s._facing = player.facing;
+  _invQ.setFromEuler(_eul.set(0, player.facing, 0, 'YXZ')).invert();
+  if (player.hang) {
+    const F = hangFrame(player.hang);
+    s.gripLocal = (s.gripLocal || { x: 0, y: 0, z: 0 });
+    _cv.set(F.hx - b.position.x, F.hy - b.position.y, F.hz - b.position.z).applyQuaternion(_invQ);
+    s.gripLocal.x = _cv.x; s.gripLocal.y = _cv.y; s.gripLocal.z = _cv.z;
+    s.gripTangent = (s.gripTangent || { x: 1, y: 0, z: 0 });
+    _cv.set(F.tx, player.hang.kind === 'zip' ? player.hang.zip.dir3.y : 0, F.tz).normalize().applyQuaternion(_invQ);
+    s.gripTangent.x = _cv.x; s.gripTangent.y = _cv.y; s.gripTangent.z = _cv.z;
+  } else { s.gripLocal = null; s.gripTangent = null; }
+  if (abilities.rope) {
+    const r = abilities.rope;
+    _cv.set(r.point.x - b.position.x, r.point.y - (b.position.y + 0.8), r.point.z - b.position.z).normalize().applyQuaternion(_invQ);
+    s.ropeDir = { x: _cv.x, y: _cv.y, z: _cv.z };
+  } else s.ropeDir = null;
+  const gp = player.grounded ? player.groundPlat : null;
+  s.surface = gp ? (gp.type === 'ice' ? 'ice' : gp.type === 'conveyor' ? 'conveyor' : null) : null;
+  _cv.set(-Math.sin(cam.yaw) * Math.cos(cam.pitch), -Math.sin(cam.pitch), -Math.cos(cam.yaw) * Math.cos(cam.pitch)).applyQuaternion(_invQ);
+  s.aimLocal = { x: _cv.x, y: _cv.y, z: _cv.z };
+  s.gear = s.gear || {};
+  s.gear.gloves = !!abilities.owned.gloves; s.gear.chalk = !!abilities.owned.chalk;
+  s.gear.rope = !!abilities.owned.rope; s.gear.helmet = !!level.def.skate;
+  CHARACTER.animate(m, s, dt);
+  if (s.chalk > 0.5 && Math.random() < dt * 14) emitChalk(1);
 
   // Rund skygge lige under spilleren (hjælper med at ramme landingen)
   _bp.set(b.position.x, b.position.y, b.position.z);
   _blobRay.set(_bp, _down);
   _blobRay.far = 60;
   const hits = _blobRay.intersectObjects(level.rayMeshes, false);
-  if (hits.length && m.root.visible) {
+  if (hits.length && m.root.visible && !player.hang) {
     const h = hits[0];
     const height = h.distance - CFG.player.radius;
     player.blob.visible = true;
     player.blob.position.set(h.point.x, h.point.y + 0.03, h.point.z);
-    const s = clamp(1 - height / 25, 0.35, 1);
-    player.blob.scale.set(s, s, s);
+    const sc = clamp(1 - height / 25, 0.35, 1);
+    player.blob.scale.set(sc, sc, sc);
     player.blob.material.opacity = clamp(1 - height / 30, 0.25, 0.9);
   } else {
     player.blob.visible = false;
@@ -2310,6 +3390,7 @@ canvas.addEventListener('mousedown', (e) => {
   audio.init();
   if (game.state !== 'playing') return;
   if (e.button === 0) {
+    if (player.skate) return; // ingen evner på skateboardet
     const hadRope = !!abilities.rope;
     useAbility();
     input.leftHeld = !hadRope && !!abilities.rope; // samme klik: hold for at hale ind
@@ -2353,6 +3434,11 @@ function updateCamera(dt) {
   if (game.state === 'playing') {
     if (k.KeyQ) cam.yaw += 2.2 * dt;
     if (k.KeyE) cam.yaw -= 2.2 * dt;
+    // På skateboardet følger kameraet automatisk brættet (medmindre man selv drejer med højreklik)
+    if (player.skate && !input.rightHeld && !k.KeyQ && !k.KeyE) {
+      cam.yaw = angleDamp(cam.yaw, -player.skate.heading, 3.2, dt);
+      cam.pitch = damp(cam.pitch, 0.24, 2, dt);
+    }
   }
   const b = player.body.position;
   const ty = Math.max(b.y + CFG.camera.height - CFG.player.radius, CFG.lavaY + 9);
@@ -2393,7 +3479,7 @@ function updateMenuCamera(elapsed) {
    ===================================================================== */
 const SLOT_ORDER = ['none', 'chalk', 'rope'];
 const abilities = {
-  owned: { chalk: false, rope: false, chalkbag: false, longrope: false },
+  owned: { chalk: false, rope: false, chalkbag: false, longrope: false, double: false, gloves: false },
   selected: 'none',
   chalkActive: 0,
   chalkCooldown: 0,
@@ -2424,6 +3510,7 @@ function cycleAbility(dir) {
 }
 
 function useAbility() {
+  if (player.skate) return;
   switch (abilities.selected) {
     case 'chalk': useChalk(); break;
     case 'rope': if (abilities.rope) releaseRope(false); else fireRope(); break;
@@ -2443,6 +3530,8 @@ function useChalk() {
   }
   abilities.chalkActive = CFG.chalk.duration;
   abilities.chalkCooldown = chalkTotalCooldown();
+  player.grip = 1; // frisk kridt: grebet fyldes helt op – også midt i et hæng
+  if (player.hang) player.hang.warned = false;
   audio.play('chalk');
   emitChalk(26);
   toast(T.toastChalk, 'good', 2200);
@@ -2501,14 +3590,19 @@ function fireRope() {
     audio.play('deny');
     return;
   }
+  if (player.hang) releaseHang('jump');
   const b = player.body.position;
   const len = Math.hypot(b.x - t.point.x, b.y + 0.8 - t.point.y, b.z - t.point.z);
-  abilities.rope = {
-    anchor: t.anchor, plat: t.plat, point: t.point.clone(), vel: new THREE.Vector3(), length: len,
-    local: t.plat ? new THREE.Vector3(t.point.x - t.plat.body.position.x, t.point.y - t.plat.body.position.y, t.point.z - t.plat.body.position.z) : null,
-  };
+  let local = null;
+  if (t.plat) { // ankerpunktet gemmes i platformens eget koordinatsystem (så det følger med, hvis den drejer)
+    const q = t.plat.body.quaternion;
+    local = new THREE.Vector3(t.point.x - t.plat.body.position.x, t.point.y - t.plat.body.position.y, t.point.z - t.plat.body.position.z)
+      .applyQuaternion(_hq.set(q.x, q.y, q.z, q.w).invert());
+  }
+  abilities.rope = { anchor: t.anchor, plat: t.plat, point: t.point.clone(), vel: new THREE.Vector3(), length: len, local };
   abilities.ropeShoot = 0;
   player.jumping = false;
+  player.airJumps = abilities.owned.double ? 1 : 0; // dobbelthoppet er klar igen efter et sving
   audio.play('rope');
 }
 
@@ -2528,9 +3622,12 @@ function updateRopeAnchor(rope) {
     rope.point.copy(rope.anchor.pos);
     rope.vel.copy(rope.anchor.vel);
   } else if (rope.plat) {
-    const pb = rope.plat.body;
-    rope.point.set(pb.position.x + rope.local.x, pb.position.y + rope.local.y, pb.position.z + rope.local.z);
-    rope.vel.set(pb.velocity.x, pb.velocity.y, pb.velocity.z);
+    const pb = rope.plat.body, q = pb.quaternion;
+    _v3a.copy(rope.local).applyQuaternion(_hq.set(q.x, q.y, q.z, q.w));
+    rope.point.set(pb.position.x + _v3a.x, pb.position.y + _v3a.y, pb.position.z + _v3a.z);
+    _hr.set(_v3a.x, _v3a.y, _v3a.z);
+    pb.angularVelocity.cross(_hr, _hw);
+    rope.vel.set(pb.velocity.x + _hw.x, pb.velocity.y + _hw.y, pb.velocity.z + _hw.z);
   }
 }
 
@@ -2636,6 +3733,8 @@ const audio = {
     const wind = loop(450, 0.04);
     this.windGain = wind.g; this.windFilter = wind.f;
     this.rumbleGain = loop(120, 0).g;
+    const roll = loop(260, 0); // hjulenes rumlen på skateboardet
+    this.rollGain = roll.g; this.rollFilter = roll.f;
   },
   setEnabled(on) {
     this.enabled = on;
@@ -2694,12 +3793,22 @@ const audio = {
       case 'buy': this.tone(784, 0.1, { type: 'square', vol: 0.06 }); this.tone(1175, 0.3, { type: 'square', vol: 0.06, delay: 0.09 }); break;
       case 'deny': this.tone(170, 0.16, { type: 'square', vol: 0.06, to: 120 }); break;
       case 'click': this.tone(620, 0.05, { type: 'triangle', vol: 0.07 }); break;
+      case 'grab': this.noise(0.09, { vol: 0.22, freq: 1200, to: 400 }); this.tone(220, 0.08, { type: 'triangle', vol: 0.06 }); break;
+      case 'climb': this.noise(0.25, { vol: 0.12, type: 'bandpass', freq: 700, to: 1400, q: 1.2 }); break;
+      case 'slip': this.noise(0.4, { vol: 0.2, type: 'highpass', freq: 2200, to: 600 }); this.tone(330, 0.3, { type: 'triangle', vol: 0.06, to: 160 }); break;
+      case 'dbl': this.noise(0.22, { vol: 0.18, type: 'bandpass', freq: 600, to: 2600, q: 1.5 }); this.tone(520, 0.16, { type: 'triangle', vol: 0.07, to: 880 }); break;
+      case 'ollie': this.tone(90, 0.08, { type: 'square', vol: 0.12 }); this.noise(0.08, { vol: 0.25, freq: 2500 }); break;
+      case 'grind': this.noise(0.5, { vol: 0.18, type: 'bandpass', freq: 3200, q: 3 }); break;
+      case 'boost': this.tone(300, 0.4, { type: 'sawtooth', vol: 0.06, to: 1200 }); break;
+      case 'zip': this.noise(0.9, { vol: 0.12, type: 'bandpass', freq: 1800, to: 3600, q: 4 }); break;
       default: break;
     }
   },
-  update(heightAboveLava, speed) {
+  update(heightAboveLava, speed, rolling = 0) {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
+    this.rollGain.gain.setTargetAtTime(Math.min(rolling / 18, 1) * 0.25, t, 0.08);
+    this.rollFilter.frequency.setTargetAtTime(160 + rolling * 22, t, 0.1);
     this.rumbleGain.gain.setTargetAtTime(clamp(1 - heightAboveLava / 70, 0, 1) * 0.35, t, 0.2);
     this.windGain.gain.setTargetAtTime(0.03 + Math.min(speed / 28, 1) * 0.09, t, 0.2);
     this.windFilter.frequency.setTargetAtTime(380 + speed * 45, t, 0.2);
@@ -2715,9 +3824,13 @@ const ICONS = {
   rope: '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3c3 2 5 2 7 1.5" stroke="#d6b27a" stroke-width="2"/><circle cx="12" cy="5" r="1.9" stroke="#cfd6e0" stroke-width="1.8"/><path d="M12 7v10" stroke="#cfd6e0" stroke-width="2.2"/><path d="M12 17c-3 0-5.5-1.6-6-4.5M12 17c3 0 5.5-1.6 6-4.5M12 17v3.5" stroke="#cfd6e0" stroke-width="2.2"/></svg>',
   bag: '<svg viewBox="0 0 24 24"><path d="M6.5 9h11l1.4 9.2a3 3 0 0 1-3 3.3H8.1a3 3 0 0 1-3-3.3z" fill="#6b8cff"/><rect x="5.5" y="7.4" width="13" height="2.6" rx="1.3" fill="#3a55c8"/><path d="M8 7.5c.8-2 2.3-3 4-3s3.2 1 4 3" fill="none" stroke="#f3f3f3" stroke-width="1.5"/><circle cx="12" cy="15.4" r="2.6" fill="#ffffff" opacity=".9"/></svg>',
   longrope: '<svg viewBox="0 0 24 24" fill="none" stroke="#d6b27a" stroke-width="1.9" stroke-linecap="round"><ellipse cx="11" cy="12" rx="8" ry="5"/><ellipse cx="11" cy="12" rx="5.3" ry="3.1"/><ellipse cx="11" cy="12" rx="2.6" ry="1.4"/><path d="M19 12c2 1.6 2.4 4.6.4 7"/></svg>',
+  double: '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20l6-6 6 6" stroke="#9fe4ff" stroke-width="2.2"/><path d="M6 13l6-6 6 6" stroke="#ffffff" stroke-width="2.2"/><path d="M8 4.5h8" stroke="#9fe4ff" stroke-width="1.6" opacity=".7"/></svg>',
+  gloves: '<svg viewBox="0 0 24 24"><path d="M7 21v-5.5L4.6 12a1.4 1.4 0 0 1 2.3-1.6L8.5 12V5.2a1.4 1.4 0 0 1 2.8 0V11h.4V3.9a1.4 1.4 0 0 1 2.8 0V11h.4V5.2a1.4 1.4 0 0 1 2.8 0V11h.3V8a1.4 1.4 0 0 1 2.8 0v7.2L18 21z" fill="#e0913a"/><rect x="7" y="18.6" width="11" height="2.6" rx="1" fill="#7a4a1a"/></svg>',
+  skate: '<svg viewBox="0 0 24 24" fill="none"><path d="M3 12.5h18c-.4 1.6-1.8 2.5-3.4 2.5H6.4C4.8 15 3.4 14.1 3 12.5z" fill="#ff7a3a"/><circle cx="7" cy="18" r="2" fill="#f0e6c8"/><circle cx="17" cy="18" r="2" fill="#f0e6c8"/></svg>',
 };
 
 function renderHotbar() {
+  $('hotbar').classList.toggle('hidden', !!(level && level.def.skate));
   $('hotbar').innerHTML = SLOT_ORDER.map((id, i) => {
     const locked = id !== 'none' && !abilities.owned[id];
     const cls = ['slot', abilities.selected === id ? 'selected' : '', locked ? 'locked' : ''].join(' ');
@@ -2764,6 +3877,7 @@ function showBanner() {
 
 function updateHud() {
   setText('hud-level-num', String(game.levelIndex + 1));
+  setText('hud-level-of', `/${LEVELS.length}`);
   setText('hud-level-name', level.def.name);
   setText('hud-coins', String(game.coins));
   setText('hud-level-coins', game.levelCoins > 0 ? `+${game.levelCoins}` : '');
@@ -2771,9 +3885,12 @@ function updateHud() {
   setText('hud-deaths', String(game.deaths));
 
   const sel = abilities.selected;
-  setText('hud-ability-name', T.abilityNames[sel]);
+  setText('hud-ability-name', player.skate ? T.skateAbility : T.abilityNames[sel]);
   let status, fill = 0, mode = '';
-  if (sel === 'chalk') {
+  if (player.skate) {
+    const v = player.body.velocity, kmh = Math.round(Math.hypot(v.x, v.z) * 3.6);
+    status = T.skateStatus(kmh); fill = Math.min(1, kmh / (CFG.skate.maxSpeed * 3.6)); mode = 'active';
+  } else if (sel === 'chalk') {
     if (abilities.chalkActive > 0) {
       status = T.chalkActive(abilities.chalkActive); fill = abilities.chalkActive / CFG.chalk.duration; mode = 'active';
     } else if (abilities.chalkCooldown > 0) {
@@ -2794,6 +3911,19 @@ function updateHud() {
     const cdFrac = abilities.chalkActive > 0 ? 0 : abilities.chalkCooldown / Math.max(0.01, chalkTotalCooldown() - CFG.chalk.duration);
     ui.chalkCd.style.transform = `scaleY(${clamp(cdFrac, 0, 1).toFixed(3)})`;
   }
+  // Grebsmåler (vises, når man hænger, eller grebet ikke er fyldt op)
+  const gripEl = $('hud-grip');
+  const showGrip = !!player.hang || player.grip < 0.995;
+  if (gripEl._show !== showGrip) { gripEl.classList.toggle('hidden', !showGrip); gripEl._show = showGrip; }
+  if (showGrip) {
+    $('hud-grip-fill').style.width = `${Math.round(player.grip * 100)}%`;
+    gripEl.classList.toggle('low', player.grip < 0.3);
+    gripEl.classList.toggle('chalked', abilities.chalkActive > 0);
+  }
+  // Dobbelthop klar?
+  const dbl = $('hud-dbl');
+  const dblState = !abilities.owned.double || player.skate ? 'off' : (player.airJumps > 0 || player.grounded ? 'ready' : 'used');
+  if (dbl._s !== dblState) { dbl.className = `panel dbl-${dblState}`; dbl._s = dblState; }
   const ch = abilities.rope ? 'hooked' : (sel === 'rope' && abilities.target ? 'target' : '');
   if (ch !== ui.crosshairState) {
     const el = $('crosshair');
@@ -2803,7 +3933,7 @@ function updateHud() {
   }
 }
 
-const SCREENS = { menu: 'screen-menu', paused: 'screen-pause', complete: 'screen-complete', shop: 'screen-shop', victory: 'screen-victory' };
+const SCREENS = { menu: 'screen-menu', paused: 'screen-pause', complete: 'screen-complete', shop: 'screen-shop', victory: 'screen-victory', levels: 'screen-levels' };
 function setState(s) {
   game.state = s;
   for (const [k, id] of Object.entries(SCREENS)) $(id).classList.toggle('hidden', k !== s);
@@ -2841,6 +3971,7 @@ function buy(id) {
   abilities.owned[id] = true;
   if (id === 'chalk' || id === 'rope') abilities.selected = id;
   audio.play('buy');
+  if (id === 'double') setTimeout(() => toast(T.toastDoubleOwned, 'gold', 2600), 50);
   saveGame();
   renderShop();
   renderHotbar();
@@ -2874,10 +4005,25 @@ function toggleSound() {
   saveGame();
 }
 
+// Banevalg: alle baner, man har låst op (gemt i "highest")
+function renderLevelSelect() {
+  const save = loadSave();
+  const highest = save ? clamp(save.highest | 0, 0, LEVELS.length - 1) : 0;
+  const best = (save && save.best) || {};
+  $('level-grid').innerHTML = LEVELS.map((def, i) => {
+    const open = i <= highest;
+    const t = best[i] ? formatTime(best[i]) : '';
+    return `<button class="level-tile ${open ? '' : 'locked'}" ${open ? `data-level="${i}"` : 'disabled'}>
+      <span class="lt-num">${i + 1}</span><span class="lt-name">${open ? def.name : T.locked}</span>
+      <span class="lt-best">${t ? `⏱ ${t}` : ''}</span></button>`;
+  }).join('');
+}
+
 let newGameArmed = 0;
 function refreshMenu() {
   const save = loadSave();
   const cont = $('btn-continue');
+  $('btn-levels').classList.toggle('hidden', !(save && (save.highest | 0) > 0));
   const canContinue = save && save.level > 0 && save.level < LEVELS.length;
   cont.classList.toggle('hidden', !canContinue);
   if (canContinue) cont.textContent = T.continueBtn(save.level + 1);
@@ -2894,6 +4040,7 @@ function saveGame() {
   storage.set(SAVE_KEY, JSON.stringify({
     v: 1, level: game.savedLevel, coins: game.coins, owned: abilities.owned, selected: abilities.selected,
     deaths: game.deaths, totalTime: Math.round(game.totalTime), sound: game.sound,
+    highest: game.highest, best: game.best,
   }));
 }
 function loadSave() {
@@ -2910,7 +4057,9 @@ function applySave(s) {
   game.deaths = s ? s.deaths | 0 : 0;
   game.totalTime = s ? +s.totalTime || 0 : 0;
   game.savedLevel = s ? clamp(s.level | 0, 0, LEVELS.length) : 0;
-  abilities.owned = { chalk: false, rope: false, chalkbag: false, longrope: false, ...(s ? s.owned : {}) };
+  abilities.owned = { chalk: false, rope: false, chalkbag: false, longrope: false, double: false, gloves: false, ...(s ? s.owned : {}) };
+  game.highest = s ? clamp(s.highest | 0, 0, LEVELS.length - 1) : 0;
+  game.best = (s && s.best) || {};
   abilities.selected = s && s.selected && (s.selected === 'none' || abilities.owned[s.selected]) ? s.selected : 'none';
   abilities.chalkActive = 0;
   abilities.chalkCooldown = 0;
@@ -2923,7 +4072,9 @@ function applySave(s) {
 const game = {
   state: 'loading', levelIndex: 0, savedLevel: 0, coins: 0, levelCoins: 0, deaths: 0,
   totalTime: 0, levelTime: 0, sound: true, deadTimer: 0, portalTimer: 0, shopReturn: 'menu',
+  highest: 0, best: {},
 };
+const FIRST_ROPE_LEVEL = () => LEVELS.findIndex((d) => d.needsRope);
 let level = null;
 
 function loadLevel(i) {
@@ -2932,7 +4083,7 @@ function loadLevel(i) {
   if (level) level.dispose();
   game.levelIndex = i;
   level = new Level(i);
-  applyTheme(THEMES[level.def.theme]);
+  applyTheme(level.theme);
   buildClouds(level.data.bounds);
   level.reset();
   respawnPlayer();
@@ -2953,9 +4104,11 @@ function startLevel(i) {
   const def = level.def;
   setTimeout(() => {
     if (game.state !== 'playing' || game.levelIndex !== i) return;
-    if (def.needsRope && !abilities.owned.rope) toast(T.toastNeedRope, 'bad', 7000);
-    else if (i === 7) toast(T.toastRopeHint, 'gold', 7000);
-    else if (def.theme === 'frost' && !abilities.owned.chalk) toast(T.tipChalk, 'gold', 6000);
+    if (def.skate) toast(T.toastSkate, 'gold', 7000);
+    else if (def.needsRope && !abilities.owned.rope) toast(T.toastNeedRope, 'bad', 7000);
+    else if (def.needsDouble && !abilities.owned.double) toast(T.toastNeedDouble, 'bad', 7000);
+    else if (i === FIRST_ROPE_LEVEL()) toast(T.toastRopeHint, 'gold', 7000);
+    else if (def.chalkTip && !abilities.owned.chalk) toast(T.tipChalk, 'gold', 6000);
   }, 1400);
 }
 
@@ -2975,6 +4128,8 @@ function die() {
   game.deaths++;
   game.deadTimer = 1.3;
   releaseRope(false);
+  player.hang = null;
+  if (player.skate) player.skate.grind = null;
   const b = player.body;
   player.deathPos.copy(b.position);
   setState('dead');
@@ -3011,6 +4166,9 @@ function completeLevel() {
   game.coins += reward + bonus;
   const last = game.levelIndex >= LEVELS.length - 1;
   game.savedLevel = last ? 0 : game.levelIndex + 1;
+  game.highest = Math.max(game.highest, Math.min(LEVELS.length - 1, game.levelIndex + 1));
+  const prevBest = game.best[game.levelIndex];
+  if (!prevBest || game.levelTime < prevBest) game.best[game.levelIndex] = Math.round(game.levelTime * 10) / 10;
   saveGame();
   $('fade').classList.remove('on');
   if (last) {
@@ -3028,9 +4186,12 @@ function completeLevel() {
   setText('complete-total', String(game.coins));
   const next = game.levelIndex + 1;
   let tip = '';
-  if (LEVELS[next].theme === 'frost' && !abilities.owned.chalk) tip = T.tipChalk;
-  else if (LEVELS[next].needsRope && !abilities.owned.rope) tip = T.tipRope;
-  else if (next === 7) tip = T.tipRopeOwned;
+  const nd = LEVELS[next];
+  if (nd.skate) tip = T.tipSkate;
+  else if (nd.needsRope && !abilities.owned.rope) tip = T.tipRope;
+  else if (nd.needsDouble && !abilities.owned.double) tip = T.tipDouble;
+  else if (nd.chalkTip && !abilities.owned.chalk) tip = T.tipChalk;
+  else if (next === FIRST_ROPE_LEVEL()) tip = T.tipRopeOwned;
   else if (next === LEVELS.length - 1) tip = T.tipFinal;
   setText('complete-tip', tip);
   setState('complete');
@@ -3114,7 +4275,9 @@ function frame(now) {
   lavaLight.position.set(pb.x, pb.y - 100, pb.z);
   lavaLight.target.position.set(pb.x, pb.y, pb.z);
   for (const c of cloudGroup.children) c.position.x += c.userData.drift * dt * 0.4;
-  audio.update(pb.y - CFG.lavaY, Math.hypot(player.body.velocity.x, player.body.velocity.y, player.body.velocity.z));
+  const pv = player.body.velocity;
+  audio.update(pb.y - CFG.lavaY, Math.hypot(pv.x, pv.y, pv.z),
+    player.skate && player.grounded && s === 'playing' ? Math.hypot(pv.x, pv.z) : 0);
 
   renderer.render(scene, camera);
 }
@@ -3169,9 +4332,57 @@ $('shop-items').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-buy]');
   if (btn) buy(btn.dataset.buy);
 });
+click('btn-levels', () => { renderLevelSelect(); setState('levels'); });
+click('btn-levels-back', () => { refreshMenu(); setState('menu'); });
+$('level-grid').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-level]');
+  if (!btn) return;
+  audio.init();
+  audio.play('click');
+  startLevel(+btn.dataset.level);
+});
+
+// Udstilling af alle platformtyper i et verdens-sæt (bruges af udviklerværktøjer og tests)
+function showcaseDef(kit, theme) {
+  return {
+    name: 'Udstilling', kit, theme, reward: 0,
+    segs: [
+      { t: 'start', w: 10, d: 10 },
+      { g: 3, w: 6, d: 6 },
+      { t: 'ice', g: 3, w: 4, d: 4 },
+      { t: 'crumble', g: 3, w: 4, d: 4 },
+      { t: 'move', g: 3, w: 4, d: 4, ax: 'x', amp: 0.001, per: 4 },
+      { t: 'bounce', g: 3, w: 4, d: 4 },
+      { t: 'spin', g: 3, w: 5, spd: 0.4 },
+      { t: 'conveyor', g: 3, w: 4, d: 6, spd: 3 },
+      { t: 'rot', g: 3, w: 6, spd: 0.25 },
+      { t: 'vent', g: 3, w: 3, d: 3, lift: 6 },
+      { t: 'swing', g: 3, w: 4, d: 3, len: 6, amp: 0.001 },
+      { t: 'bar', at: 1, y: 2.6, len: 4 },
+      { g: 6, w: 4, shape: 'cyl' },
+      { t: 'zip', at: -1, y: 3.4, len: 14, drop: 0.8 },
+      { g: 12, w: 6, d: 6 },
+      { t: 'bar', at: 2, y: 2.4, len: 3, ang: 90, x: -1.5, sw: { len: 5, amp: 25, per: 3 } },
+      { t: 'gust', at: 3, w: 6, d: 6, h: 10, y: -2, pow: 12 },
+      { t: 'vent', g: 6, w: 3, d: 3, lift: 6, pulse: 3, duty: 0.5 },
+      { t: 'anchor', at: 2, y: 6 },
+      { g: 4, w: 6, d: 6, v: 'big' },
+      { g: 3, w: 4, d: 4, grab: true, dy: 1 },
+      { g: 3, w: 4, d: 4, slick: true },
+      { t: 'bounce', g: 3, w: 4, d: 4, mv: { ax: 'y', amp: 0.001, per: 3 } },
+      { t: 'bar', at: 1, y: 2.6, len: 3, mv: { ax: 'x', amp: 0.001, per: 4 } },
+      { g: 5, w: 6, d: 6 },
+      { t: 'ramp', g: 3, w: 4, len: 6, rise: 2 },
+      { t: 'boost', g: 0, w: 4, d: 6 },
+      { t: 'rail', g: 2, len: 8 },
+      { t: 'finish', g: 3, w: 10, d: 10 },
+    ],
+  };
+}
 
 // ---- Opstart ----
 function boot() {
+  markSharedGpu();
   createPlayer();
   const save = loadSave();
   applySave(save);
@@ -3193,11 +4404,65 @@ function boot() {
       buildLevelData, startLevel, loadLevel, completeLevel, die, fireRope, releaseRope, findRopeTarget,
       useAbility, selectAbility, openShop, setState, renderShop, renderHotbar, toast, saveGame, applySave,
       fixedStep, respawnPlayer, onKeyPress, updateCamera, camera, renderer, scene, world, debug, particles,
-      emitChalk, enterPortal, restartLevel,
+      emitChalk, enterPortal, restartLevel, tryGrab, releaseHang, hangFrame, WORLD_KITS, renderLevelSelect,
+      get CHARACTER() { return CHARACTER; },
+      setLevelDef(i, def) { LEVELS[i] = def; },
+      showcaseDef,
+      // Start en vilkårlig banedefinition (uden at ændre LEVELS permanent)
+      playDef(def, slot = 0) {
+        const keep = LEVELS[slot];
+        LEVELS[slot] = def;
+        startLevel(slot);
+        LEVELS[slot] = keep;
+        document.getElementById('level-banner').classList.add('hidden');
+        return level.data;
+      },
+      setCharacter(impl) { replaceCharacter(impl); },
+      // Vis alle platformtyper i et sæt og stil kameraet, så de kan fotograferes
+      showcase(kit, theme = 'day') {
+        const def = showcaseDef(kit, theme);
+        const keep = LEVELS[0];
+        LEVELS[0] = def;
+        startLevel(0);
+        LEVELS[0] = keep;
+        document.getElementById('level-banner').classList.add('hidden');
+        return level.data.plats.map((p) => ({ type: p.type, x: p.x, z: p.z, top: p.top }));
+      },
+      camTo(x, y, z, tx, ty, tz) {
+        debug.freeCam = true;
+        camera.position.set(x, y, z);
+        camera.lookAt(tx, ty, tz);
+        camera.updateMatrixWorld();
+      },
+      // Stil flere figurer op i forskellige stillinger (til skærmbilleder af animationerne)
+      lineup(states, spacing = 1.6) {
+        if (window.__lineup) for (const r of window.__lineup) scene.remove(r.root);
+        const sp = level.spawn;
+        window.__lineup = states.map((st, i) => {
+          const rig = CHARACTER.build();
+          rig.inner.rotation.order = 'YXZ';
+          rig.root.position.set(sp.x + (i - (states.length - 1) / 2) * spacing, sp.y + (st.yOffset || 0), sp.z);
+          rig.inner.rotation.y = st.facing ?? 0;
+          scene.add(rig.root);
+          const hanging = st.mode === 'hang' || st.mode === 'climb';
+          const full = { mode: 'idle', speed: 0, vy: 0, grounded: true, runPhase: 0, time: 0, squash: 0, flipT: -1, chalk: 0,
+            hangKind: null, shimmy: 0, climbT: 0, push: false, lean: 0, crouch: 0,
+            grip: 1, turnRate: 0, surface: null, aimLocal: { x: 0, y: -0.2, z: -1 },
+            gripLocal: hanging ? { x: 0, y: CFG.hang.drop, z: st.hangKind === 'bar' ? 0 : -CFG.hang.wallGap } : null,
+            gripTangent: hanging ? { x: 1, y: 0, z: 0 } : null,
+            ropeDir: st.mode === 'rope' ? { x: 0, y: 0.94, z: -0.34 } : null,
+            gear: { gloves: false, chalk: true, rope: true, helmet: st.mode === 'skate' || st.mode === 'grind' }, ...st };
+          for (let k = 0; k < 40; k++) CHARACTER.animate(rig, full, 1 / 30);
+          return rig;
+        });
+        player.model.root.visible = false;
+        return window.__lineup.length;
+      },
     };
   }
 }
 
+const _invQ = new THREE.Quaternion(), _eul = new THREE.Euler(), _cv = new THREE.Vector3();
 const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
 Promise.race([fontsReady, new Promise((r) => setTimeout(r, 1500))]).then(boot);
 })();

@@ -28,7 +28,7 @@
     <div id="hud-level" class="panel">
       <div class="hud-level-top">
         <span class="hud-label">BANE</span>
-        <span id="hud-level-num">1</span><span class="hud-level-of">/10</span>
+        <span id="hud-level-num">1</span><span id="hud-level-of" class="hud-level-of">/15</span>
       </div>
       <div id="hud-level-name">Første skridt</div>
       <div class="hud-stats">
@@ -57,6 +57,16 @@
 
     <div id="crosshair"><div class="ch-ring"></div><div class="ch-dot"></div></div>
 
+    <div id="hud-grip" class="hidden">
+      <span class="grip-label">GREB</span>
+      <div class="grip-bar"><div id="hud-grip-fill"></div></div>
+    </div>
+
+    <div id="hud-dbl" class="panel dbl-off" title="Dobbelthop">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20l6-6 6 6" stroke="currentColor" stroke-width="2.4"/><path d="M6 13l6-6 6 6" stroke="currentColor" stroke-width="2.4"/></svg>
+      <span>2× HOP</span>
+    </div>
+
     <div id="hotbar"></div>
 
     <div id="toasts"></div>
@@ -66,7 +76,8 @@
     </div>
 
     <div id="help-hint" class="panel">
-      <b>WASD</b> bevæg · <b>Mellemrum</b> hop · <b>Højreklik</b> (hold) kamera · <b>Venstreklik</b> evne · <b>Scroll</b> skift evne · <b>B</b> butik · <b>P</b> pause · <b>H</b> skjul
+      <b>WASD</b> bevæg · <b>Mellemrum</b> hop · <b>Højreklik</b> (hold) kamera · <b>Venstreklik</b> evne · <b>Scroll</b> skift evne · <b>B</b> butik · <b>P</b> pause · <b>H</b> skjul<br>
+      Hænger du: <b>W</b>/<b>Mellemrum</b> klatr op · <b>A</b>/<b>D</b> flyt dig · <b>S</b> giv slip
     </div>
   </div>
 
@@ -93,15 +104,17 @@
   <div id="screen-menu" class="screen hidden">
     <div class="card card-menu">
       <div class="logo">SKYHØJ <span>PARKOUR</span></div>
-      <p class="tagline">Løb, hop og sving dig gennem 10 baner – højt over et glødende hav af lava.</p>
+      <p class="tagline">Løb, hop, klatr og sving dig gennem 15 baner – højt over et glødende hav af lava.</p>
       <div class="menu-buttons">
         <button id="btn-continue" class="btn btn-primary hidden">Fortsæt</button>
         <button id="btn-new" class="btn btn-primary">Nyt spil</button>
+        <button id="btn-levels" class="btn hidden">Vælg bane</button>
         <button id="btn-menu-shop" class="btn">Butik</button>
       </div>
       <div class="controls-grid">
         <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div><div>Bevæg dig</div>
-        <div><kbd class="wide">Mellemrum</kbd></div><div>Hop (hold for højere hop)</div>
+        <div><kbd class="wide">Mellemrum</kbd></div><div>Hop (hold for højere hop) – med dobbelthop også i luften</div>
+        <div>Hop mod en kant</div><div>Du griber automatisk fat med hænderne. <kbd>W</kbd> klatr op · <kbd>A</kbd><kbd>D</kbd> flyt dig · <kbd>S</kbd> slip</div>
         <div><kbd class="wide">Højreklik</kbd> hold</div><div>Drej kameraet / se dig omkring</div>
         <div><kbd class="wide">Venstreklik</kbd></div><div>Brug den valgte evne</div>
         <div><kbd class="wide">Scrollhjul</kbd> <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></div><div>Skift evne</div>
@@ -109,6 +122,16 @@
       </div>
       <p class="fineprint">Tjen mønter ved at nå portalen for enden af hver bane. Rør du lavaen, starter banen forfra.</p>
       <p id="touch-note" class="fineprint touch-note hidden">Skyhøj Parkour spilles med tastatur og mus – åbn spillet på en computer.</p>
+    </div>
+  </div>
+
+  <div id="screen-levels" class="screen hidden">
+    <div class="card card-shop">
+      <div class="shop-head"><h2>Vælg bane</h2></div>
+      <div id="level-grid"></div>
+      <div class="menu-buttons row">
+        <button id="btn-levels-back" class="btn btn-primary">Tilbage</button>
+      </div>
     </div>
   </div>
 
@@ -159,7 +182,7 @@
   <div id="screen-victory" class="screen hidden">
     <div class="card card-narrow">
       <div class="logo small">TILLYKKE!</div>
-      <p class="tagline">Du har gennemført alle 10 baner i Skyhøj Parkour og overlevet lavaen.</p>
+      <p class="tagline">Du har gennemført alle 15 baner i Skyhøj Parkour og overlevet lavaen.</p>
       <div class="result-rows">
         <div class="result-row"><span>Samlet tid</span><b id="victory-time">00:00</b></div>
         <div class="result-row"><span>Dødsfald</span><b id="victory-deaths">0</b></div>
