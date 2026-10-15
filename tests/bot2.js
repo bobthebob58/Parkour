@@ -29,7 +29,7 @@ module.exports = async (page, h) => {
     def = process.env.LEVEL_FILE.endsWith('.json') ? JSON.parse(src) : eval('(' + src.replace(/^[^{]*/, '').replace(/;\s*$/, '') + ')');
   }
   const levelNo = +(process.env.LEVEL || 0);
-  const inv = process.env.INV ? process.env.INV.split(',').filter(Boolean) : null;
+  const inv = process.env.INV !== undefined ? process.env.INV.split(',').filter(Boolean) : null;
   const opts = { verbose: !!process.env.VERBOSE, maxTries: +(process.env.MAXTRIES || 60), shots: !!process.env.SHOTS,
     debugStage: process.env.DEBUG_STAGE !== undefined ? +process.env.DEBUG_STAGE : -1, noGrab: process.env.NOGRAB || '' };
   const res = await page.evaluate(planner, { def, levelNo, inv, opts });
@@ -254,6 +254,8 @@ async function planner({ def, levelNo, inv, opts }) {
           return;
         }
         if (P.hang.kind === 'ledge') return `fail:caught wrong ledge (plat ${P.hang.plat.def.index})`;
+        // en stang længere fremme på ruten (fx næste del af en abegren) er også fremskridt
+        if (P.hang.kind === 'bar' && stages.some((st, j) => j > curStage && st.goal.kind === 'bar' && st.goal.bar === P.hang.bar)) return 'ok';
         return `fail:grabbed wrong ${P.hang.kind}`;
       }
       if (P.grounded && !goal.reached()) {
@@ -441,6 +443,7 @@ async function planner({ def, levelNo, inv, opts }) {
 
   // Rope chain: hook anchors in order and release towards the goal.
   function ropeTo(goal, anchors, prm) {
+    if (!A.owned.rope) return 'fail:no rope';
     S.selectAbility('rope');
     let idx = -1, jumped = false, released = false;
     const g0 = goal.aim();
@@ -555,7 +558,7 @@ async function planner({ def, levelNo, inv, opts }) {
       for (const ollie of [false, true]) for (const lead of ollie ? [0.6, 1.5, 3, 4.5, 6] : [0]) for (const speed of [99, 11, 8, 14]) V.push({ ctl: 'skate', ollie, lead, speed });
       return V;
     }
-    if (stage.kind === 'rope') {
+    if (stage.kind === 'rope' && A.owned.rope) {
       for (const pred of [true, false]) for (const rel of [0, 2, 4, -2, 6]) for (const dbl of dblOpts.slice(0, 3)) {
         V.push({ ctl: 'rope', pred, rel, slack: 0.4, sw: 0, hook: 0, edge: 0, dbl });
         if (V.length > opts.maxTries) break;
@@ -639,8 +642,10 @@ async function planner({ def, levelNo, inv, opts }) {
   for (let i = 0; i < 60; i++) step();
   const t0 = L.time;
 
+  let curStage = 0;
   function solve(k, depth) {
     if (k >= stages.length) return true;
+    curStage = k;
     const stage = stages[k];
     const snap = S.snapshot();
     const V = variants(stage);
@@ -662,7 +667,12 @@ async function planner({ def, levelNo, inv, opts }) {
         let nk = k + 1;
         const gp = P.grounded ? P.groundPlat : (P.skate && P.skate.grind ? P.skate.grind.plat : null);
         if (gp) while (nk < stages.length && stages[nk].trans < gp.def.index) nk++;
-        if (P.hang && P.hang.kind === 'bar') while (nk < stages.length && stages[nk].goal.kind === 'bar' && stages[nk].goal.bar.def.index <= P.hang.bar.def.index) nk++;
+        if (P.hang && P.hang.kind === 'bar') {
+          const j = stages.findIndex((st, jj) => jj > k && st.goal.kind === 'bar' && st.goal.bar === P.hang.bar);
+          if (j > 0) nk = j + 1;
+          while (nk < stages.length && stages[nk].goal.kind === 'bar' && stages[nk].goal.bar.def.after === P.hang.bar.def.after && stages[nk].goal.bar.def.index <= P.hang.bar.def.index) nk++;
+        }
+        curStage = nk;
         if (nk >= stages.length) return true;
         if (solve(nk, depth + 1)) return true;
         // begrænset backtracking: højst et par alternativer pr. trin og et samlet budget

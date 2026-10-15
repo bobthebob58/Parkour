@@ -1,0 +1,299 @@
+{
+ "name": "Solbanen",
+ "kit": "skatemesa",
+ "theme": "skatemesa",
+ "reward": 45,
+ "needsRope": false,
+ "needsDouble": false,
+ "chalkTip": false,
+ "skate": true,
+ "segs": [
+  {
+   "t": "start",
+   "w": 12,
+   "d": 14,
+   "v": "plaza",
+   "look": "skate plaza with graffiti",
+   "hint": "Skateboard! W: sæt fart · A/D: styr · S: brems · Mellemrum: ollie"
+  },
+  {
+   "g": 0,
+   "w": 10,
+   "d": 30,
+   "dy": -0.5,
+   "coin": true,
+   "look": "wide concrete sky road"
+  },
+  {
+   "t": "coin",
+   "at": -20,
+   "y": 1.2
+  },
+  {
+   "t": "coin",
+   "at": -10,
+   "y": 1.2
+  },
+  {
+   "turn": 15,
+   "g": 0,
+   "w": 9,
+   "d": 26,
+   "dy": -1,
+   "coin": true,
+   "look": "road bending right"
+  },
+  {
+   "t": "boost",
+   "g": 0,
+   "w": 6,
+   "d": 6,
+   "look": "boost pad (Kaktusslalom)",
+   "hint": "Boost! De lysende pile giver fuld fart"
+  },
+  {
+   "turn": -20,
+   "g": 0,
+   "w": 7,
+   "d": 24,
+   "dy": -1,
+   "coin": true,
+   "look": "narrow cactus-lined road"
+  },
+  {
+   "t": "coin",
+   "at": -12,
+   "y": 1.2,
+   "x": 1.5
+  },
+  {
+   "turn": 20,
+   "g": 0,
+   "w": 7,
+   "d": 24,
+   "dy": -1,
+   "coin": true,
+   "look": "narrow cactus-lined road"
+  },
+  {
+   "t": "coin",
+   "at": -12,
+   "y": 1.2,
+   "x": -1.5
+  },
+  {
+   "turn": -15,
+   "g": 0,
+   "w": 8,
+   "d": 20,
+   "dy": -0.5,
+   "cp": true,
+   "look": "mesa top before the stair set"
+  },
+  {
+   "g": 0,
+   "w": 8,
+   "d": 4,
+   "dy": -1,
+   "v": "stairs",
+   "look": "stair set step 1 (Trappesættet)"
+  },
+  {
+   "g": 0,
+   "w": 8,
+   "d": 4,
+   "dy": -1,
+   "v": "stairs",
+   "look": "stair set step 2"
+  },
+  {
+   "g": 0,
+   "w": 8,
+   "d": 4,
+   "dy": -1,
+   "v": "stairs",
+   "look": "stair set step 3"
+  },
+  {
+   "g": 0,
+   "w": 8,
+   "d": 14,
+   "dy": -1,
+   "coin": true,
+   "look": "landing road after the stairs"
+  },
+  {
+   "t": "rail",
+   "g": 2.5,
+   "len": 12,
+   "dy": 0.5,
+   "look": "steel handrail grind",
+   "hint": "Gelænder! Hop op på det (mellemrum) og grind"
+  },
+  {
+   "g": 2.5,
+   "w": 8,
+   "d": 16,
+   "dy": -1,
+   "coin": true,
+   "look": "road after the rail"
+  },
+  {
+   "t": "boost",
+   "g": 0,
+   "w": 6,
+   "d": 6,
+   "look": "boost pad"
+  },
+  {
+   "t": "ramp",
+   "g": 0,
+   "w": 6,
+   "len": 6,
+   "rise": 1.6,
+   "look": "plywood kicker"
+  },
+  {
+   "g": 6,
+   "w": 10,
+   "d": 20,
+   "dy": -2.5,
+   "coin": true,
+   "look": "next mesa road after the kicker gap"
+  },
+  {
+   "turn": 25,
+   "g": 0,
+   "shape": "cyl",
+   "w": 14,
+   "dy": -0.5,
+   "v": "bowl",
+   "coin": true,
+   "look": "concrete bowl (Bowlen)"
+  },
+  {
+   "turn": 25,
+   "g": 0,
+   "shape": "cyl",
+   "w": 12,
+   "dy": -0.5,
+   "v": "bowl",
+   "look": "second bowl"
+  },
+  {
+   "g": 0,
+   "w": 9,
+   "d": 18,
+   "dy": -0.5,
+   "cp": true,
+   "coin": true,
+   "look": "road out of the bowl, checkpoint"
+  },
+  {
+   "t": "ramp",
+   "g": 0,
+   "w": 6,
+   "len": 6,
+   "rise": 1.4,
+   "look": "banked kicker"
+  },
+  {
+   "g": 5,
+   "w": 8,
+   "d": 22,
+   "dy": -2,
+   "coin": true,
+   "look": "road on a lower mesa"
+  },
+  {
+   "turn": -20,
+   "g": 0,
+   "w": 6,
+   "d": 24,
+   "dy": -1,
+   "coin": true,
+   "look": "narrowing road"
+  },
+  {
+   "t": "rail",
+   "g": 2.5,
+   "len": 14,
+   "dy": 0.4,
+   "look": "guard rail grind"
+  },
+  {
+   "g": 2.5,
+   "w": 6,
+   "d": 18,
+   "dy": -1,
+   "coin": true,
+   "look": "narrow road"
+  },
+  {
+   "turn": 20,
+   "g": 0,
+   "w": 8,
+   "d": 16,
+   "dy": -0.5,
+   "coin": true,
+   "look": "approach to the mega ramp"
+  },
+  {
+   "t": "boost",
+   "g": 0,
+   "w": 6,
+   "d": 6,
+   "look": "boost pad 1 (Megarampen)",
+   "hint": "Megarampen! Fuld fart over kløften",
+   "spd": 26
+  },
+  {
+   "t": "boost",
+   "g": 0,
+   "w": 6,
+   "d": 6,
+   "look": "boost pad 2",
+   "spd": 26
+  },
+  {
+   "t": "boost",
+   "g": 0,
+   "w": 6,
+   "d": 6,
+   "look": "boost pad 3",
+   "spd": 26
+  },
+  {
+   "t": "ramp",
+   "g": 0,
+   "w": 7,
+   "len": 8,
+   "rise": 3,
+   "look": "giant kicker"
+  },
+  {
+   "t": "coin",
+   "at": 6,
+   "y": 3
+  },
+  {
+   "t": "coin",
+   "at": 10,
+   "y": 3.5
+  },
+  {
+   "t": "coin",
+   "at": 14,
+   "y": 3
+  },
+  {
+   "t": "finish",
+   "g": 15,
+   "w": 14,
+   "d": 18,
+   "dy": -6,
+   "v": "plaza",
+   "look": "portal plaza across the canyon"
+  }
+ ]
+}
