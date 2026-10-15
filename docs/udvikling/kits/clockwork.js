@@ -867,7 +867,101 @@
 
       /* ---------- Kulisser (se decor) ---------- */
       function buildDecor(data) {
-        return new THREE.Group();
+        const root = new THREE.Group();
+        const b = data.bounds, rng = ctx.mulberry32(7171 + ctx.levelIndex);
+        const R0 = b.radius + 45, yMid = (b.minY + b.maxY) / 2;
+        const place = (minR, spread, yLo, yHi, tries = 30) => {
+          for (let i = 0; i < tries; i++) {
+            const a = rng() * TAU, r = minR + rng() * spread;
+            const x = b.cx + Math.cos(a) * r, z = b.cz + Math.sin(a) * r, y = yLo + rng() * (yHi - yLo);
+            if (ctx.clearOfCourse(x, y, z, 14)) return { x, y, z, a };
+          }
+          return null;
+        };
+        // Kæmpe tandhjul, der drejer langsomt i baggrunden (lodrette, vendt mod banen)
+        const gearMats = ['brass', 'pipe', 'iron', 'brassSide'];
+        for (let i = 0; i < 14; i++) {
+          const q = place(R0, 220, yMid - 30, yMid + 50);
+          if (!q) continue;
+          const R = 10 + rng() * 26, n = Math.round(R * 1.4);
+          const geo = tr(gearGeo(R, R * 0.88, n, 2 + rng() * 2, 5, R * 0.18).translate(0, 0, -1));
+          const g = new THREE.Mesh(geo, mat(gearMats[i % gearMats.length]));
+          const holder = new THREE.Group();
+          holder.position.set(q.x, q.y, q.z);
+          holder.lookAt(b.cx, q.y, b.cz);
+          holder.add(g);
+          root.add(holder);
+          anim.gears.push({ mesh: g, w: (i % 2 ? 1 : -1) * (0.6 / R) * 6, ph: rng() * TAU });
+        }
+        // Fabrikshaller med oplyste vinduer og skorstene
+        const winGeo = tr(new THREE.PlaneGeometry(1.6, 2.4));
+        for (let i = 0; i < 10; i++) {
+          const q = place(R0 + 60, 260, b.minY - 60, b.minY - 40);
+          if (!q) continue;
+          const w = 40 + rng() * 50, h = 50 + rng() * 60, d = 30 + rng() * 30;
+          const hall = new THREE.Group();
+          hall.position.set(q.x, q.y, q.z);
+          hall.lookAt(b.cx, q.y, b.cz);
+          const body = new THREE.Mesh(tr(new THREE.BoxGeometry(w, h, d)), mat(i % 2 ? 'ironDark' : 'copperSide'));
+          body.position.y = h / 2;
+          hall.add(body);
+          const roof = new THREE.Mesh(tr(new THREE.CylinderGeometry(d / 2, d / 2, w, 3, 1).rotateZ(PI / 2)), mat('darkPlate'));
+          roof.position.y = h + d * 0.2;
+          hall.add(roof);
+          const rows = Math.floor(h / 9), cols = Math.floor(w / 6);
+          const wins = new THREE.InstancedMesh(winGeo, mat('window'), rows * cols);
+          let k = 0;
+          for (let r = 1; r < rows; r++) for (let c = 0; c < cols; c++) {
+            if (rng() < 0.35) continue;
+            const m = new THREE.Matrix4().makeTranslation(-w / 2 + 3 + c * 6, r * 9, d / 2 + 0.05);
+            wins.setMatrixAt(k++, m);
+          }
+          wins.count = k;
+          hall.add(wins);
+          for (let c = 0; c < 2; c++) { // skorstene
+            const stack = new THREE.Mesh(tr(new THREE.CylinderGeometry(2.2, 3, 50, 12)), mat('rust'));
+            stack.position.set(-w / 3 + c * w / 2, h + 25, -d / 4);
+            hall.add(stack);
+          }
+          root.add(hall);
+        }
+        // Urtårnet: en stor urskive med visere, der drejer
+        const tq = place(R0 + 30, 40, b.maxY + 10, b.maxY + 25, 60) || { x: b.cx + R0 + 40, y: b.maxY + 15, z: b.cz };
+        const tower = new THREE.Group();
+        tower.position.set(tq.x, tq.y, tq.z);
+        tower.lookAt(b.cx, tq.y, b.cz);
+        const shaft = new THREE.Mesh(tr(new THREE.BoxGeometry(24, 120, 24)), mat('brassSide'));
+        shaft.position.y = -50;
+        tower.add(shaft);
+        const face = new THREE.Mesh(tr(new THREE.CircleGeometry(16, 48)), mat('dialGlow'));
+        face.position.set(0, 0, 12.2);
+        tower.add(face);
+        const rim = new THREE.Mesh(tr(new THREE.TorusGeometry(16.4, 1, 10, 48)), mat('brass'));
+        rim.position.z = 12.4;
+        tower.add(rim);
+        for (const [len, wid, w] of [[11, 1.1, 0.12], [14, 0.7, 1.4]]) {
+          const hand = new THREE.Mesh(tr(new THREE.BoxGeometry(wid, len, 0.4).translate(0, len / 2 - 1.5, 0)), mat('iron'));
+          hand.position.z = 12.9;
+          tower.add(hand);
+          anim.hands.push({ mesh: hand, w });
+        }
+        const cap = new THREE.Mesh(tr(new THREE.ConeGeometry(18, 22, 4).rotateY(PI / 4)), mat('patina'));
+        cap.position.y = 27;
+        tower.add(cap);
+        root.add(tower);
+        // Kobberrør, der bugter sig mellem hallerne
+        for (let i = 0; i < 6; i++) {
+          const pts = [];
+          let a = rng() * TAU;
+          for (let k = 0; k < 6; k++) {
+            a += 0.25 + rng() * 0.2;
+            const r = R0 + 20 + rng() * 80;
+            pts.push(new V3(b.cx + Math.cos(a) * r, b.minY - 30 + rng() * 60, b.cz + Math.sin(a) * r));
+          }
+          if (!pts.every((p) => ctx.clearOfCourse(p.x, p.y, p.z, 10))) continue;
+          root.add(new THREE.Mesh(tr(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 60, 1.4, 8)), mat('pipe')));
+        }
+        return root;
       }
     },
   };

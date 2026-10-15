@@ -310,6 +310,7 @@
             P.setZ(i, Math.abs(z) < d * 0.4 ? Math.sign(z) * (d / 2 - bz) : z);
           }
         }
+        if (!g.attributes.color) g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3), 3));
         const P = g.attributes.position, C = g.attributes.color, U = g.attributes.uv;
         for (let i = 0; i < P.count; i++) {
           const x = P.getX(i), z = P.getZ(i);

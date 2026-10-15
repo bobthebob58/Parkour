@@ -3,7 +3,11 @@
 const path = require('path'), fs = require('fs');
 module.exports = async (page, h) => {
   await page.waitForFunction(() => window.skyhoj && window.skyhoj.game.state === 'menu', null, { timeout: 60000 });
-  if (process.env.KIT_FILE) await page.addScriptTag({ path: process.env.KIT_FILE });
+  if (process.env.KIT_FILE) {
+    const lib = path.join(path.dirname(process.env.KIT_FILE), '_lib.js');
+    if (fs.existsSync(lib)) await page.addScriptTag({ path: lib });
+    await page.addScriptTag({ path: process.env.KIT_FILE });
+  }
   const id = process.env.KIT_ID || 'sten';
   const theme = process.env.THEME || (await page.evaluate((id) => (window.SKYHOJ_THEMES[id] ? id : 'day'), id));
   const out = process.env.OUT || path.join(__dirname, '..', 'preview');
