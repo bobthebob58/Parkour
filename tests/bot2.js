@@ -165,7 +165,7 @@ async function planner({ def, levelNo, inv, opts }) {
       aim() { const b = pos(); const s = barClosestS(bar, b.x, b.z); return barPoint(bar, s); },
       top: () => bar.a.y - H.drop - radius + 0.2,
       radius: () => 0.4,
-      reached: () => !!(P.hang && P.hang.kind === 'bar' && P.hang.bar === bar),
+      reached: () => !!(P.hang && P.hang.kind === 'bar' && (P.hang.bar === bar || (P.hang.bar.def.after === bar.def.after && P.hang.bar.def.index > bar.def.index && !P.hang.bar.def.opt))),
     };
   }
   function goalZip(z) {
@@ -192,10 +192,10 @@ async function planner({ def, levelNo, inv, opts }) {
   const stages = [];
   for (let i = 0; i + 1 < N; i++) {
     const hs = [];
-    for (const b of L.bars) if (b.def.after === i) hs.push({ seq: b.def.seq, g: goalBar(b) });
-    for (const z of L.zips) if (z.def.after === i) hs.push({ seq: z.def.seq, g: goalZip(z) });
+    for (const b of L.bars) if (b.def.after === i && !b.def.opt) hs.push({ seq: b.def.seq, g: goalBar(b) });
+    for (const z of L.zips) if (z.def.after === i && !z.def.opt) hs.push({ seq: z.def.seq, g: goalZip(z) });
     for (const w of L.winds) if (w.def.after === i) hs.push({ seq: w.def.seq, g: goalWind(w) });
-    const ancs = L.anchors.filter((a) => a.def.after === i).sort((a, b) => a.def.seq - b.def.seq);
+    const ancs = L.anchors.filter((a) => a.def.after === i && !a.def.opt).sort((a, b) => a.def.seq - b.def.seq);
     hs.sort((a, b) => a.seq - b.seq);
     // anchors: insert a rope stage before the first helper that comes after them (or before the platform)
     let ropeInserted = false;
@@ -297,7 +297,10 @@ async function planner({ def, levelNo, inv, opts }) {
     keys({});
     let ok = true;
     for (let i = 0; i < 18; i++) { step(); if (!alive() || S.game.state === 'dead') { ok = false; break; } }
-    if (ok && !(P.grounded && P.groundPlat === goal.pl) && !(P.hang && P.hang.plat === goal.pl)) ok = P.grounded;
+    if (ok && !(P.grounded && P.groundPlat === goal.pl) && !(P.hang && P.hang.plat === goal.pl)) {
+      // kastet videre af en springpude eller landet længere fremme er fint; faldet ned er ikke
+      ok = (P.grounded && P.groundPlat && P.groundPlat.def.index >= goal.pl.def.index) || pos().y - radius > goal.top() - 0.8;
+    }
     S.restore(snap);
     return ok;
   }
@@ -327,6 +330,21 @@ async function planner({ def, levelNo, inv, opts }) {
       }, 3);
       keys({});
       if (r !== 'ok') return r;
+    }
+    // langsom tilgang: gå hen til kanten, stå stille og hop (til stænger lige ude over kanten)
+    if (prm.slow) {
+      r = run((t) => {
+        const p = pos(), a = goal.aim(), dh = Math.hypot(a.x - p.x, a.z - p.z) || 1;
+        const e = distToEdge(P.groundPlat || from, p.x, p.z, (a.x - p.x) / dh, (a.z - p.z) / dh);
+        yawTo(a.x, a.z);
+        if (e > prm.slow) { keys({ W: true }); return; }
+        keys({});
+        if (Math.hypot(P.body.velocity.x - P.groundVel.x, P.body.velocity.z - P.groundVel.z) < 0.6) return 'ok';
+        if (!P.grounded && P.coyote <= 0) return 'fail:fell off while stopping';
+      }, 5);
+      if (r !== 'ok') return r;
+      keys({ Space: true }); pressSpace(); step();
+      return airTo(goal, prm.dbl);
     }
     // run and jump
     let jumped = false, tj = 0;
@@ -562,6 +580,8 @@ async function planner({ def, levelNo, inv, opts }) {
       }
       // short hops for tiny gaps / ledges just above
       V.push({ ctl: 'run', wait: 0, back: 0, lead: 0.3, short: true, dbl: null });
+      // stående hop mod en stang/svævebane lige ude over kanten
+      if (goal.kind === 'bar' || goal.kind === 'zip') for (const slow of [0.3, 0.8, 1.4]) for (const wait of waits.slice(0, 8)) V.push({ ctl: 'run', slow, wait, back: 0, lead: 0, dbl: null });
       // sort: cheap & common first
       V.sort((a, b) => (a.dbl ? 1 : 0) - (b.dbl ? 1 : 0) || a.wait - b.wait);
       return V.slice(0, Math.max(opts.maxTries, 12 * waits.length));
@@ -629,6 +649,7 @@ async function planner({ def, levelNo, inv, opts }) {
     for (const prm of V) {
       vi++;
       stats.tries++;
+      if (stats.tries > 9000) break; // nødbremse: banen er for svær/umulig for robotten
       S.restore(snap);
       let r = execute(stage, prm);
       if (r === 'portal') r = k === stages.length - 1 ? 'ok' : 'ok';
@@ -641,9 +662,12 @@ async function planner({ def, levelNo, inv, opts }) {
         let nk = k + 1;
         const gp = P.grounded ? P.groundPlat : (P.skate && P.skate.grind ? P.skate.grind.plat : null);
         if (gp) while (nk < stages.length && stages[nk].trans < gp.def.index) nk++;
+        if (P.hang && P.hang.kind === 'bar') while (nk < stages.length && stages[nk].goal.kind === 'bar' && stages[nk].goal.bar.def.index <= P.hang.bar.def.index) nk++;
         if (nk >= stages.length) return true;
         if (solve(nk, depth + 1)) return true;
-        if (successes >= 4) break; // limited backtracking
+        // begrænset backtracking: højst et par alternativer pr. trin og et samlet budget
+        stats.backtracks = (stats.backtracks || 0) + 1;
+        if (successes >= 3 || stats.backtracks > 40) break;
         continue;
       }
       const why = r.replace(/^fail:/, '');

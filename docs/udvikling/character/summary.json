@@ -1,0 +1,35 @@
+{
+  "file": "/tmp/claude-0/-home-user-Parkour/eaa922d6-d00f-5fe4-a15d-da7efe1299c2/scratchpad/character/character.js",
+  "meshes": 56,
+  "tris": 28460,
+  "lines": 1060,
+  "features": [
+    "1.80 m adult, about 7.8 heads tall, hips at 0.95 m, shoulders (deltoids) wider than hips, neck with trapezius slope, LatheGeometry torso flattened front to back",
+    "Nested joint hierarchy: tiltG (bank) > pivot (flip, rope tilt, skate yaw) > base > pelvis > spine > chest > neck > head; clavicle > upper arm > forearm > hand (palm, 2-segment thumb, four 2-segment fingers); hip > thigh > shin > foot > toe pivot; joint spheres hide gaps",
+    "Analytic two-bone IK on all four limbs, with pole vectors and absolute hand and foot orientation; poses are flat number arrays blended between modes with per-mode transition rates",
+    "Run cycle with no foot sliding: stance length and duty factor come from the engine's runPhase rate, so the planted forefoot moves back at exactly ground speed. Includes heel rise and toe roll at push-off, Catmull-Rom swing path (heel kick, knee drive, reach, paw-back), pelvis bob twice per cycle, pelvis and shoulder counter-rotation, arms swinging at about 90 degrees with fists, torso lean that grows with speed and acceleration, smooth idle > jog > sprint blend, banking into turns (turnRate x speed), ice and conveyor variants",
+    "Idle life: breathing (chest scale plus shoulder rise, heavier after hangs and climbs), slow weight shift with hip drop, glancing around, blinking every 3-6 s, head turns gently toward the camera aim",
+    "Air: takeoff extension with knee drive (vy > 1.5), tuck near the apex, legs reaching down and arms out when falling, landing squash scaled by s.squash",
+    "Double jump: a real forward tuck somersault. The pivot 0.9 m above the feet turns a full 360 degrees with smoothstep easing over flipT, knees pulled to the chest and hands on the shins, opening at the end. A landing mid-flip unwinds smoothly",
+    "Hang: palms placed exactly at gripLocal +/- 0.2 x gripTangent by IK (checked numerically to within 1 mm). Ledge = braced hang with feet on the wall at z of about -0.3, palm flat on the top, fingers over the edge. Bar = overhand free hang with fingers wrapped, shoulders shrugged, a pendulum swing driven by entry speed, and the body turned so the shoulders line up with the bar. Zip = narrow overhead grip with knees tucked. Shimmy = asymmetric hand-over-hand where each hand lifts and reaches, then slides back while the body follows. Grip below 0.3 = arm and body tremble and fingers slip open",
+    "Climb (mantle) keyed to the engine's placeClimb curve: pull, chest to the edge with elbows coming up, knee onto the ledge, step up, stand. The ledge position comes from gripLocal while the hands hold on, so it lines up both in the game and in the frozen preview",
+    "Rope: body tilted to line up with ropeDir, left hand above and right hand below on the rope line (the rope leaves from hands[1]) in a hammer grip, legs together and trailing the swing velocity",
+    "Skateboard: maple deck (0.8 m) with kicked nose and tail, concave, black grip tape and orange underside, metal trucks with bushings, 4 rounded urethane wheels; deck top 0.11 m above the feet. Rider stands sideways (left foot forward) with knees bent and arms out, head turned toward the nose. Push = body turns forward and the back foot cycles on the ground. Lean banks the rider and rolls the deck slightly. Crouch = ollie crouch. Airborne = knees up, then an automatic indy grab after 0.25 s. Grind = low crouch with arms wide",
+    "Gear: fingerless gloves (palm, thumb and inner finger segments swap to a glove material), chalk bag on the back belt with a white chalk rim (dangles on a spring), coiled two-tone rope on the back, helmet with yellow stripe and knee pads on the skate level (the headband is hidden under the helmet)",
+    "setChalk whitens palm and fingers (and lightens the gloves)",
+    "Face and head: shaped skull with jaw, chin, eye sockets and stubble tint; nose, ears, lips, brows, sclera with brown iris and pupil, blinking upper lids with a lash line; short hair as a slightly noisy cap plus clumps; yellow headband",
+    "Clothing: hoodie with hood roll and hood on the back, drawstrings that dangle on a spring (gravity plus air drag, clamped so they stay off the chest), kangaroo pocket, rib cuffs and hem; navy joggers with side stripes and ankle cuffs; sneakers with white midsole, dark outsole, grey side panel, lace stripes and a yellow heel tab",
+    "Materials: MeshPhysicalMaterial with sheen and a shared procedural CanvasTexture knit normal map for fabric; warm skin with sheen; glossier shoes and helmet; colours stored as vertex colours on merged geometries (a custom merge helper, no addons)",
+    "Several rigs can exist at once (all state lives in rig._st); 56 meshes and about 28k triangles including the board; no console output"
+  ],
+  "knownIssues": [
+    "One merged mesh per bone, not a SkinnedMesh: joints are hidden with overlapping spheres, so very sharp bends (deep knee bend in the tuck, elbows in the mantle) can show a slight crease or overlap",
+    "The face is stylised-realistic, not photoreal: it works at gameplay distance, but in close-up it looks smooth and somewhat doll-like",
+    "No ground raycast for the feet: feet plant on the root's ground line, so on steps or slopes a foot can hover or sink a few cm",
+    "The skate push foot sweeps at about 1.5 m/s while the board moves much faster, so it slides during the short ground contact",
+    "No wall check for the braced hang: if the wall under a ledge is missing or slanted, the feet press against air",
+    "The flip happens around the visual pivot only (the physics body does not rotate); flip 0.3 in the frozen preview looks like a head-first dive because the preview root sits at ground height",
+    "The rope coil on the back can read a little like a ring or target from directly behind at long distance",
+    "Not done: an 80 ms anticipation crouch before jumps (the engine sends no pre-jump event), the parkour roll after big drops, and dust puffs and particles (those belong to the engine)"
+  ]
+}

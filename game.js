@@ -1340,7 +1340,7 @@ function buildLevelData(def) {
         const yaw = heading + (s.ang || 0) * DEG, dv = fwdVec(yaw), len = s.len ?? 4;
         bars.push({
           x: bx + dv.x * len / 2, y: prev.top + (s.y ?? 2.6), z: bz + dv.z * len / 2,
-          dx: dv.x, dz: dv.z, yaw, len, r: s.r ?? 0.06, v: s.v || null, index: bars.length, after, seq,
+          dx: dv.x, dz: dv.z, yaw, len, r: s.r ?? 0.06, v: s.v || null, index: bars.length, after, seq, opt: !!s.opt,
           move: s.mv ? makeMove(s.mv, heading) : null, // stang, der flytter sig (fx under et luftskib)
           // Trapez: stangen hænger i reb og svinger som et pendul
           swing: s.sw ? makeSwing({ ax: s.sw.ax || 'z', len: s.sw.len ?? 5, amp: s.sw.amp ?? 30, per: s.sw.per ?? 3, ph: s.sw.ph ?? 0 }, heading) : null,
@@ -1351,7 +1351,7 @@ function buildLevelData(def) {
         const ay = prev.top + (s.y ?? 3.2);
         zips.push({
           ax: bx, ay, az: bz, bx: bx + dv.x * len, by: ay - drop, bz: bz + dv.z * len,
-          len, drop, dx: dv.x, dz: dv.z, yaw, v: s.v || null, index: zips.length, after, seq,
+          len, drop, dx: dv.x, dz: dv.z, yaw, v: s.v || null, index: zips.length, after, seq, opt: !!s.opt,
         });
       } else if (t === 'gust') {
         // Vindstød: et område, der med mellemrum skubber spilleren sidelæns
@@ -1364,7 +1364,7 @@ function buildLevelData(def) {
         // Opvind (søjle af luft/damp), der løfter spilleren
         winds.push({ x: bx, y: prev.top + (s.y ?? -8), z: bz, r: s.r ?? 1.8, h: s.h ?? 12, power: s.pow ?? CFG.vent.power, after, seq });
       } else {
-        const item = { x: bx, y: prev.top + s.y, z: bz, move: s.ax ? makeMove(s, heading) : null, after, seq };
+        const item = { x: bx, y: prev.top + s.y, z: bz, move: s.ax ? makeMove(s, heading) : null, after, seq, opt: !!s.opt };
         (t === 'anchor' ? anchors : coins).push(item);
       }
       continue;
