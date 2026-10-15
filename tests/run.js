@@ -8,6 +8,7 @@
 //   W, H         vinduesstørrelse (standard 1280x720)
 //   OUT_DIR      hvor skærmbilleder gemmes (standard ../docs/images)
 //   LEVELS       f.eks. "1,5,10" – begræns bot/skærmbilleder til bestemte baner
+//   TIMEOUT_MS   grænse for klik og andre handlinger (standard 120000)
 const path = require('path');
 const fs = require('fs');
 const { chromium } = require('playwright');
@@ -29,6 +30,10 @@ async function main() {
   });
   const width = +(process.env.W || 1280), height = +(process.env.H || 720);
   const page = await browser.newPage({ viewport: { width, height } });
+  // Software-WebGL holder sidens hovedtråd optaget i lange stræk, og et klik venter på hovedtråden
+  // (målt: 4 s pr. klik uden belastning, 12 s under belastning). Playwrights standard på 30 s er for
+  // stram på en travl CI-maskine, så handlinger får samme rummelige grænse som testenes andre ventetider.
+  page.setDefaultTimeout(+(process.env.TIMEOUT_MS || 120000));
   const logs = [];
   page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
   page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}\n${e.stack}`));

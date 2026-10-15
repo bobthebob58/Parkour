@@ -50,3 +50,4 @@ Miljøvariabler:
 - `W`/`H`: vinduesstørrelse
 - `OUT_DIR`: hvor billeder gemmes
 - `LEVELS`: begræns baner
+- `TIMEOUT_MS`: grænse for klik og andre handlinger (standard 120 s, fordi software-WebGL gør siden langsom)
