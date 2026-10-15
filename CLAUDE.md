@@ -57,7 +57,8 @@ First time in a session: `cd tests && npm ci` (Chromium is preinstalled in cloud
 | `npm run e2e` | ~10 min | 36 real mouse/keyboard checks |
 
 - **CI runs all of this on every push/PR** (`.github/workflows/test.yml`: build check, e2e, levels
-  in 3 parallel jobs). In a session, test only what you changed and let CI do the full run.
+  in 3 parallel jobs) in about 4 minutes – far faster than in a session. Test only what you changed
+  locally, push, and read the CI result.
 - Run long tests in the background and read only the `RESULT`/`BESTÅET`/`FAIL` lines.
 - Level requirements (enforced by `tests/alle-baner.js`): rope required from level 8
   (`needsRope`), double jump from level 11 (`needsDouble`); levels 2–5 and 7–10 must be impossible

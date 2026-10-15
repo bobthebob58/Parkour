@@ -1,5 +1,5 @@
 # Kører spillets tests på GitHub, så de ikke skal køres i hver arbejdssession.
-# Robotten fordeles på tre parallelle job (fem baner hver), så det hele tager ca. et kvarter.
+# Robotten fordeles på tre parallelle job (fem baner hver); det hele tager ca. 4 minutter.
 name: Test
 
 on:
@@ -17,8 +17,8 @@ jobs:
     name: game.js er bygget fra src/
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - run: node tools/byg.js --tjek
@@ -31,8 +31,8 @@ jobs:
       run:
         working-directory: tests
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -53,8 +53,8 @@ jobs:
       run:
         working-directory: tests
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
