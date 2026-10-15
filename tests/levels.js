@@ -1,13 +1,13 @@
 // Screenshots of every level: start view (gameplay camera + HUD) and a drone overview.
 module.exports = async (page, h) => {
   await page.waitForFunction(() => window.skyhoj && window.skyhoj.game.state === 'menu', null, { timeout: 60000 });
-  const only = process.env.LEVELS ? process.env.LEVELS.split(',').map(Number) : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const only = process.env.LEVELS ? process.env.LEVELS.split(',').map(Number) : Array.from({ length: 15 }, (_, i) => i + 1);
   const mode = process.env.MODE || 'both';
   for (const n of only) {
     const tag = String(n).padStart(2, '0');
     await page.evaluate((i) => {
       const S = window.skyhoj;
-      S.abilities.owned.chalk = true; S.abilities.owned.rope = true;
+      S.abilities.owned.chalk = true; S.abilities.owned.rope = true; S.abilities.owned.double = true;
       S.debug.freeCam = false; S.debug.freeze = false;
       S.startLevel(i);
       document.getElementById('level-banner').classList.add('hidden');

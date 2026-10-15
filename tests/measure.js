@@ -1,5 +1,5 @@
 // Measure what the physics allows, using the planner bot on many tiny synthetic levels.
-const { planner } = require('./bot2.js');
+const { planner } = require('./bot.js');
 module.exports = async (page, h) => {
   await page.waitForFunction(() => window.skyhoj && window.skyhoj.game.state === 'menu', null, { timeout: 60000 });
   const run = async (segs, inv, extra = {}) => {

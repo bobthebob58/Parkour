@@ -1,6 +1,6 @@
 # Tests og skærmbilleder
 
-Alle scripts køres via `run.js`, som åbner `../index.html?debug` i headless Chromium med Playwright. Adresserne på jsDelivr (Three.js 0.160.0 og cannon-es 0.20.0) besvares med de lokale kopier i `node_modules`, så testene kører offline og mod præcis de versioner, spillet bruger.
+Alle scripts køres via `run.js`. Det åbner `../index.html?debug` i headless Chromium med Playwright. Adresserne på jsDelivr (Three.js 0.160.0 og cannon-es 0.20.0) besvares med de lokale kopier i `node_modules`. Derfor kører testene offline og mod præcis de versioner, spillet bruger.
 
 ```bash
 npm install
@@ -9,13 +9,44 @@ npx playwright install chromium   # hvis Playwright ikke allerede har en Chromiu
 
 | Kommando | Hvad den gør |
 |---|---|
-| `npm run valider` | Bygger alle 10 baner som data og sammenligner hvert hul (kant til kant, over hele bevægelsescyklussen) med den maksimale hoplængde ved den aktuelle højdeforskel. Tjekker også rækkevidden til krogpunkterne og at platforme ikke overlapper. |
-| `npm run bot` | Fysik-botten placeres på platform *i* og skal nå platform *i + 1* med den rigtige fysik – for hver overgang på alle baner. Den venter på bevægelige platforme, tager springpuder og vindmøller i fart, og svinger i rebet. `LEVELS=8,10 npm run bot` begrænser til bestemte baner. |
-| `npm run e2e` | Rigtige mus- og tastaturhændelser: menuer, WASD, hop (og at man *ikke* kan hoppe i luften), højreklik-kamera, scrollhjul, kridt og reb, butik, pause, død i lavaen, portal, gemning og "Fortsæt" efter genindlæsning. |
-| `npm test` | Alle tre ovenstående. Afslutter med fejlkode, hvis noget fejler. |
-| `npm run billeder` | Genskaber skærmbillederne i `../docs/images` (startudsigt og perspektiv for alle baner samt iscenesatte action-billeder). |
-| `npm run gif:reb` / `npm run gif:springpude` | Renderer animationerne billede for billede (fysikken fryses mellem hvert billede) og samler dem til GIF med Python/Pillow. |
+| `npm run baner` | Planlægningsrobotten spiller alle 15 baner fra start til portal med den rigtige fysik og tjekker kravene (se nedenfor). `LEVELS=3,7 npm run baner` begrænser til bestemte baner. Afslutter med fejlkode, hvis et krav ikke er opfyldt. |
+| `npm run e2e` | 36 kontroller med rigtige mus- og tastaturhændelser (se nedenfor). |
+| `npm test` | Begge ovenstående. |
+| `npm run bot` | Robotten på én bane med en detaljeret rapport: `LEVEL=8 VERBOSE=1 npm run bot`. Se kommentaren øverst i `bot.js` for alle indstillinger. |
+| `npm run billeder` | Startudsigt og perspektiv for alle 15 baner til `../docs/images`. |
+| `npm run skaerme` | Portalen, døden i lavaen, bane fuldført, butik, pause, sejr og hovedmenuen til `../docs/images`. |
+| `npm run verden` | Fotograferer et verdenssæt med alle dets platformtyper: `KIT_FILE=../docs/udvikling/kits/candy.js KIT_ID=candy npm run verden`. |
+| `npm run figur` | Fotograferer løberen i alle stillinger (løb, hop, hænder, skateboard, reb). |
+| `npm run maal` | Måler med robotten, hvad fysikken tillader (hoplængder med og uden greb osv.). Resultatet ligger i `../docs/udvikling/MEASURED.md`. |
 
-Software-rendering giver kun få billeder i sekundet, så scripts, der afhænger af tid, venter på *simuleret* tid (`level.time`) i stedet for vægur-tid.
+**`npm run baner`** tjekker for hver bane:
 
-Miljøvariabler: `CHROME_PATH` (egen Chromium), `W`/`H` (vinduesstørrelse), `OUT_DIR` (hvor billeder gemmes), `LEVELS` (begræns baner).
+- Banen kan gennemføres med netop det udstyr, den kræver: reb fra bane 8 og dobbelthop fra bane 11.
+- Uden det krævede udstyr er banen umulig.
+- Uden kantgreb (`NOGRAB=ledge`) er bane 2–5 og 7–10 umulige, så de kræver hænderne.
+
+**`npm run e2e`** dækker:
+
+- menuer, WASD og hop (og at man *ikke* kan hoppe i luften uden dobbelthop)
+- dobbelthop og kantgreb med klatring
+- højreklik-kamera og scrollhjul
+- kridt og reb
+- butik, pause og død i lavaen
+- kontrolpunkter og portalen
+- skatebanen (start på skateboard, W sætter fart)
+- gemning og "Fortsæt" efter genindlæsning
+
+**Action-billeder fra banerne** tages af robotten. Den gemmer et øjebliksbillede af hele simulationen ved hvert trin på sin rute og kan derefter genafspille og fotografere dem:
+
+```bash
+SHOTS=/tmp/billeder SHOT_MATCH="greb|bar" SHOT_MAX=2 LEVEL=2 node run.js bot.js
+```
+
+Software-rendering giver kun få billeder i sekundet. Derfor venter scripts, der afhænger af tid, på *simuleret* tid i stedet for vægur-tid. Robotten kører fysikken direkte med faste tidsskridt.
+
+Miljøvariabler:
+
+- `CHROME_PATH`: egen Chromium
+- `W`/`H`: vinduesstørrelse
+- `OUT_DIR`: hvor billeder gemmes
+- `LEVELS`: begræns baner

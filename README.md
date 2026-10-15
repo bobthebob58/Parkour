@@ -1,10 +1,11 @@
 # Skyhøj Parkour
 
-**Et 3D-parkourspil i skyerne – højt over et glødende hav af lava.**
-Løb, hop og sving dig gennem 10 baner, tjen mønter ved hver portal, og køb kridt og reb i butikken.
-Bygget med [Three.js](https://threejs.org) (grafik) og [cannon-es](https://pmndrs.github.io/cannon-es/) (fysik). Hele spillet – også brugerfladen – er på dansk.
+**Et 3D-parkourspil i skyerne, højt over et glødende hav af lava.**
+Løb, hop, klatr og sving dig gennem **15 baner i 15 forskellige verdener**: fra græsøer og skyskrabertage over slikøer, gletsjere og luftskibe til en skateboardbane, en tandhjulsfabrik, en jungle, et kirsebærtempel, en neonby, en vulkan, et himmelhav fuld af hvalskeletter og til sidst et krystaltårn under nordlyset.
+Grib kanter og stænger med hænderne, køb dobbelthop, kridt og reb i butikken, og nå portalen for enden af hver bane.
+Spillet er bygget med [Three.js](https://threejs.org) (grafik) og [cannon-es](https://pmndrs.github.io/cannon-es/) (fysik). Hele spillet er på dansk, også brugerfladen.
 
-![Svingtur i rebet på bane 8](docs/images/anim-reb-sving.gif)
+![Alle 15 verdener – startudsigten på hver bane](docs/images/alle-15-verdener.jpg)
 
 ---
 
@@ -12,8 +13,9 @@ Bygget med [Three.js](https://threejs.org) (grafik) og [cannon-es](https://pmndr
 
 - [Spil det](#spil-det)
 - [Styring](#styring)
-- [Evner, mønter og butik](#evner-mønter-og-butik)
-- [De 10 baner](#de-10-baner)
+- [Hænderne, dobbelthop og skateboard](#hænderne-dobbelthop-og-skateboard)
+- [Mønter, butik og kontrolpunkter](#mønter-butik-og-kontrolpunkter)
+- [De 15 baner](#de-15-baner)
 - [Byggedagbog – billeder fra hele processen](#byggedagbog--billeder-fra-hele-processen)
 - [Teknisk overblik](#teknisk-overblik)
 - [Tests](#tests)
@@ -24,10 +26,10 @@ Bygget med [Three.js](https://threejs.org) (grafik) og [cannon-es](https://pmndr
 
 Spillet består af tre filer: **`index.html`**, **`style.css`** og **`game.js`**.
 
-1. **Dobbeltklik på `index.html`** – det virker direkte fra disken (`file://`).
+1. **Dobbeltklik på `index.html`**. Det virker direkte fra disken (`file://`).
 2. Eller kør en lokal webserver i mappen, f.eks. `npx serve .` eller `python3 -m http.server`, og åbn adressen.
 
-Der skal være internetforbindelse, første gang siden åbnes: Three.js `0.160.0` og cannon-es `0.20.0` hentes fra jsDelivr-CDN'en via et *import map*. Spillet kræver en moderne browser med WebGL (Chrome, Edge, Firefox eller Safari 16.4+). Fremskridt, mønter og køb gemmes automatisk i browseren.
+Første gang siden åbnes, skal der være internetforbindelse. Three.js `0.160.0` og cannon-es `0.20.0` hentes nemlig fra jsDelivr-CDN'en via et *import map*. Spillet kræver en moderne browser med WebGL (Chrome, Edge, Firefox eller Safari 16.4+). Fremskridt, mønter og køb gemmes automatisk i browseren. Når du har klaret en bane, kan du også vælge den direkte fra hovedmenuen under **Vælg bane**.
 
 ![Hovedmenuen](docs/images/skaerm-hovedmenu.jpg)
 
@@ -35,30 +37,69 @@ Der skal være internetforbindelse, første gang siden åbnes: Three.js `0.160.0
 
 | Tast / mus | Handling |
 |---|---|
-| **W A S D** | Bevæg dig (i forhold til kameraets retning) |
-| **Mellemrum** | Hop – hold for højere hop, tryk kort for et lille hop. Man kan kun hoppe fra jorden |
-| **Højreklik (hold)** | Drej kameraet / se dig omkring (musen låses, mens knappen holdes) |
-| **Venstreklik** | Brug den valgte evne |
+| **W A S D** | Bevæg dig i forhold til kameraets retning |
+| **Mellemrum** | Hop. Hold for et højere hop. Ejer du **dobbelthop**, kan du trykke igen i luften |
+| **Højreklik (hold)** | Drej kameraet og se dig omkring |
+| **Q / E** | Drej kameraet med tastaturet |
+| **Venstreklik** | Brug den valgte evne (kridt eller reb) |
 | **Scrollhjul** eller **1 / 2 / 3** | Skift evne |
 | **B** | Butik |
 | **P** / **Esc** | Pause |
 | **R** | Genstart banen |
 | **M** | Lyd til/fra |
 | **H** | Skjul/vis hjælpelinjen |
-| **Q / E** | Drej kameraet med tastaturet (alternativ til højreklik) |
 
-**Rebet:** Venstreklik skyder rebet. *Hold* venstreklik for at hale dig ind, tryk på **W** for at give svinget fart, og tryk **mellemrum** for at hoppe af (med et ekstra løft) – eller klik igen for blot at give slip.
+**Når du hænger i hænderne:**
 
-## Evner, mønter og butik
+| Tast | Kant | Stang | Svævebane |
+|---|---|---|---|
+| **W** / **Mellemrum** | Klatr op | Mellemrum: spring videre i den retning, du kigger | Mellemrum: hop af |
+| **A / D** | Flyt dig sidelæns langs kanten | Flyt dig hånd over hånd | – |
+| **S** | Giv slip | Giv slip | – |
 
-Man tjener **mønter** ved at nå portalen for enden af hver bane (25 → 160 mønter, stigende med banen) og ved at samle **bonusmønter** undervejs (5 stk. hver – de udbetales først ved portalen, og de nulstilles, hvis du dør).
+**På skateboard (bane 6):** **W** sætter fart, **A/D** styrer, **S** bremser, og **mellemrum** laver en ollie. Lander du på et rækværk, grinder du automatisk hen ad det.
 
-| Vare | Pris | Effekt |
+**Med rebet:** Venstreklik skyder rebet mod et lysende krogpunkt. *Hold* venstreklik for at hale dig ind. **W** giver svinget fart, og **mellemrum** hopper af med et ekstra løft.
+
+## Hænderne, dobbelthop og skateboard
+
+**Hænderne griber selv.** Hopper du mod en kant, der er lidt for høj eller lidt for langt væk, griber løberen fat med hænderne. Det gælder også stænger, lianer, trapezer, svævebaner og rebstiger. Derfor kan hop med greb være meget længere end hop, hvor du skal lande på fødderne:
+
+| Højdeforskel | Kun fødderne | Med greb i kanten |
 |---|---|---|
-| **Kridt** (evne) | 60 | Venstreklik: 5 sekunder med op til 4× greb (perfekt på is) og 30 % højere hop. Genoplades på 10 s |
-| **Reb / entrehage** (evne) | 150 | Skyd rebet mod et lysende krogpunkt eller en platform og sving dig over kløfter. Nødvendigt fra bane 8 |
-| **Kridtpose** (opgradering) | 100 | Kridtet genoplades dobbelt så hurtigt |
-| **Langt reb** (opgradering) | 160 | Rebets rækkevidde øges fra 32 m til 45 m |
+| Samme højde | 7,75 m | **10 m** |
+| 1 m op | 6,75 m | **9,25 m** |
+| 2 m op | 5 m | **8,75 m** |
+| 3 m op | umuligt | **7,75 m** |
+
+Alle tal er målt med spillets rigtige fysik (se [`docs/udvikling/MEASURED.md`](docs/udvikling/MEASURED.md)). Mens du hænger, tømmes **grebsmåleren** (GREB) på cirka 4 sekunder ved en kant og cirka 5,5 sekunder i en stang. Det koster ekstra greb at flytte sig, og våde eller isglatte kanter tærer dobbelt så hurtigt. Når måleren er tom, glider hænderne. Står du på fast grund, fyldes den igen.
+
+**Kridt virker kun på hænderne.** Venstreklik med kridt fylder grebet op. I 8 sekunder holder grebet derefter fire gange så længe, og hænderne når kanter længere væk. Kridt gør dig ikke hurtigere og får dig ikke til at hoppe højere.
+
+**Dobbelthop** (købes i butikken) giver et ekstra hop i luften, og du kan skifte retning i det. Et dobbelthop rækker op til ca. 14 m, og med greb i enden ca. 16 m. Fra bane 11 er det påkrævet.
+
+**Skateboardbanen** (bane 6, Solbanen) køres helt på skateboard med ramper, rækværk at grinde på og fartstriber, der skyder dig fremad.
+
+| Kantgreb på fyrtårnet (bane 5) | I en stang på stilladset (bane 2) |
+|---|---|
+| ![Kantgreb](docs/images/greb-fyrtaarn.jpg) | ![Stillads](docs/images/stillads-stang.jpg) |
+| **Skateboard på Solbanen (bane 6)** | **Iskant på gletsjeren (bane 4)** |
+| ![Skateboard](docs/images/skateboard.jpg) | ![Iskant](docs/images/greb-iskant.jpg) |
+
+## Mønter, butik og kontrolpunkter
+
+Når du når portalen for enden af en bane, får du **mønter**: fra 20 på bane 1 til 100 på bane 15. Undervejs kan du samle **bonusmønter** til 5 mønter stykket. Alle mønter udbetales ved portalen.
+
+Hver bane har 1–5 **kontrolpunkter**. Det er de platforme, der har en lys ring, og ringen bliver grøn, når du lander på den. Rører du lavaen, starter du igen fra det seneste kontrolpunkt, og de mønter, du allerede har samlet, beholder du. Trykker du **R**, starter banen helt forfra.
+
+| Vare | Type | Pris | Effekt |
+|---|---|---|---|
+| **Kridt** | Evne | 60 | Frisk kridt på hænderne. Grebet fyldes op, og i 8 s holder det 4× så længe og griber kanter længere væk. Genoplades på 12 s |
+| **Dobbelthop** | Evne | 120 | Tryk mellemrum igen i luften. **Kræves fra bane 11** |
+| **Reb (entrehage)** | Evne | 150 | Skyd rebet mod et lysende krogpunkt og sving dig over kløfter. **Kræves fra bane 8** |
+| **Klatrehandsker** | Opgradering | 90 | Grebet holder 50 % længere, når du hænger i kanter og stænger |
+| **Kridtpose** | Opgradering | 100 | Kridtet genoplades dobbelt så hurtigt (6 s). Kræver kridt |
+| **Langt reb** | Opgradering | 160 | Rebets rækkevidde øges fra 32 m til 45 m. Kræver reb |
 
 Butikken åbnes mellem banerne, fra pausemenuen, fra hovedmenuen eller med **B** midt i en bane.
 
@@ -66,133 +107,186 @@ Butikken åbnes mellem banerne, fra pausemenuen, fra hovedmenuen eller med **B**
 |---|---|
 | ![Bane fuldført](docs/images/skaerm-bane-fuldfoert.jpg) | ![Butik](docs/images/skaerm-butik.jpg) |
 
-## De 10 baner
+## De 15 baner
 
-Rører du lavaen i bunden af verden (y = −50), dør du med det samme, og banen starter forfra. Banerne bliver gradvist længere, platformene mindre og hullerne større.
+Hver bane har sin egen verden med egne platforme, egen pynt og egen himmel. Under det hele ligger lavahavet. Rører du det, mister du banen, eller du starter fra det seneste kontrolpunkt. Hver bane ender i en **glødende portal**.
 
-| # | Navn | Stemning | Nyt / særligt | Platforme | Længde | Belønning |
-|---|---|---|---|---|---|---|
-| 1 | Første skridt | Morgen | Store platforme, lette hop | 18 | ~200 m | 25 |
-| 2 | Himmeltrappen | Dag | Trapper op og ned, runde søjler | 24 | ~220 m | 40 |
-| 3 | Springfjedre | Dag | **Springpuder** – op til 6 m op og 9 m frem | 25 | ~225 m | 55 |
-| 4 | Glatis | Frost | **Glatis** – kridt anbefales | 26 | ~230 m | 70 |
-| 5 | I bevægelse | Eftermiddag | **Bevægelige platforme** (side, frem/tilbage, elevator), mindre landingszoner | 27 | ~205 m | 85 |
-| 6 | Smuldrende sten | Gylden time | **Smuldrende sten** – bliv ikke stående | 29 | ~220 m | 100 |
-| 7 | Vindmøllerne | Solnedgang | **Vindmøller** med roterende arme, smalle bjælker | 26 | ~230 m | 115 |
-| 8 | Rebets prøve | Skumring | **Rebet er påkrævet**: fire kløfter på 14–22 m | 23 | ~235 m | 130 |
-| 9 | Stormens øje | Storm | Alt kombineret, **bevægelige krogpunkter** | 31 | ~290 m | 145 |
-| 10 | Himlens ende | Nat | Platforme ned til 1,2 m, hop på 6–6,5 m, fem rebkløfter op til **40 m** med op til tre krogpunkter | 45 | ~475 m | 160 |
+| # | Navn | Verden | Nyt / særligt | Kræver | Mønter |
+|---|---|---|---|---|---|
+| 1 | **Himmelengen** | Svævende græsøer med træer, får og luftballon | Store platforme og lette hop. Den første stang at gribe | – | 20 |
+| 2 | **Højhustagene** | Skyskrabertage, vandtårne og helikopterplads | **Kantgreb**: hop der kun kan klares med hænderne. Stilladsstænger og en svævebane | Hænderne | 25 |
+| 3 | **Slikøerne** | Chokoladeplader, lagkager, slikstokke og skumfiduser | **Springpuder**, **smuldrende kiks** og slikstokstænger | Hænderne | 30 |
+| 4 | **Gletsjeren** | Isflager, istapper og frosne isfald | **Glatis**, **isglatte kanter**, der tærer på grebet, og roterende isflager | Hænderne (kridt anbefales) | 35 |
+| 5 | **Luftskibshavnen** | Moler, balloner og et rød-hvidt fyrtårn | **Bevægelige** færgedæk og ballonkurve, der stiger og falder | Hænderne | 40 |
+| 6 | **Solbanen** | Ørkenmesa ved solnedgang | **Skateboard**: ramper, rækværk til grind og fartstriber | – | 45 |
+| 7 | **Tandhjulsfabrikken** | Messingtandhjul, rør og et klokketårn | **Drejeskiver**, **transportbånd** og **dampventiler**, der løfter dig | Hænderne | 50 |
+| 8 | **Junglekronerne** | Trækroner, lianer og vandfald | **Rebet** og krogpunkter. Lianetrapezer og svævebane | Reb, hænderne | 55 |
+| 9 | **Stormskibene** | Flyvende sejlskibe i et uvejr | Gyngende dæk, våde og glatte rælinger og en ræstige med rå-stænger | Reb, hænderne | 60 |
+| 10 | **Himlens ende** | Stjernehimmel og meteorer | Smuldrende meteorer og lange rebkløfter med flere krogpunkter | Reb, hænderne | 70 |
+| 11 | **Kirsebærtemplet** | Pagoder, torii-porte og kirsebærtræer | Rækker af røde stænger og huller, der kun kan klares med **dobbelthop** | Reb, dobbelthop | 75 |
+| 12 | **Neonbyen** | Neonskyskrabere om natten | Transportbånd, en ventil, der løfter dig, og bevægelige stænger | Reb, dobbelthop | 80 |
+| 13 | **Vulkanen** | Basaltsøjler og lavafald | Bevægelige sten, smuldrende basalt, en ventil og en springpude | Reb, dobbelthop | 85 |
+| 14 | **Himmelhavet** | Hvalskeletter, skildpadder og koraller i skyerne | 13 stænger i hvalribben, vindstrøm og springpuder | Reb, dobbelthop | 90 |
+| 15 | **Nordlystårnet** | Krystaltårn under nordlyset | Finalen: klatr hele vejen rundt om tårnet til kronen, med lysekroner, trapez og alt det andet | Reb, dobbelthop | 100 |
 
-Hver bane ender med en **glødende, roterende portal**. Rører du den, udbetales mønterne, og du teleporteres til næste bane.
+"Hænderne" betyder, at banen har mindst ét hop, der ikke kan klares uden kantgreb. Det har testrobotten bevist ved at spille banen med kantgreb slået fra (se [Tests](#tests)).
 
-| Bane 1 | Bane 2 |
+| Bane 3 – slikstokstang | Bane 7 – drejeskiver |
 |---|---|
-| ![Bane 1](docs/images/bane-01-start.jpg) | ![Bane 2](docs/images/bane-02-oversigt.jpg) |
-| **Bane 3** | **Bane 4** |
-| ![Bane 3](docs/images/bane-03-oversigt.jpg) | ![Bane 4](docs/images/bane-04-start.jpg) |
-| **Bane 5** | **Bane 6** |
-| ![Bane 5](docs/images/bane-05-start.jpg) | ![Bane 6](docs/images/bane-06-start.jpg) |
-| **Bane 7** | **Bane 8** |
-| ![Bane 7](docs/images/bane-07-oversigt.jpg) | ![Bane 8](docs/images/bane-08-oversigt.jpg) |
-| **Bane 9** | **Bane 10** |
-| ![Bane 9](docs/images/bane-09-start.jpg) | ![Bane 10](docs/images/bane-10-start.jpg) |
+| ![Slikøerne](docs/images/slikstok-stang.jpg) | ![Tandhjulsfabrikken](docs/images/tandhjul.jpg) |
+| **Bane 8 – lianer** | **Bane 9 – stormskibenes ræling** |
+| ![Junglekronerne](docs/images/lianer.jpg) | ![Stormskibene](docs/images/stormskibe-greb.jpg) |
+| **Bane 11 – tempelstænger** | **Bane 13 – vulkanen** |
+| ![Kirsebærtemplet](docs/images/tempel-staenger.jpg) | ![Vulkanen](docs/images/vulkan.jpg) |
+| **Bane 14 – hvalribben** | **Bane 15 – lysekronerne** |
+| ![Himmelhavet](docs/images/hvalribben.jpg) | ![Nordlystårnet](docs/images/lysekroner.jpg) |
 
-Alle 20 baneskærmbilleder (startudsigt + perspektiv fra ca. en tredjedel inde på banen) ligger i [`docs/images`](docs/images).
+Startudsigten og et perspektiv fra cirka en tredjedel inde på banen findes for alle 15 baner i [`docs/images`](docs/images) (`bane-01-start.jpg` … `bane-15-oversigt.jpg`).
 
 ---
 
 ## Byggedagbog – billeder fra hele processen
 
-Spillet er bygget i milepæle. Hvert trin blev dokumenteret med skærmbilleder taget automatisk i en headless browser.
+Spillet er bygget i to omgange. Begge blev dokumenteret med skærmbilleder, som blev taget automatisk i en headless browser.
 
-### Trin 1 – Himlen, lavaen og lyset
+### Version 2 – realistisk løber, hænder og 15 verdener
 
-Først miljøet: en gradient-himmel (shader) med sol eller måne, procedurelle skyer, en animeret lava-shader med mørk skorpe, glødende revner og flydende pøle, gløder der stiger op, og retningsbestemt sollys med bløde skygger. Alle teksturer (stenfliser, klippe, is, sandsten, metal med advarselsstriber) tegnes på `<canvas>` ved opstart – der er ingen eksterne billedfiler.
+Ønskerne til version 2 var:
+
+- en mere realistisk løber
+- mere forskellige baner, og ikke kun sten
+- længere hop, hvor hænderne skal gribe og holde fast
+- dobbelthop i butikken
+- kridt, der kun hjælper hænderne
+- fem nye baner (15 i alt), hvoraf én køres på skateboard
+
+#### Løberen
+
+Den gamle figur var bygget af kasser og cylindre. Den nye løber er 1,80 m høj med rigtige proportioner. Han består af 56 dele: hofte, ryg, bryst, nakke og hoved, skulderblade, over- og underarme og hænder med tommel og fire fingre med to led hver, lår, skinneben, fødder og tæer.
+
+- **Bevægelser:** Alle fire lemmer styres med *inverse kinematik* (IK). Det betyder, at hænder og fødder placeres præcist på kanter, stænger, rebet og skateboardet, og så regnes armene og benene ud derfra.
+- **Løb:** I løbecyklussen glider fødderne ikke. Skridtlængden følger farten, og hælen løftes, mens tåen ruller af. Hoften vipper, armene svinger modsat benene, og kroppen læner sig ind i svingene.
+- **I hvile:** Han trækker vejret, og tungere efter en klatretur. Han flytter vægten fra ben til ben og kigger sig omkring.
+
+| Før | Efter: løb, hop, hænder, skateboard, rebet og salto |
+|---|---|
+| ![Den gamle figur](docs/images/foer-figur.jpg) | ![Den nye løber](docs/images/figur-ny.jpg) |
+
+#### Verdenssæt i stedet for sten
+
+I version 1 var alle platforme stenblokke med takket klippe under. Nu har hver bane sit eget **verdenssæt**: en fil, der bygger banens platforme, stænger, svævebaner og krogpunkter, og som pynter verden omkring dem.
+
+- **Platforme:** f.eks. chokoladeplader og lagkager, isflager med istapper, færgedæk og ballonkurve, messingtandhjul, skibsdæk, pagodetage, neontage, basaltsøjler, hvalribben og krystaller.
+- **Pynt:** skyskrabere, luftskibe, tandhjul, sejlskibe, kirsebærtræer, vulkaner og nordlys.
+
+De 15 sæt deler en fælles værktøjskasse (`_lib.js`) med teksturer, materialer og former. Hvert sæt blev fotograferet fra flere vinkler og rettet, før banerne blev bygget.
+
+| Før: alle platforme var sten | Efter: 15 forskellige verdener |
+|---|---|
+| ![Stenbaner](docs/images/foer-stenbaner.jpg) | ![Verdener](docs/images/alle-15-verdener.jpg) |
+
+#### Nye mekanikker i motoren
+
+- **Hænderne:**
+  - kantgreb med klatring op og sidelæns
+  - stænger hånd over hånd og spring fra stang til stang
+  - trapezer, svævebaner (zip-lines) og ræstiger
+  - grebsmåler, isglatte kanter og klatrehandsker
+- **Dobbelthop**, med retningsskift i luften.
+- **Skateboard:**
+  - fart, styring, ollie og grind på rækværk
+  - ramper og fartstriber
+- **Nye platformtyper:**
+  - drejeskiver og roterende platforme
+  - transportbånd og dampventiler, der løfter dig
+  - vindstrøm og springpuder i flere styrker
+  - bevægelige platforme og stænger af alle slags
+- **Kontrolpunkter**, så man ikke skal starte forfra efter hvert fald.
+
+| Dampventil i tandhjulsfabrikken (bane 7) | Springpude på slikøerne (bane 3) |
+|---|---|
+| ![Dampventil](docs/images/dampventil.jpg) | ![Springpude](docs/images/springpude-slik.jpg) |
+
+#### Banerne blev designet med målinger og spillet af en robot
+
+Først blev spillets grænser målt med den rigtige fysik: hoplængder med og uden greb, med og uden dobbelthop, og hvor langt springpuder, ventiler og stænger rækker. Tallene ligger i [`docs/udvikling/MEASURED.md`](docs/udvikling/MEASURED.md). Hver bane blev derefter beskrevet som en liste af segmenter, f.eks. `{ g: 9, dy: 1, grab: true }` for "et hul på 9 m, 1 m op, kun med kantgreb".
+
+En **planlægningsrobot** spiller hver bane fra start til portal med spillets rigtige fysik og rigtige tastetryk. Den prøver varianter af hvert hop:
+
+- tilløb
+- timing
+- dobbelthop
+- slip-tidspunkt fra stænger og reb
+
+Med gem/gendan af hele simulationen kan den gå tilbage og prøve igen. For hver bane kontrollerer robotten:
+
+1. Banen **kan** gennemføres med det udstyr, banen kræver.
+2. Banen **kan ikke** gennemføres uden rebet eller dobbelthoppet, hvis banen kræver det.
+3. Banen **kan ikke** gennemføres uden kantgreb, når den skal kræve hænderne.
+
+Robotten fandt mange problemer undervejs, som blev rettet:
+
+- for lange hop
+- stænger, man fløj forbi
+- et smuldrende stykke, der faldt for tidligt
+- et tagudhæng, der skjulte en kant
+- baner, hvor man kunne snyde sig uden om hænderne
+
+Bane 9, 13 og 14 blev strammet, så de kræver det, de skal.
+
+| Bane 2 – tagene i storbyen | Bane 5 – ballonkurvene ved havnen |
+|---|---|
+| ![Bane 2](docs/images/bane-02-oversigt.jpg) | ![Bane 5](docs/images/bane-05-oversigt.jpg) |
+| **Bane 12 – Neonbyen** | **Bane 15 – Nordlystårnet** |
+| ![Bane 12](docs/images/bane-12-oversigt.jpg) | ![Bane 15](docs/images/bane-15-oversigt.jpg) |
+
+| Portalen | Død i lavaen |
+|---|---|
+| ![Portal](docs/images/portal.jpg) | ![Død i lavaen](docs/images/lava-doed.jpg) |
+| **Pause** | **Alle 15 baner gennemført** |
+| ![Pause](docs/images/skaerm-pause.jpg) | ![Sejr](docs/images/skaerm-sejr.jpg) |
+
+### Version 1 – himlen, lavaen, rebet og de første 10 baner
+
+Den første version byggede fundamentet. Det meste af det er stadig med, men banerne og figuren er skiftet ud.
+
+**Miljøet** består af:
+
+- en gradient-himmel med sol eller måne og procedurelle skyer
+- en animeret lava-shader med mørk skorpe, glødende revner og gløder, der stiger op
+- retningsbestemt sollys med bløde skygger
+
+Alle teksturer tegnes på `<canvas>` ved opstart, så der er ingen eksterne billedfiler.
 
 | Morgen | Solnedgang | Nat |
 |---|---|---|
 | ![Miljø om morgenen](docs/images/01-miljoe-morgen.jpg) | ![Miljø ved solnedgang](docs/images/01-miljoe-solnedgang.jpg) | ![Miljø om natten](docs/images/01-miljoe-nat.jpg) |
 
-*Første forsøg gav en overeksponeret, næsten hvid lava og en hård kant i horisonten; lava-shaderen blev skrevet om, så skorpen er mørk og kun revner og pøle gløder.*
+**Evnerne og mekanikkerne** fra version 1:
 
-### Trin 2 – Spilleren, kameraet og brugerfladen
+- **Rebet** er en uelastisk afstandsbegrænsning, så man svinger som et ægte pendul.
+- **Bevægelige platforme** giver deres fart videre til spilleren.
+- **Smuldrende sten** ryster og falder.
+- **Springpuder** sender en højt op.
 
-Parkourløberen er bygget af simple former og animeret i kode (løb, hop, svæv, landing med "squash", armene op i rebet). Kollisionen er to kugler i cannon-es med låst rotation. Tredjepersonskameraet drejes med højreklik og trækkes ind, hvis en platform kommer i vejen. HUD'en viser bane, mønter, tid, dødsfald, valgt evne og en hotbar.
-
-| Før: sigtekornet sad på hovedet | Efter: kameraet sigter over hovedet |
+| Rebet låser på et krogpunkt | Midt i et sving |
 |---|---|
-| ![Før](docs/images/foer-start.jpg) | ![Efter](docs/images/bane-01-start.jpg) |
+| ![Sigte med rebet](docs/images/reb-sigte.jpg) | ![Midt i et sving](docs/images/reb-sving.jpg) |
+| **Bevægelige platforme** | **Springpude** |
+| ![Bevægelige platforme](docs/images/bevaegelige-platforme.jpg) | ![Springpude](docs/images/springpude.jpg) |
 
-### Trin 3 – Banebyggeren og de 10 baner
+![Svingtur i rebet (version 1)](docs/images/anim-reb-sving.gif)
 
-Banerne er hårdkodet som lister af segmenter (`{ t: 'move', g: 4.5, w: 3, ax: 'x', amp: 3, per: 4 }` = "bevægelig platform, 4,5 m hul, 3 m bred, svinger 3 m sidelæns hvert 4. sekund"). Byggeren placerer hver platform ud fra den forriges kant, så hullerne er præcise, og pynter de svævende platforme med takkede klippestykker. Hver bane har sin egen himmel og stenfarve.
+Testene fra version 1 fandt allerede dengang reelle fejl:
 
-| Bane 2 – Himmeltrappen | Bane 7 – Vindmøllerne |
-|---|---|
-| ![Bane 2 perspektiv](docs/images/bane-02-oversigt.jpg) | ![Bane 7 perspektiv](docs/images/bane-07-oversigt.jpg) |
-
-### Trin 4 – Banemekanikker
-
-| Bevægelige platforme (bane 5) | Smuldrende sten (bane 6) |
-|---|---|
-| ![Bevægelige platforme](docs/images/bevaegelige-platforme.jpg) | ![Smuldrende sten](docs/images/smuldrende-sten.jpg) |
-| **Vindmøller (bane 7)** | **Springpude (bane 3)** |
-| ![Vindmølle](docs/images/vindmoelle.jpg) | ![Springpude](docs/images/springpude.jpg) |
-
-Bevægelige platforme er kinematiske legemer, og spilleren arver deres fart (også ved hop). Smuldrende sten ryster i 0,55 s og falder, og kommer tilbage efter få sekunder. Vindmøllernes arme slår spilleren væk. Springpuder sender en op i 17–19 m/s.
-
-![Springpude-sekvens på bane 3](docs/images/anim-springpude.gif)
-
-### Trin 5 – Evnerne: kridt og reb
-
-| Kridt på glatis (bane 4) | Rebet låser på et krogpunkt (bane 8) |
-|---|---|
-| ![Kridt](docs/images/kridt-paa-is.jpg) | ![Sigte med rebet](docs/images/reb-sigte.jpg) |
-
-Kridtet gør hænderne hvide og drysser støv; HUD'en tæller ned. Rebet er en uelastisk afstandsbegrænsning, så man svinger som et ægte pendul.
-
-![Midt i et sving](docs/images/reb-sving.jpg)
-
-### Trin 6 – Test og balancering
-
-For at sikre, at alle 10 baner faktisk kan gennemføres, blev der skrevet tre automatiske tests (se [Tests](#tests)):
-
-1. **Banevalidering:** For hvert par af platforme beregnes det mindste hul (kant til kant, over hele bevægelsescyklussen) og sammenlignes med den maksimale hoplængde ved den givne højdeforskel. Sværhedsgraden stiger jævnt fra højst 47 % af den maksimale hoplængde på bane 1 til 87 % på bane 10.
-2. **Fysik-bot:** En bot spiller *hver eneste overgang* på alle baner med den rigtige fysik – løber, hopper, venter på bevægelige platforme, svinger i rebet og slipper, når en forudsigelse af faldbanen rammer målet.
-3. **End-to-end:** Rigtige mus- og tastaturhændelser i browseren: menuer, WASD, hop, højreklik-kamera, scrollhjul, evner, butik, pause, død i lavaen, portal, gemning og "Fortsæt" efter genindlæsning.
-
-Slutresultat:
-
-```
-Bane 1: 17/17 overgange klaret        Bane 6: 28/28 overgange klaret
-Bane 2: 23/23 overgange klaret        Bane 7: 25/25 overgange klaret
-Bane 3: 24/24 overgange klaret        Bane 8: 22/22 overgange klaret
-Bane 4: 25/25 overgange klaret        Bane 9: 30/30 overgange klaret
-Bane 5: 26/26 overgange klaret        Bane 10: 44/44 overgange klaret
-End-to-end: 29/29 kontroller OK – ingen JavaScript-fejl
-```
-
-Testene fandt reelle problemer, som blev rettet undervejs:
-
-- **Rebet** halede sig automatisk ind, så lange enkeltsving gik i stå under krogpunktet. Nu holder rebet sin længde (ægte pendul), og man haler sig ind ved at holde venstreklik.
-- **Luftkontrol:** Sidelæns fart arvet fra en bevægelig platform kunne ikke styres væk i luften. Nu kan sidelæns drift korrigeres, mens farten fremad bevares.
-- **Bane 3:** En springpude krævede et 90°-sving i luften for at nå en platform 4,5 m oppe – svinget blev flyttet.
-- **Vindmøller på bane 7 og 10:** Hurtige krydsarme gav et sikkert vindue, der var kortere end tiden det tager at krydse platformen – farten blev sat ned.
-- **Bane 10:** Den sidste kløft (44 m, tre krogpunkter) var for lang – den er nu 40 m med tættere krogpunkter.
-- **Sigte med rebet:** Krogpunkter højt oppe tvang kameraet ned bag figuren. Nu låser rebet automatisk på et krogpunkt foran dig, og figuren skjules, hvis kameraet presses helt ind på den.
-- **Portalen** var overeksponeret (helt hvid) og blev tonet ned, så hvirvlen kan ses.
+- rebet halede sig selv ind
+- sidelæns fart fra bevægelige platforme kunne ikke styres
+- vindmøller var for hurtige
+- portalen var helt hvid
 
 | Før: sigte mod et højt krogpunkt | Efter: automatisk lås |
 |---|---|
 | ![Før](docs/images/foer-sigte.jpg) | ![Efter](docs/images/reb-sigte.jpg) |
-| **Før: portalen** | **Efter: portalen** |
-| ![Før](docs/images/foer-portal.jpg) | ![Efter](docs/images/portal.jpg) |
-
-### Trin 7 – Død, pause og sejr
-
-| Død i lavaen | Pause | Alle baner gennemført |
-|---|---|---|
-| ![Død i lavaen](docs/images/lava-doed.jpg) | ![Pause](docs/images/skaerm-pause.jpg) | ![Sejr](docs/images/skaerm-sejr.jpg) |
 
 ---
 
@@ -200,38 +294,69 @@ Testene fandt reelle problemer, som blev rettet undervejs:
 
 ```
 index.html   Import map (Three.js + cannon-es fra CDN), HUD og alle menuskærme
-style.css    HUD, hotbar, menuer, butik, overgange (glas-look, responsivt)
-game.js      Hele spillet (ca. 3.200 linjer), opdelt i 18 afsnit:
-               1  Konfiguration       10  Baneobjekter (bevægelige, smuldrende, vindmøller, portal …)
-               2  Danske tekster      11  Spilleren (krop, figur, animation, bevægelse)
-               3  Himmel-temaer       12  Input (tastatur og mus)
-               4  De 10 baner         13  Kamera
-               5  Hjælpefunktioner    14  Evner (kridt og reb)
-               6  Teksturer           15  Lyd (procedurel WebAudio)
-               7  Himmel, lava, lys   16  Brugerflade
-               8  Fysikverden         17  Gem / indlæs
-               9  Banebygger          18  Spiltilstand og hovedløkke
-docs/images  Skærmbilleder og animationer brugt i denne README
-tests/       Banevalidering, fysik-bot, end-to-end-test og skærmbillede-scripts
+style.css    HUD, hotbar, grebsmåler, menuer, butik, banevalg (glas-look, responsivt)
+game.js      Hele spillet (ca. 12.800 linjer), opdelt i afsnit:
+               1  Konfiguration          9c  De 15 verdenssæt (ét pr. bane)
+               2  Danske tekster         10  Baneobjekter i drift (bevægelige, drejeskiver, ventiler …)
+               3  Himmel-temaer          11  Spilleren (fysik, hænder, dobbelthop, skateboard, løberen)
+               4  De 15 baner            12  Input
+               5  Hjælpefunktioner       13  Kamera
+               6  Teksturer              14  Evner (kridt og reb)
+               7  Himmel, lava, lys      15  Lyd (procedurel WebAudio)
+               8  Fysikverden            16  Brugerflade
+               9  Banebygger             17  Gem / indlæs
+               9b Verdenssæt-systemet    18  Spiltilstand og hovedløkke
+docs/images     Skærmbilleder brugt i denne README
+docs/udvikling  Specifikationer, målinger, verdenssæt, baner og figur som separate kildefiler
+tests/          Testrobot, end-to-end-test og skærmbillede-scripts
 ```
 
-- **Fysik:** fast tidsskridt på 1/120 s, tyngdekraft 24 m/s², løbefart 9 m/s, hop 10,5 m/s (≈ 2,3 m højt, op til ≈ 7,9 m langt). Friktionen i cannon-es er 0 – grebet styres i stedet af bevægelseskoden, så is og kridt kan justere det præcist.
-- **Stramme kontroller:** "coyote time" (man kan hoppe 0,11 s efter at have forladt en kant), hop-buffer (0,14 s), variabel hophøjde og en rund skygge lige under spilleren, der viser, hvor man lander.
-- **Lyd:** alle lydeffekter (hop, landing, mønter, reb, springpude, lava, portal) og vind/lava-rumlen syntetiseres med WebAudio – ingen lydfiler.
+- **Fysikken:**
+  - Tidsskridtet er fast: 1/120 s.
+  - Tyngdekraften er 24 m/s², løbefarten 9 m/s og hoppet 10,5 m/s.
+  - Hænderne er ikke fysiklegemer. Bevægelseskoden finder i stedet kanter og stænger inden for rækkevidde i hvert skridt og låser hænderne fast på dem.
+- **Stramme kontroller:**
+  - *Coyote time:* man kan hoppe 0,11 s efter at have forladt en kant.
+  - En hop-buffer og variabel hophøjde.
+  - En rund skygge under spilleren, der viser, hvor man lander.
+- **Verdenssæt:** Hvert sæt registrerer sig som `window.SKYHOJ_KITS[id]` og leverer funktioner, der bygger platforme, stænger, svævebaner, krogpunkter og pynt. Banen beskriver kun *hvor* tingene er. Verdenssættet bestemmer, *hvordan* de ser ud. Kildefilerne ligger i [`docs/udvikling/kits`](docs/udvikling/kits) og samles ind i `game.js` med `docs/udvikling/assemble.py`.
+- **Lyd:** Alle lydeffekter syntetiseres med WebAudio, så der er ingen lydfiler.
 - **Virker fra disken:** `index.html` indlæser bibliotekerne som ES-moduler og starter derefter `game.js` som et klassisk script, fordi browsere blokerer lokale modulfiler under `file://`.
-- **Udvikler-hooks:** Med `?debug` i adressen får testene adgang til `window.skyhoj`.
+- **Udvikler-hooks:** Med `?debug` i adressen får testene adgang til `window.skyhoj`. Det giver bl.a. gem/gendan af hele simulationen, frys og fri kamera.
 
 ## Tests
 
-Testene kører spillet i headless Chromium (WebGL via software-rendering) og besvarer CDN-adresserne med lokale kopier af præcis de samme biblioteksversioner, så de også kører offline.
+Testene kører spillet i headless Chromium (WebGL via software-rendering). CDN-adresserne besvares med lokale kopier af præcis de samme biblioteksversioner, så testene også kører offline.
 
 ```bash
 cd tests
 npm install
-npm run valider     # beregner alle huller mod hoplængden
-npm run bot         # fysik-botten spiller alle 264 overgange
-npm run e2e         # rigtige mus-/tastaturhændelser end-to-end
-npm run billeder    # genskaber skærmbillederne i docs/images
+npm run baner       # robotten spiller alle 15 baner og tjekker kravene (reb, dobbelthop, hænder)
+npm run e2e         # rigtige mus-/tastaturhændelser end-to-end (36 kontroller)
+npm test            # begge dele
+npm run billeder    # startudsigt og perspektiv for alle 15 baner til docs/images
+npm run skaerme     # portal, lavadød, menu, butik, pause og sejr til docs/images
+```
+
+Slutresultat af `npm run baner`:
+
+```
+Bane  1 Himmelengen          BESTÅET
+Bane  2 Højhustagene         BESTÅET   uden kantgreb: umulig ✓
+Bane  3 Slikøerne            BESTÅET   uden kantgreb: umulig ✓
+Bane  4 Gletsjeren           BESTÅET   uden kantgreb: umulig ✓
+Bane  5 Luftskibshavnen      BESTÅET   uden kantgreb: umulig ✓
+Bane  6 Solbanen             BESTÅET   (skateboard)
+Bane  7 Tandhjulsfabrikken   BESTÅET   uden kantgreb: umulig ✓
+Bane  8 Junglekronerne       BESTÅET   uden reb: umulig ✓   uden kantgreb: umulig ✓
+Bane  9 Stormskibene         BESTÅET   uden reb: umulig ✓   uden kantgreb: umulig ✓
+Bane 10 Himlens ende         BESTÅET   uden reb: umulig ✓   uden kantgreb: umulig ✓
+Bane 11 Kirsebærtemplet      BESTÅET   uden dobbelthop: umulig ✓
+Bane 12 Neonbyen             BESTÅET   uden dobbelthop: umulig ✓
+Bane 13 Vulkanen             BESTÅET   uden dobbelthop: umulig ✓
+Bane 14 Himmelhavet          BESTÅET   uden dobbelthop: umulig ✓
+Bane 15 Nordlystårnet        BESTÅET   uden dobbelthop: umulig ✓
+End-to-end: 36/36 kontroller OK – ingen JavaScript-fejl
 ```
 
 Se [`tests/README.md`](tests/README.md) for detaljer.

@@ -3,13 +3,15 @@
   "private": true,
   "description": "Automatiske tests og skærmbilleder til Skyhøj Parkour",
   "scripts": {
-    "valider": "node run.js validate.js",
-    "bot": "node run.js bot.js",
+    "baner": "node run.js alle-baner.js",
     "e2e": "node run.js e2e.js",
-    "test": "node run.js validate.js && node run.js bot.js && node run.js e2e.js",
-    "billeder": "node run.js levels.js && node run.js actions.js",
-    "gif:reb": "CLIP=reb W=960 H=540 node run.js gif.js && python3 mkgif.py frames-reb ../docs/images/anim-reb-sving.gif 560 128",
-    "gif:springpude": "CLIP=spring W=960 H=540 node run.js gif.js && python3 mkgif.py frames-spring ../docs/images/anim-springpude.gif 480 112"
+    "test": "node run.js alle-baner.js && node run.js e2e.js",
+    "bot": "node run.js bot.js",
+    "billeder": "node run.js levels.js",
+    "skaerme": "node run.js skaerme.js",
+    "verden": "node run.js preview-kit.js",
+    "figur": "node run.js preview-char.js",
+    "maal": "node run.js measure.js"
   },
   "devDependencies": {
     "cannon-es": "0.20.0",
