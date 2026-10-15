@@ -1,0 +1,35 @@
+{
+ "kit": {
+  "id": "candy",
+  "usedByLevels": [
+   3
+  ],
+  "platformLook": "Normal platforms: donuts with frosting and sprinkles (cylinders), chocolate bars, macarons, wafer bridges, lollipop discs and the wedding-cake tiers. Bounce pads: marshmallow and jelly cushions that squash. Crumbling platforms: cracked biscuits that break into crumbs.",
+  "barLook": "Red-and-white candy canes with white grip bands. The trapeze is a licorice swing.",
+  "scenery": "A chocolate waterfall pouring from a giant cup, cotton-candy clouds, a gumdrop and gummy-bear field, and sprinkle sparkles in the air."
+ },
+ "levels": [
+  {
+   "index": 3,
+   "nameDa": "Slikøerne",
+   "world": "Giant sweets in a pastel sky.\n- Platforms: pink-frosted donuts with sprinkles (cylinders), chocolate bars (boxes), stacked macarons, a three-tier wedding cake, wafer bridges and lollipop discs.\n- Hang bars are red-and-white candy canes.\n- Bounce pads are marshmallow and jelly cushions that squash when you land.\n- Crumbling platforms are biscuits that break into crumbs.\n- Trapezes are licorice swings.\n- Decoration: gumdrops and gummy bears.\n- Background: a chocolate waterfall pouring from a giant cup between cotton-candy clouds.",
+   "sky": "Pastel afternoon. The zenith is pink (#f7a8d8) and the horizon mint (#b8f5e0). The sun is soft, the clouds are tinted pink and lilac, and sprinkle-like sparkles drift in the air.",
+   "signatureMechanics": [
+    "Bounce pads (marshmallow, jelly)",
+    "Bounce into a hand catch",
+    "Crumbling platforms intro (biscuits)",
+    "Candy-cane monkey bars",
+    "Trapeze intro (licorice swing)"
+   ],
+   "layout": "An S-shape that goes up and then down, about 24 segments and about 260 m. The first half climbs the wedding-cake tower (+15 m). The second half steps down a staircase of donuts and ends with a run across a long wafer bridge.",
+   "setPieces": [
+    "'Bryllupskagen': a bounce pad on each tier throws you just short of the next one, and the hands catch the frosting rim. This repeats on 3 tiers. Missing only drops you back onto the same tier.",
+    "'Kiksebanen': five 3x3 m biscuits in a row that crumble 0.55 s after you land, so you have to keep running.",
+    "'Slikstokkene': four candy canes 2.2 m apart above the chocolate waterfall, then a licorice trapeze that throws you onto a macaron.",
+    "'Geléknappen': a strong jelly pad throws you over a 10 m gap onto a lollipop disc."
+   ],
+   "handsMoments": "Catching the frosting rim after each bounce, the candy-cane monkey bars (about 7 m), and the licorice trapeze, which is a long jump you finish holding on.",
+   "difficulty": 3
+  }
+ ]
+}

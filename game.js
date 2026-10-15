@@ -153,6 +153,7 @@ const T = {
   toastDeath: 'Du faldt i lavaen! Banen starter forfra.',
   toastCoin: (n) => `+${n} mønter`,
   toastRestart: 'Banen er genstartet',
+  toastCheckpoint: 'Kontrolpunkt! Rører du lavaen, starter du herfra.',
   toastNeedRope: 'Denne bane kræver rebet! Tryk B for at åbne butikken.',
   toastRopeHint: 'Tip: Vælg rebet (scroll), sigt på det lysende krogpunkt og venstreklik. Sving med W, hop af med mellemrum.',
   toastSound: (on) => (on ? 'Lyd: til' : 'Lyd: fra'),
@@ -1376,7 +1377,7 @@ function buildLevelData(def) {
     const p = {
       type: t, shape, w, d, yaw: heading + (s.yaw || 0) * DEG, heading, index: plats.length,
       gap: s.g ?? 3, rope: !!s.rope, grab: !!s.grab, dbl: !!s.dbl, v: s.v || null, seed,
-      slick: !!s.slick, lip: s.lip ?? true, hint: s.hint || null,
+      slick: !!s.slick, lip: s.lip ?? true, hint: s.hint || null, cp: !!s.cp,
     };
     if (!prev) { p.x = 0; p.z = 0; p.top = 0; }
     else {
@@ -1708,6 +1709,7 @@ class Level {
     this.rayMeshes = [];      // kamera-kollision, reb-sigte og skygge
     this.disposables = [];
     this.time = 0;
+    this.checkpoint = null;   // seneste kontrolpunkt (platform), man genstarter fra
     this.bodyToPlat = new Map();
     const ctx = makeKitContext(this);
     this.kit = (WORLD_KITS[this.def.kit] || WORLD_KITS.sten).create(ctx);
@@ -1730,6 +1732,7 @@ class Level {
       const d = this.kit.decor(this.data);
       if (d) this.group.add(d);
     }
+    for (const plat of this.platforms) if (plat.def.cp) this.buildCheckpoint(plat);
     this.buildStartDecor();
     this.buildPortal();
   }
@@ -1991,6 +1994,26 @@ class Level {
     group.position.copy(obj.pos);
     this.group.add(group);
     this.coins.push(obj);
+  }
+
+  // Kontrolpunkt: en flad, lysende ring på platformen (bliver grøn, når den er nået)
+  buildCheckpoint(plat) {
+    const d = plat.def, R = Math.min(d.w, d.shape === 'cyl' ? d.w : d.d) * 0.3;
+    const mat = new THREE.MeshBasicMaterial({ color: '#e8f2ff', transparent: true, opacity: 0.75, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+    this.disposables.push(mat);
+    const ring = new THREE.Mesh(this.geo(new THREE.RingGeometry(R * 0.82, R, 48).rotateX(-Math.PI / 2)), mat);
+    ring.position.y = d.h / 2 + 0.012;
+    const dot = new THREE.Mesh(this.geo(new THREE.CircleGeometry(R * 0.28, 32).rotateX(-Math.PI / 2)), mat);
+    dot.position.y = d.h / 2 + 0.012;
+    plat.mesh.add(ring, dot);
+    plat.cpMat = mat;
+  }
+
+  setCheckpoint(plat) {
+    if (this.checkpoint === plat) return;
+    if (this.checkpoint && this.checkpoint.cpMat) this.checkpoint.cpMat.color.set('#e8f2ff');
+    this.checkpoint = plat;
+    if (plat && plat.cpMat) plat.cpMat.color.set('#5dff9b');
   }
 
   buildStartDecor() {
@@ -2837,7 +2860,7 @@ function tryGrab() {
   const handY = p.y + H.drop;
   let best = null, bestScore = Infinity;
   for (const plat of level.platforms) {
-    if (NO_LEDGE.has(plat.type) || plat.state === 'falling' || !plat.body.world) continue;
+    if (NO_LEDGE.has(plat.type) || plat.state === 'falling' || !plat.body.world || debug.noLedge) continue;
     const d = plat.def, bp = plat.body.position;
     const dy = bp.y + d.h / 2 - handY;
     if (dy < -win || dy > win * 0.8) continue;
@@ -3208,6 +3231,12 @@ function postStep(dt, playing) {
   if (grounded) {
     const plat = player.groundPlat;
     if (plat.def.hint && !plat.hintShown) { plat.hintShown = true; toast(plat.def.hint, 'gold', 5000); } // banens egne tips
+    if (plat.def.cp && level.checkpoint !== plat) { // kontrolpunkt nået
+      level.setCheckpoint(plat);
+      toast(T.toastCheckpoint, 'gold', 2600);
+      audio.play('buy');
+      particles.burst(b.position.x, b.position.y - 0.3, b.position.z, 24, { color: '#5dff9b', speed: 4, up: 1.2, size: 0.25, life: 0.8, grav: 3 });
+    }
     if (plat.type === 'bounce') {
       b.velocity.y = plat.def.pow;
       player.grounded = false;
@@ -4168,6 +4197,7 @@ function startLevel(i) {
 
 function restartLevel(manual) {
   releaseRope(false);
+  level.setCheckpoint(null);
   level.reset();
   respawnPlayer();
   cam.yaw = -level.data.startHeading;
@@ -4175,6 +4205,24 @@ function restartLevel(manual) {
   game.levelCoins = 0;
   abilities.chalkActive = 0;
   if (manual) toast(T.toastRestart, '', 1400);
+}
+
+// Genstart fra det seneste kontrolpunkt (banens tid, mønter og bevægelser fortsætter)
+function respawnAtCheckpoint() {
+  releaseRope(false);
+  for (const plat of level.platforms) if (plat.type === 'crumble' && plat.state !== 'solid') level.restoreCrumble(plat);
+  const cp = level.checkpoint, c = cp.body.position, b = player.body;
+  respawnPlayer();
+  b.position.set(c.x, c.y + cp.def.h / 2 + CFG.player.radius + 0.05, c.z);
+  b.previousPosition.copy(b.position);
+  b.velocity.set(cp.body.velocity.x, Math.max(0, cp.body.velocity.y), cp.body.velocity.z);
+  const next = level.platforms[cp.def.index + 1];
+  const h = next ? next.def.heading : cp.def.heading;
+  player.facing = -h;
+  if (player.skate) player.skate.heading = h;
+  cam.yaw = -h;
+  cam.target.set(b.position.x, b.position.y + CFG.camera.height - CFG.player.radius, b.position.z);
+  abilities.chalkActive = 0;
 }
 
 function die() {
@@ -4277,7 +4325,7 @@ function fixedStep(dt) {
 }
 
 const simulateStates = new Set(['playing', 'dead', 'portal', 'menu', 'complete', 'victory']);
-const debug = { freeze: false, freeCam: false, quiet: false }; // kun til automatiske tests/skærmbilleder (?debug)
+const debug = { freeze: false, freeCam: false, quiet: false, noLedge: false }; // kun til automatiske tests/skærmbilleder (?debug)
 let lastT = performance.now(), acc = 0, elapsed = 0;
 
 function frame(now) {
@@ -4296,7 +4344,7 @@ function frame(now) {
   if (s === 'playing') { game.levelTime += dt; game.totalTime += dt; }
   if (s === 'dead') {
     game.deadTimer -= dt;
-    if (game.deadTimer <= 0) { restartLevel(false); setState('playing'); }
+    if (game.deadTimer <= 0) { if (level.checkpoint) respawnAtCheckpoint(); else restartLevel(false); setState('playing'); }
   }
   if (s === 'portal') {
     game.portalTimer -= dt;
@@ -4487,6 +4535,7 @@ function boot() {
           bars: level.bars.map((r) => ({ a: v3(r.a), v: v3(r.vel) })),
           anchors: level.anchors.map((a) => ({ p: v3(a.pos), v: v3(a.vel) })),
           coins: level.coins.map((c) => c.collected),
+          cp: level.checkpoint ? level.platforms.indexOf(level.checkpoint) : -1,
         };
       },
       restore(s) {
@@ -4518,6 +4567,7 @@ function boot() {
         level.bars.forEach((r, i) => { r.a.set(s.bars[i].a.x, s.bars[i].a.y, s.bars[i].a.z); r.vel.set(s.bars[i].v.x, s.bars[i].v.y, s.bars[i].v.z); });
         level.anchors.forEach((a, i) => { a.pos.set(s.anchors[i].p.x, s.anchors[i].p.y, s.anchors[i].p.z); a.vel.set(s.anchors[i].v.x, s.anchors[i].v.y, s.anchors[i].v.z); });
         level.coins.forEach((c, i) => { c.collected = s.coins[i]; });
+        level.setCheckpoint(s.cp >= 0 ? level.platforms[s.cp] : null);
         if (game.state === 'playing') { $('screen-complete').classList.add('hidden'); }
       },
       // Start en vilkårlig banedefinition (uden at ændre LEVELS permanent)

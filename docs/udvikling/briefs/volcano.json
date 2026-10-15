@@ -1,0 +1,38 @@
+{
+ "kit": {
+  "id": "volcano",
+  "usedByLevels": [
+   13
+  ],
+  "platformLook": "Normal platforms: obsidian and basalt hex columns with glowing magma cracks. Vertical movers: rising and sinking columns. Crumbling platforms: cooled crust plates. Bounce pads: geysers. Updrafts: heat vents. Hot ledges with an orange rim drain grip twice as fast.",
+  "barLook": "Iron chains between columns, with white grip bands. Rope anchors are glowing obsidian hooks with a cyan ring.",
+  "scenery": "A huge erupting volcano with lava falls, the lava sea very close below, sulphur crystals, ash, embers and heat shimmer."
+ },
+ "levels": [
+  {
+   "index": 13,
+   "nameDa": "Vulkanen",
+   "world": "Down by the lava.\n- Black obsidian and basalt hexagonal columns (6-sided cylinders) with glowing magma cracks rise out of the lava sea.\n- Cooled crust plates are the crumbling platforms, geysers are the bounce pads, and heat vents are the updrafts.\n- Hot glowing edges use the icy grip rule (orange rim, grip drains twice as fast).\n- Iron chains between columns are hang bars.\n- Yellow sulphur crystals, ash and lava falls pouring off floating rocks.\n- The course runs low (y between -30 and -40) so the lava fills the view.\n- Background: a huge erupting volcano, with the portal on its crater rim.",
+   "sky": "Volcanic. Black-red ash clouds (#1a0605 to #8a2a0a), no sun, and a dim eruption plume. The main light is strong orange light coming up from the lava, with floating embers and heat shimmer.",
+   "signatureMechanics": [
+    "Hex columns rising and sinking in waves (vertical movers)",
+    "Crumbling crust plates",
+    "Geyser bounce pads",
+    "Heat-vent updrafts",
+    "Hot edges (grip drains twice as fast)",
+    "Chain hang bars",
+    "Rope swings past lava falls",
+    "Double jump"
+   ],
+   "layout": "A V-shaped height profile, about 38 segments and about 440 m. You drop down a cliff toward the lava on crumbling ash steps, cross a tense low stretch only 12-15 m above the lava, then climb the volcano's flank using vents, columns and rope to reach the crater rim.",
+   "setPieces": [
+    "'Basaltorglet': eight hex columns rising and falling in a wave like organ pipes. Run along the top of the wave.",
+    "'Skorpen': cooled lava plates crack and sink just above the glowing lava, with a chain monkey-bar escape (8 m).",
+    "'Lavafaldet': a rope swing right past a pouring lava fall, released into a catch on a hot ledge (chalk helps).",
+    "'Udbruddet': a geyser launches you toward the crater rim. Double jump at the top and the hands catch the rim."
+   ],
+   "handsMoments": "Catching column tops as they rise past you, a shimmy along a hot cliff ledge beside the lava fall (2.5 m sections), the chain monkey bars, and the final catch on the crater rim.",
+   "difficulty": 8
+  }
+ ]
+}

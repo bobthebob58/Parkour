@@ -1,0 +1,36 @@
+{
+ "kit": {
+  "id": "jungle",
+  "usedByLevels": [
+   8
+  ],
+  "platformLook": "Normal platforms: giant bark branches, bracket-fungus shelves, thatched treehouse decks and sagging rope bridges. Bounce pads: springy leaves and spotted mushrooms. Crumbling platforms: dead grey branches.",
+  "barLook": "Thin branches with white grip bands. Trapezes are vines. Rope anchors are glowing orange seed pods with a cyan ring. The zipline is a vine cable between treehouses.",
+  "scenery": "Colossal trunks plunging into mist, waterfalls pouring from hollow trunks, parrots, orchids, god rays and floating pollen."
+ },
+ "levels": [
+  {
+   "index": 8,
+   "nameDa": "Junglekronerne",
+   "world": "Colossal rainforest trees whose trunks plunge into the mist.\n- Platforms: giant horizontal branches (bark-textured long boxes), bracket-fungus shelves on the trunks (small round ledges), thatched treehouses and sagging rope bridges.\n- Huge springy leaves and red spotted mushrooms are bounce pads, and dead grey branches crumble.\n- Thin branches are hang bars, and hanging vines are trapezes.\n- Glowing orange seed pods with the standard cyan ring are the rope anchors.\n- Decoration: orchids, parrots, and waterfalls pouring from hollow trunks.",
+   "sky": "Tropical late afternoon. A green-gold haze (#6fb3a0 to #e6e3a0), with god rays slanting through the canopy, warm low light, layers of mist and floating pollen.",
+   "signatureMechanics": [
+    "Rope introduced and required from here (hook the glowing seed pods)",
+    "Branch hang bars and monkey bars",
+    "Vine trapezes",
+    "Mushroom and leaf bounce pads",
+    "Crumbling dead branches",
+    "Zipline between treehouses"
+   ],
+   "layout": "About 32 segments and about 380 m. First a spiral climb one and a half times around the 'mother tree' (+25 m). Then a crossing out over 4 smaller trees on rope swings, vines and branches, and a zipline down to the portal in a hollow trunk.",
+   "setPieces": [
+    "'Det første sving': a guided, generous 14 m gap with a big glowing seed pod overhead and a wide deck 4 m below to catch misses. A pop-up explains how to throw the rope.",
+    "'Moderstammen': climb around the trunk on fungus shelves and branch stubs using catch-jumps (7 m gaps to stubs 1.8 m higher).",
+    "'Abegrenen': hang under a horizontal branch and go hand over hand for 8 m, with a resting stub halfway.",
+    "'Tarzan-kæden': vine, rope, vine. Three swings in a row without touching the ground, ending in a hand catch on a treehouse balcony."
+   ],
+   "handsMoments": "Fungus-shelf catch-jumps up the trunk, the monkey branch, vine trapezes, and releasing a rope swing a little short on purpose so the hands catch the balcony edge.",
+   "difficulty": 6
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+double dy=-2: max gap 16
+double dy=0: max gap 16
+double dy=1: max gap 15.5
+double dy=2: max gap 15
+double dy=3: max gap 14
+double dy=4: max gap 13.5
+double dy=5: max gap 12.5
+perpendicular bars spacing 1.6: OK
+perpendicular bars spacing 2: OK
+perpendicular bars spacing 2.4: OK
+perpendicular bars spacing 2.8: OK
+perpendicular bars spacing 3.2: OK
+perpendicular bars spacing 3.6: OK
+perpendicular bars spacing 4: OK
+perpendicular bars spacing 4.4: OK
+perpendicular bars spacing 4.8: OK
+bar to bar height diff -1 (0.3 m apart): OK
+bar to bar height diff 0.6 (0.3 m apart): fail
+bar to bar height diff 1.2 (0.3 m apart): fail
+bar to bar height diff 1.5 (0.3 m apart): fail
+bar to bar height diff 1.8 (0.3 m apart): fail
+bar (1.2 m out) then platform gap 3: OK
+bar (1.2 m out) then platform gap 4: OK
+bar (1.2 m out) then platform gap 5: OK
+bar (1.2 m out) then platform gap 6: OK
+bar (1.2 m out) then platform gap 7: OK
+double dy=-2: max gap 14
+double dy=0: max gap 14
+double dy=1: max gap 13
+double dy=2: max gap 12
+double dy=3: max gap 11.5
+double dy=4: max gap 9
+double dy=5: max gap null
+jump dy=-4: max gap 10.25
+jump dy=-2: max gap 8.5
+jump dy=-1: max gap 8.5
+jump dy=0: max gap 7.75
+jump dy=1: max gap 6.75
+jump dy=1.5: max gap 6.25
+jump dy=2: max gap 5
+jump dy=2.5: max gap 4.25
+jump dy=3: max gap null
+vent lift 5: max dy null
+vent lift 7: max dy null
+vent lift 9: max dy null
+vent lift 11: max dy null
+vent lift 13: max dy null
+bounce pow 14: best {"dy":6,"g":6}
+bounce pow 18: best {"dy":8,"g":9}
+bounce pow 22: best {"dy":10,"g":12}
+bounce pow 26: best {"dy":10,"g":12}

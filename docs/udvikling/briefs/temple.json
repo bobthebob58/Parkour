@@ -1,0 +1,36 @@
+{
+ "kit": {
+  "id": "temple",
+  "usedByLevels": [
+   11
+  ],
+  "platformLook": "Normal platforms: pagoda tiers with curved red-tile eaves (the grab edges), red arched bridges and koi-pond islands. Turntable: the rotating top pagoda tier.",
+  "barLook": "Torii top beams and bamboo poles with white grip bands. Ziplines are strings of paper lanterns. Rope anchors are bronze bells with a cyan ring.",
+  "scenery": "Misty floating mountain peaks, cherry trees in bloom with drifting petals, stone lanterns, a giant pale rising moon, and a round moon gate."
+ },
+ "levels": [
+  {
+   "index": 11,
+   "nameDa": "Kirsebærtemplet",
+   "world": "A floating Japanese mountain temple.\n- Multi-tier pagodas with curved red-tile roofs; each tier's eave is a ledge you can grab.\n- Vermilion torii gates whose top beams are hang bars, and bamboo groves with horizontal poles.\n- Red arched wooden bridges, koi-pond islands and stone lanterns.\n- Strings of paper lanterns work as ziplines.\n- Bronze temple bells are the rope anchors.\n- Cherry trees in bloom.\n- Background: misty mountain peaks floating, and a giant pale moon rising.",
+   "sky": "Lilac dusk. The zenith is #4a3a7a and the horizon pink (#f4a6b8). A huge pale moon is rising, the lanterns glow warm orange, and cherry petals drift past.",
+   "signatureMechanics": [
+    "Double jump introduced and required from here",
+    "Climbing pagoda eaves and shimmying around corners",
+    "Torii and bamboo monkey bars",
+    "Lantern-string zipline",
+    "Slowly rotating top pagoda tier (turntable)",
+    "Gentle rope swing to a temple bell"
+   ],
+   "layout": "Act 3 opens a little easier: about 32 segments and about 360 m, with generous platforms again. First up: climb a 5-storey pagoda eave by eave (+20 m). Then down a long lantern zipline. Then through a tunnel of torii gates and a bamboo forest to the portal inside a round moon gate.",
+   "setPieces": [
+    "'Koispringet': an 11 m gap over a koi pond that only a double jump clears. It is marked with a floating arrow, and a hint says 'Tryk mellemrum igen i luften'. Misses land in a shallow pond deck below.",
+    "'Pagodeklatringen': catch each eave and shimmy around the corners to the open side. The top tier rotates.",
+    "'Lanternesnoren': a 40 m zipline down a string of paper lanterns. Let go above an arched bridge.",
+    "'Toriitunnelen': eight torii beams 2 m apart over a gap, crossed hand over hand, with a rest platform after the fourth. Then a double jump into a hand catch (13 m) on the moon-gate platform."
+   ],
+   "handsMoments": "This is the most hand-heavy level so far: pagoda eaves, torii and bamboo monkey bars, the lantern zipline, and the first 'double jump plus hand catch' long jump.",
+   "difficulty": 6
+  }
+ ]
+}

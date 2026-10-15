@@ -1,0 +1,38 @@
+{
+ "kit": {
+  "id": "skyreef",
+  "usedByLevels": [
+   14
+  ],
+  "platformLook": "Normal platforms: table corals, brain-coral domes and tube sponges. Bounce pads: drifting jellyfish. Moving platforms: manta rays and turtles. Updrafts: bubble columns. Conveyor: a current stream over a sandbar.",
+  "barLook": "Whale-skeleton ribs with white grip bands. Trapezes are kelp strands. Rope anchors are glowing pearls with a cyan ring.",
+  "scenery": "A kelp forest, anemones, schools of fish, caustic light rippling over everything, sunbeams from above, marine snow, and a giant clam."
+ },
+ "levels": [
+  {
+   "index": 14,
+   "nameDa": "Himmelhavet",
+   "world": "Underwater, but in the sky.\n- Coral reef islands: brain-coral domes, flat table corals (platforms) and tube sponges (cylinders).\n- Giant translucent jellyfish that drift up and down are bounce pads.\n- Gliding manta rays and sea turtles are moving platforms.\n- The ribs of a whale skeleton are monkey bars.\n- Bubble columns are updrafts, and a current stream over a sandbar is a conveyor.\n- Kelp strands are trapezes, and glowing pearls are rope anchors.\n- Anemones, and schools of fish as particle swarms.\n- Caustic light patterns ripple over every surface.",
+   "sky": "Underwater teal. Turquoise (#39c6c0) near the horizon, deep teal (#0b6d8a) above and dark blue (#04213a) below. Sunbeams shine down from above, caustics shimmer, and marine snow drifts.",
+   "signatureMechanics": [
+    "Jellyfish bounce pads (moving vertically)",
+    "Manta and turtle moving platforms",
+    "Bubble-column updrafts",
+    "Whale-rib monkey bars (long, managed with grip rests)",
+    "Current conveyor",
+    "Kelp trapezes",
+    "Rope to pearls",
+    "Double jump"
+   ],
+   "layout": "About 42 segments and about 500 m. Dive into a trench, then rise again: descend along the reef, cross the whale skeleton, ride the mantas over open water, then climb back up through bubble columns to a giant clam where the portal glows like a pearl.",
+   "setPieces": [
+    "'Gopler': five drifting jellyfish bounces in a row, each ending in a hand catch on the rim of a table coral.",
+    "'Hvalskelettet': 12 ribs as monkey bars along the whale's belly, with rest spots on the vertebrae after every 4 ribs. It is just inside the base grip and comfortable with chalk or gloves.",
+    "'Mantaturen': stand on a gliding manta for a 25 m stretch, then double jump off it at the right moment onto a turtle's shell.",
+    "'Perlesvinget': kelp trapeze into a rope swing to a pearl, then up a bubble column to the giant clam."
+   ],
+   "handsMoments": "The whale-rib monkey bars (the hardest grip test outside the finale), catching table-coral rims after jellyfish bounces, kelp trapezes, and catching a turtle shell's edge as it moves.",
+   "difficulty": 9
+  }
+ ]
+}

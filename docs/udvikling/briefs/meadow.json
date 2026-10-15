@@ -1,0 +1,34 @@
+{
+ "kit": {
+  "id": "meadow",
+  "usedByLevels": [
+   1
+  ],
+  "platformLook": "Normal platforms: green turf tops with flower specks, sitting on upside-down cones of brown soil and roots that drip small waterfalls. Plank footbridges with rope rails. Upright hay bales as cylinders. The barn roof as a box. No moving, icy or crumbling platforms in this kit.",
+  "barLook": "Weathered wooden fence beams and a low apple branch, wrapped with white grip-tape bands.",
+  "scenery": "Distant floating islands pouring waterfalls into the morning mist, a turning windmill, sheep, a red barn, an apple tree, a ring of standing stones, and a hot-air balloon far away."
+ },
+ "levels": [
+  {
+   "index": 1,
+   "nameDa": "Himmelengen",
+   "world": "Floating meadow farm islands. Each island has a thick green turf top with flower specks, with an upside-down cone of soil and roots underneath, dripping thin waterfalls into the mist.\n- Platforms: wide plank footbridges with rope rails, round hay bales standing on end (cylinders), and a red barn whose roof is a platform.\n- Decoration: sheep, a turning windmill and an apple tree.\n- Background: distant floating islands pouring waterfalls into the haze, and a hot-air balloon drifting far away.\n- Platforms are 8-12 m wide with no moving parts. There is no grey stone anywhere.",
+   "sky": "Dawn. The zenith is pale blue (#7fb8e8), the horizon peach (#ffd9a8), and the last stars are fading. A low warm sun about 10 degrees up casts long soft shadows. Mist lies 20-30 m below the islands, dew sparkles in the air, and the lava glow is at its weakest of the game.",
+   "signatureMechanics": [
+    "Running and jumping on big platforms (gaps 2.5-3.5 m, steps up to 1 m)",
+    "Coin trails that teach the route",
+    "Ledge-grab tutorial (safe, mandatory)",
+    "Optional low hang bar (fence beam)"
+   ],
+   "layout": "A gentle S-curve of about 200 m over about 18 segments. It has two 90-degree turns and climbs about 8 m. It starts on the porch of the runner's cottage and ends on the apple-tree hilltop, where the portal stands in a ring of standing stones. From the finish you can see the city skyline of level 2 on the horizon.",
+   "setPieces": [
+    "'Plankebroen': the first thing you do is run 14 m across a wide plank bridge with a coin line on it.",
+    "'Høballerne': five upright hay bales 4 m across, 2.5 m apart, each 0.5 m higher than the last, with a coin on top of each.",
+    "'Laderyggen': the barn's roof gutter is 2.8 m above the approach, too high to jump onto. The hands catch it automatically and the hint reads 'Hop mod kanten - hænderne griber selv! W: klatr op'. Falling short only drops you onto the meadow below.",
+    "Finale: a last 3 m hop onto the hilltop while the windmill sails turn behind the portal."
+   ],
+   "handsMoments": "One mandatory and safe ledge grab on the barn gutter. One optional fence-beam hang bar over a 1 m dip, with a coin hanging under it.",
+   "difficulty": 1
+  }
+ ]
+}

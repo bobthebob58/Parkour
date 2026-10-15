@@ -1,0 +1,36 @@
+{
+ "kit": {
+  "id": "harbor",
+  "usedByLevels": [
+   5
+  ],
+  "platformLook": "Normal platforms: white wooden piers with blue railings and steel mooring-mast rings. Moving platforms: wicker balloon baskets (vertical) and zeppelin gondola decks (sideways or forward). Pendulums: cargo crates on crane hooks. Turntable: the rotating top of a mooring mast.",
+  "barLook": "Mooring bars and rigging under the airships (moving bars), with white grip tape. A cargo cable is the zipline.",
+  "scenery": "Dozens of striped balloons and airships drifting at different distances, a striped lighthouse, bunting and windsocks, seagulls, and a towering bank of cumulus."
+ },
+ "levels": [
+  {
+   "index": 5,
+   "nameDa": "Luftskibshavnen",
+   "world": "A festive sky harbour.\n- White wooden piers with blue railings and bollards, a striped lighthouse, and steel mooring masts with round landing rings on top.\n- Striped hot-air balloons whose wicker baskets are small platforms.\n- Fabric zeppelins carrying wooden gondola decks, which are the moving platforms.\n- Cargo crates swinging from crane hooks.\n- Bunting, windsocks and seagulls.\n- Background: dozens of balloons and airships drifting in front of a towering bank of cumulus.\n- Landing zones are small, 2.5-4 m.",
+   "sky": "Bright afternoon. The zenith is #3d8fd6 and the horizon hazy #d8ecf8. Towering cumulus clouds are lit warm on top, the sun is at about 45 degrees, and flags flap in the wind.",
+   "signatureMechanics": [
+    "Moving platforms on all three axes: rising and sinking balloon baskets, zeppelin decks sliding sideways, a ferry deck moving forward and back",
+    "Smaller landing zones (2.5-4 m)",
+    "Pendulum cargo crates",
+    "Turntable (the rotating top of a mooring mast)",
+    "Moving hang bar: a mooring bar under a drifting airship",
+    "Catches on moving ledges"
+   ],
+   "layout": "Straight out from the harbour through airship 'traffic' to a far dock tower: about 28 segments and about 260 m, mostly forward with sideways swerves, climbing about 10 m. The portal is on top of the lighthouse.",
+   "setPieces": [
+    "'Ballonelevatoren': three 2.5x2.5 m baskets rise and fall 4 m out of phase. Hop from basket to basket at the right moment.",
+    "'Zeppelinerne': two gondola decks slide 6 m sideways at different speeds. Jump when they line up.",
+    "'Krankasserne': three crates swinging on crane cables carry you across a 14 m gap.",
+    "'Fortøjningsstangen': hang under a bar on the bow of a drifting airship as it carries you across an 18 m gap in about 3 s, then drop onto the dock. A cargo zipline takes you down to the lighthouse pier."
+   ],
+   "handsMoments": "Catching the rim of a rising basket (it lifts you), the moving mooring-bar ride (which must stay inside the 4 s grip), and the zipline finale. A double-jump shortcut leads up to a coin zeppelin.",
+   "difficulty": 5
+  }
+ ]
+}

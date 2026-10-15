@@ -1,0 +1,38 @@
+{
+ "kit": {
+  "id": "stormships",
+  "usedByLevels": [
+   9
+  ],
+  "platformLook": "Normal platforms: tilted plank decks and crow's nests. Vertical movers: bobbing hulls. Pendulums: anchors on chains. Crumbling platforms: broken planks. Spinners: capstan bars. Wet icy ledges: rain-soaked gunwales with a blue rim.",
+  "barLook": "Yardarms and bowsprits with white grip tape. Trapezes are rigging lines. Rope anchors are lanterns at the mast tops with a cyan ring.",
+  "scenery": "Torn sails flapping, dark ship silhouettes appearing in lightning flashes, ragged cloud 'waves', and rain streaks."
+ },
+ "levels": [
+  {
+   "index": 9,
+   "nameDa": "Stormskibene",
+   "world": "A fleet of wrecked wooden sailing ships hovering in a thunderstorm.\n- Platforms: tilted plank decks (dressed boxes) and crow's nests (small cylinders).\n- Masts with yardarms are the hang bars.\n- Anchors swinging on chains are pendulum platforms.\n- Broken planks crumble.\n- Capstan bars sweeping the deck are spinners.\n- Swinging rigging lines are trapezes.\n- Rain-soaked gunwales count as icy edges (blue rim, grip drains twice as fast).\n- Decoration: torn sails flapping, cannons, barrels and rocking lanterns.\n- Background: dark ship silhouettes that appear in the lightning above ragged cloud 'waves'.",
+   "sky": "Storm. Dark slate green-grey (#1e2a2c to #4d5c58), rolling clouds and rain streaks. Lightning flashes light the whole scene white-blue, followed by delayed thunder.",
+   "signatureMechanics": [
+    "Bobbing ship decks (slow vertical movers)",
+    "Pendulum anchors",
+    "Yardarm ladder (hang bars stacked up a mast)",
+    "Rigging trapezes",
+    "Crumbling planks",
+    "Capstan spinners",
+    "Rope to mast tops",
+    "Wet ledges (grip drains twice as fast)"
+   ],
+   "layout": "A zig-zag from ship to ship through the fleet, climbing from the bow of a low wreck to the flagship's crow's nest: about 34 segments, about 400 m and +30 m.",
+   "setPieces": [
+    "'Gyngende dæk': three ships rise and fall 3 m out of phase. Catch the gunwale of a ship as it rises past you.",
+    "'Ræstigen': climb a mast by jumping up from one yardarm to the next, then shimmy out to the end of the top yard.",
+    "'Ankersvinget': ride a swinging anchor across a 12 m gap while a capstan bar sweeps the landing deck.",
+    "'Udkigstønden': throw the rope from the top of the mast and make a 22 m swing to the flagship's crow's nest, where the portal glows."
+   ],
+   "handsMoments": "The yardarm ladder, catches on wet gunwales (chalk recommended), hanging from the bowsprit, and the rigging trapeze. A double-jump coin route runs over the sails.",
+   "difficulty": 7
+  }
+ ]
+}

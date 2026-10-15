@@ -1,0 +1,36 @@
+{
+ "kit": {
+  "id": "skatemesa",
+  "usedByLevels": [
+   6
+  ],
+  "platformLook": "Skate-only pieces: road decks of smooth concrete with painted lines and low curbs, on top of red-orange layered sandstone mesas with tapering undersides. Plus downhill ramps, kickers made from plywood billboards, quarter pipes, a bowl, a stair set, and glowing chevron boost pads.",
+  "barLook": "Grind rails: steel guard rails, handrails and a sagging cable.",
+  "scenery": "Giant sandstone arches and hoodoos in dusty haze, cacti, palm trees, an old camper van, graffiti walls, a neon 'RUL!' sign, and a huge low sun straight ahead."
+ },
+ "levels": [
+  {
+   "index": 6,
+   "nameDa": "Solbanen",
+   "world": "SKATEBOARD LEVEL. A sky highway and skatepark built on floating red sandstone mesas: flat-topped buttes with layered red and orange rock and long tapering undersides.\n- The tops are smooth concrete with painted lane lines.\n- Skate features: quarter pipes, kickers made from plywood billboards, a big bowl, a stair set with a steel handrail, and glowing chevron boost pads.\n- Grind rails: guard rails and a sagging cable.\n- Decoration: graffiti walls, cacti, palm trees, road cones, an old camper van and a neon 'RUL!' sign.\n- Low 0.5 m curbs on the curve edges keep the ride forgiving.\n- Background: giant sandstone arches and hoodoos in dusty haze.",
+   "sky": "Golden hour. The zenith is violet (#5a3d8a) and the horizon blazing orange (#ff9a3c). A huge low sun sits straight ahead along the road, so you ride into the sun, with lens flare, very long shadows and dust motes.",
+   "signatureMechanics": [
+    "Skateboard mode (auto-roll, A/D steer, W push, S brake, Space ollie)",
+    "Downhill ramps, kickers and quarter pipes",
+    "Grind rails and handrails",
+    "Ollie gaps (4-9 m)",
+    "Boost pads",
+    "Coin run (20 bonus coins)"
+   ],
+   "layout": "A one-way sky highway of about 700 m, roughly a 75 s run, across 6 mesas. It runs mostly downhill. At first the road is 8-10 m wide, narrowing to 5 m. It splits once, into a safe road line and a riskier rail line with more coins, and the two merge before the finale. Coin trails mark the ideal racing line throughout.",
+   "setPieces": [
+    "'Kaktusslalom': a narrow road lined with cacti and boost pads, with coins on the racing line.",
+    "'Trappesættet': a 10-step stair set with a handrail grind that leads straight into a kicker over a 6 m gap.",
+    "'Bowlen': carve around a concrete bowl and exit through a banked kicker to the next mesa. On the rail line you ollie from a rail that ends early onto a parallel one.",
+    "'Megarampen': three boost pads and a giant kicker send you over a 20 m canyon through a golden ring of coins. The jump goes into slow motion mid-air and you land on the portal plaza."
+   ],
+   "handsMoments": "None by design: this level gives the hands a rest and is a change of pace. During big airs the runner automatically grabs the board with one hand (an 'indy grab').",
+   "difficulty": 4
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+{ "name": "Vent", "kit": "sten", "theme": "day", "reward": 0, "segs": [
+  { "t": "start", "w": 10, "d": 10 }, { "g": 3, "w": 6, "d": 8 },
+  { "t": "vent", "g": 3, "w": 3, "d": 3, "lift": 9 },
+  { "g": 3, "w": 5, "d": 5, "dy": 6 },
+  { "t": "finish", "g": 3, "w": 10, "d": 10 } ] }

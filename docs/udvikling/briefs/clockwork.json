@@ -1,0 +1,37 @@
+{
+ "kit": {
+  "id": "clockwork",
+  "usedByLevels": [
+   7
+  ],
+  "platformLook": "Normal platforms: riveted brass and copper plates and iron catwalks. Turntables: cogs with tooth rims. Vertical movers: pistons. Conveyors: chain-drive belts. Crumbling platforms: rusty grates. Spinners: crane arms. Updrafts: steam vents.",
+  "barLook": "Copper steam pipes with white grip bands. The trapeze is a swinging crane hook.",
+  "scenery": "A giant clock tower with exposed gears and a glowing dial, smokestacks reaching down into the sepia smog, gauges and flywheels, and drifting soot."
+ },
+ "levels": [
+  {
+   "index": 7,
+   "nameDa": "Tandhjulsfabrikken",
+   "world": "A huge floating clockwork factory.\n- Materials: riveted brass and copper plates and black iron girders.\n- Giant rotating cogs are turntables, with tooth-shaped rims as dressing.\n- Chain-drive conveyor belts carry crates.\n- Pumping pistons are vertical movers.\n- Glowing furnace mouths.\n- Copper steam pipes are the hang bars, rusty grates are the crumbling platforms, and rotating crane arms are the spinners.\n- Steam vents are updrafts, and swinging crane hooks are trapezes.\n- Background: a giant clock tower with exposed gears, and smokestacks reaching down into the smog.",
+   "sky": "Sepia smog. The haze runs from brown (#6b5a45) to amber (#c9944f), the sun is a pale orange disc behind the smoke, and soot and steam puffs drift past in heavy, close fog.",
+   "signatureMechanics": [
+    "Conveyor belts (running with you and against you)",
+    "Turntable cogs",
+    "Vertical pistons",
+    "Steam updraft vents",
+    "Spinners (crane arms)",
+    "Crumbling rusty grates",
+    "Trapeze (swinging crane hook)"
+   ],
+   "layout": "An assembly line of about 30 segments and about 300 m in three halls. Hall 1 is a descending production line: conveyor, then cogs, then pistons. Hall 2 is a vertical climb up a steam-filled chimney. Hall 3 is a network of pipes leading to the clock face, where the portal sits at the centre of the dial.",
+   "setPieces": [
+    "'Samlebåndet': a 14 m belt runs against you toward an edge. Sprint and jump off its end.",
+    "'Tandhjulstrappen': four cogs at rising heights that turn in alternating directions. Jump when the teeth line up.",
+    "'Dampskorstenen': steam vents lift you 12 m up the chimney. At the top of each one, catch a ledge or a copper pipe.",
+    "'Ovnen': monkey bars on a copper pipe (8.5 m) above a glowing furnace while a crane arm sweeps underneath. Then ride a swinging crane hook (trapeze) to the clock tower."
+   ],
+   "handsMoments": "Pipe monkey bars over the furnace (8.5 m, just inside the base grip), catching piston tops as they rise past you, ledge catches at the top of the steam columns, and the crane-hook trapeze. A chalk route takes a 14 m pipe for 3 coins, and a double-jump shortcut skips the cogs. From here on, catch-jumps are routine.",
+   "difficulty": 6
+  }
+ ]
+}

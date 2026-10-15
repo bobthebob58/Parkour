@@ -1,0 +1,37 @@
+{
+ "kit": {
+  "id": "neoncity",
+  "usedByLevels": [
+   12
+  ],
+  "platformLook": "Normal platforms: rain-slick steel walkways with reflective puddles. Moving platforms: flying cars, buses and cargo drones in traffic lanes. Conveyors: moving walkways. Updrafts: rooftop vents.",
+  "barLook": "Neon sign frames with white grip bands. Ziplines are power cables. Rope anchors are hovering drones with a cyan ring.",
+  "scenery": "Towers plunging into magenta and cyan neon fog, holographic billboards, an advertising blimp, rain streaks and streams of traffic lights."
+ },
+ "levels": [
+  {
+   "index": 12,
+   "nameDa": "Neonbyen",
+   "world": "A cyberpunk megacity in the rain.\n- Hovering cars, buses and cargo drones fly in traffic lanes; they are moving platforms at different speeds.\n- Rain-slick steel walkways with reflective puddles, and moving walkways (conveyors).\n- Neon sign frames are the hang bars, rooftop vents are updrafts, and power cables are ziplines.\n- Hovering delivery drones with cyan rings are the rope anchors.\n- Holographic billboards.\n- Towers plunge into magenta and cyan neon fog.",
+   "sky": "Rainy night. Deep indigo (#0a0b24), with magenta (#c03aa0) and cyan city glow on the low clouds, rain streaks, a glowing advertising blimp and no stars.",
+   "signatureMechanics": [
+    "Traffic-lane moving platforms (crossing your path, alternating directions)",
+    "Moving walkways (conveyors)",
+    "Rooftop updraft vents",
+    "Neon-sign ladder (hang bars)",
+    "Power-cable ziplines",
+    "Rope to drones",
+    "Double jump between lanes"
+   ],
+   "layout": "About 36 segments and about 420 m. You cross three 'traffic rivers' (4-5 lanes of flying cars each) with rooftop islands between them. Then you climb a tower on a neon ladder. Last, you zipline down power cables to the portal on top of a holographic billboard.",
+   "setPieces": [
+    "'Myldretid': hop across 5 lanes of flying cars moving alternately left and right. A double jump saves a mistimed hop.",
+    "'Rullebåndene': a maze of moving walkways running against you and across your path.",
+    "'Neonstigen': climb a vertical stack of sign frames by jumping from bar to bar, with an updraft vent halfway up.",
+    "'Dronekrogen': throw the rope at a hovering drone to swing across an 18 m gap, then release into a power-cable zipline."
+   ],
+   "handsMoments": "Catching the roof edge of a flying bus as it passes (moving ledge), the neon ladder, and the power-cable ziplines that release into ledge catches.",
+   "difficulty": 7
+  }
+ ]
+}

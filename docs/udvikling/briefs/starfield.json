@@ -1,0 +1,36 @@
+{
+ "kit": {
+  "id": "starfield",
+  "usedByLevels": [
+   10
+  ],
+  "platformLook": "Normal platforms: tiny glowing crystal shards and meteorite chunks (1.0-1.4 m tops). Crumbling platforms: cracked meteors. Moving platforms: slowly drifting shards. Rest decks: satellite plates. Spinners: solar-panel arms.",
+  "barLook": "Satellite truss girders with white grip bands. Rope anchors are glowing stars with a cyan ring.",
+  "scenery": "The Milky Way, a ringed planet, a nebula, passing comets and shooting stars, a tiny moon, and the lava reading as a red planet surface far below."
+ },
+ "levels": [
+  {
+   "index": 10,
+   "nameDa": "Himlens ende",
+   "world": "The edge of the sky, where the atmosphere ends.\n- Platforms are tiny glowing crystal shards and meteorite chunks with 1.0-1.4 m tops, many of them crumbling.\n- A broken satellite station has rotating solar-panel arms (spinners) and truss girders (hang bars).\n- Glowing star anchors take the rope.\n- Small shards drift slowly as moving platforms.\n- Background: comets drifting past, the Milky Way, a ringed planet and a nebula.\n- The lava sea far below reads as a red-glowing planet surface.",
+   "sky": "Deep-space night. Near-black violet (#05030f to #2a1446), dense stars, the Milky Way band, nebula clouds, shooting stars and a large ringed planet.",
+   "signatureMechanics": [
+    "Tiny platforms (1.0-1.4 m)",
+    "Massive rope gaps (18-30 m), chained swings",
+    "Crumbling meteorites",
+    "Small drifting shards",
+    "Spinners (solar arrays)",
+    "Catches on tiny shard edges"
+   ],
+   "layout": "An extremely long winding 'star road': about 60 segments and about 650 m, the longest course so far, in three acts. Act 1 is a chain of meteors. Act 2 is the great void and the satellite. Act 3 is a final spiral around a tiny moon. Three small satellite 'rest decks' split the acts. The plain-jump margin is cut almost to nothing. A long-rope shortcut uses a high anchor to skip one swing in the void.",
+   "setPieces": [
+    "'Meteorkæden': eight crumbling 1.2 m meteorites in a row with 5-6 m gaps. You cannot stop.",
+    "'Det store tomrum': three 20-30 m rope swings back to back between star anchors, each landing on a tiny shard. Releasing short is saved by a hand catch on the shard edge.",
+    "'Satellitten': a hub with rotating solar-panel arms. Cross underneath them on the truss bars (9 m, the full base grip) while the arms sweep above.",
+    "'Månespiralen': spiral up around a tiny moon on 1 m shards, finishing with a catch on the rim of the portal ledge."
+   ],
+   "handsMoments": "Catching the edges of tiny shards is often the only way to land them. The truss monkey bars under the satellite, and the last catch onto the portal rim. Chalk is strongly recommended because it extends catch reach.",
+   "difficulty": 9
+  }
+ ]
+}

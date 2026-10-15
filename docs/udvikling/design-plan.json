@@ -1,0 +1,552 @@
+{
+ "rationale": "BACKBONE: I used Proposal 1 (visual variety first) as the spine. It has the most distinct worlds, 15 skies with no repeats, and the five gameplay signals that look the same in every world. Its sawtooth runs in three acts, and the act boundaries line up with the rules for when you need the rope, double jump and the skateboard level. From Proposal 3 I took the gap sizes, the grip budget rule, the economy and the reason to put the skateboard at level 6. From Proposal 2 I took the 'teach it safely, then twist it' structure and the moving hang bar you ride (level 5). From Proposal 4 I took the coins hidden behind double-jump shortcuts from level 4 onward, a view of the next world from every finish, and the visible equipment on the runner.\n\nSCORES (out of 10):\n- P1: 9. Strongest worlds and skies, good hands coverage, and it already matches every hard constraint.\n- P3: 8.5. Best difficulty curve and economy, but its worlds are a little less striking.\n- P4: 8. A lovely story and a remix finale, but the double jump is never mandatory, which breaks the brief, and the finale reuses all 14 kits, which breaks the kit rule.\n- P2: 7.5. It requires double jump from level 6 and puts the skateboard at 11, after the extreme level 10, so a kid has to beat the hardest level before they get to ride the board.\n\nACTS AND DIFFICULTY: 1,2,3,4,5 | 4,6,6,7,9 | 6,7,8,9,10.\n- Act 1 (L1-5) teaches the body: hands, bounce, ice and grip, then moving platforms on small landings. L5 is the spike the original spec asks for.\n- Act 2 (L6-10):\n  - L6 is the skateboard level. It gives a change of pace after the L5 spike. Its 20-coin run pays for the rope before the rope is required. A kid can reach it early.\n  - L8 introduces the rope, and the rope is required from L8 to L15.\n  - L10 'Himlens ende' is extremely hard: 1.0-1.4 m tops, rope gaps of 18-30 m, about 650 m.\n- Act 3 (L11-15) opens softer at difficulty 6. Double jump is required from L11 to L15 and is taught at L11's koi leap. L15 is the grand finale.\n\nGAP SIZES (run 9 m/s, max flat jump 7.9 m):\n- Plain jumps: comfortable up to 7 m.\n- Hands-only catch: 8.5-9.3 m at the same height, or 8-8.5 m to a ledge 1 m higher, or 6.5-7.5 m to a ledge 1.5-2 m higher.\n- Double jump: 10-13 m. Double jump plus a hand catch: 13-14.5 m. Chalk adds about 0.8 m of catch reach.\n- Rope gaps: 15-30 m. Gaps up to 40 m are only for long-rope shortcuts.\n\nGRIP BUDGET (keeps chalk about the hands only). Mandatory hanging between rest spots stays within these limits without chalk or gloves:\n- dry ledge shimmy: 5 m or less\n- icy ledge shimmy: 2.5 m or less\n- monkey bars: 9 m or less\n\nChalk (refill, slow drain, longer catch reach) is never hard-required. Every level from 4 has a chalk-only coin route of about twice these limits. Levels 4, 14 and 15 are tuned so the icy or long hanging sections are just possible without chalk and comfortable with it. Chalk affects nothing except the hands.\n\nDOUBLE JUMP: It is useful from L4 as an optional shortcut to hidden coin caches and as a rescue on the moving L5. It is required from L11.\n\nECONOMY: Proposal 3's numbers, with prices taken from the current shop:\n- Portal rewards rise from 20 to 100 and bonus coins are worth 5 each.\n- L6 carries 20 coins.\n- A player who collects no bonus coins can still afford rope plus chalk after L7, and chalk plus rope plus double jump after L10.\n- Shop tips appear before L4 (chalk), L8 (rope) and L11 (double jump).\n\nTHE FIVE SIGNALS THAT NEVER CHANGE: the lava sea at y=-50 looks the same everywhere; hang bars always carry white grip-tape bands; rope anchors always have a glowing cyan ring; icy ledges always have a blue frosty rim; crumbling platforms always show cracks and shake. Every grabbable top edge also gets a faint worn chalk-white lip.\n\nHANDS: Hands moments appear in 14 of 15 levels: catch-jumps, shimmies, monkey bars, the new zipline and trapeze, moving bars and catches on moving ledges. Engine note: when you grab a ledge or bar on a moving or rotating platform, you must inherit that platform's velocity. This is needed in L5, L9, L12 and L14.\n\nFINALE KIT: L15 has its own crystal-and-gold kit. Floating 'souvenir' props from earlier worlds orbit the spire as decoration only, so the kit rule holds while the finale still recalls the whole journey. Every finish platform shows the next world on the horizon.",
+ "levels": [
+  {
+   "index": 1,
+   "nameDa": "Himmelengen",
+   "world": "Floating meadow farm islands. Each island has a thick green turf top with flower specks, with an upside-down cone of soil and roots underneath, dripping thin waterfalls into the mist.\n- Platforms: wide plank footbridges with rope rails, round hay bales standing on end (cylinders), and a red barn whose roof is a platform.\n- Decoration: sheep, a turning windmill and an apple tree.\n- Background: distant floating islands pouring waterfalls into the haze, and a hot-air balloon drifting far away.\n- Platforms are 8-12 m wide with no moving parts. There is no grey stone anywhere.",
+   "sky": "Dawn. The zenith is pale blue (#7fb8e8), the horizon peach (#ffd9a8), and the last stars are fading. A low warm sun about 10 degrees up casts long soft shadows. Mist lies 20-30 m below the islands, dew sparkles in the air, and the lava glow is at its weakest of the game.",
+   "signatureMechanics": [
+    "Running and jumping on big platforms (gaps 2.5-3.5 m, steps up to 1 m)",
+    "Coin trails that teach the route",
+    "Ledge-grab tutorial (safe, mandatory)",
+    "Optional low hang bar (fence beam)"
+   ],
+   "layout": "A gentle S-curve of about 200 m over about 18 segments. It has two 90-degree turns and climbs about 8 m. It starts on the porch of the runner's cottage and ends on the apple-tree hilltop, where the portal stands in a ring of standing stones. From the finish you can see the city skyline of level 2 on the horizon.",
+   "setPieces": [
+    "'Plankebroen': the first thing you do is run 14 m across a wide plank bridge with a coin line on it.",
+    "'Høballerne': five upright hay bales 4 m across, 2.5 m apart, each 0.5 m higher than the last, with a coin on top of each.",
+    "'Laderyggen': the barn's roof gutter is 2.8 m above the approach, too high to jump onto. The hands catch it automatically and the hint reads 'Hop mod kanten - hænderne griber selv! W: klatr op'. Falling short only drops you onto the meadow below.",
+    "Finale: a last 3 m hop onto the hilltop while the windmill sails turn behind the portal."
+   ],
+   "handsMoments": "One mandatory and safe ledge grab on the barn gutter. One optional fence-beam hang bar over a 1 m dip, with a coin hanging under it.",
+   "difficulty": 1,
+   "requiredItems": []
+  },
+  {
+   "index": 2,
+   "nameDa": "Højhustagene",
+   "world": "The rooftops of glass skyscrapers. Each roof's building continues 60-100 m down into the haze, with a lit window grid and reflective blue glass.\n- Roof props: low parapets (the edges you grab), AC boxes as step-ups, water towers on stilts (cylinders), antennas with red blinking lights, rooftop gardens and laundry lines.\n- One building is still under construction, with yellow scaffolding pipes.\n- A window-washer gondola hangs on a facade.\n- The portal is on a helipad marked with a yellow H.\n- Roofs are 5-10 m wide.",
+   "sky": "Crisp midday. The zenith is deep blue (#2f7fe0) and the horizon pale (#bfe3ff). A high sun about 65 degrees up gives hard short shadows. Big white cumulus, a plane contrail, and the sun glinting on the glass.",
+   "signatureMechanics": [
+    "Catch-jumps: long jumps that only the hands can finish (the core lesson)",
+    "Parapet shimmy (A/D) and shimmying around a corner",
+    "Scaffolding-pipe hang bars",
+    "Slow vertical mover (window-washer gondola)",
+    "Zipline intro: the gondola cable, optional"
+   ],
+   "layout": "A zig-zag up one city block: about 22 roofs and about 240 m. It has three 90-degree turns and climbs about 20 m. Normal gaps are 3-6 m. Four gaps are deliberately 8-8.5 m to a roof 1-1.5 m higher, so the hands must finish them.",
+   "setPieces": [
+    "'Det første lange hop': an 8.3 m gap to a roof 1 m higher. The feet cannot make it and the hands catch the parapet. A hint appears the first time.",
+    "'Stilladset': three scaffold pipes 2.2 m apart over the gap between two towers. Hang from one, swing, and jump to the next.",
+    "'Vinduespudseren': the gondola rides 5 m up and down a facade and lifts you to a high roof. Its cable doubles as a short zipline down to a bonus coin roof.",
+    "'Hjørnet': an antenna fence blocks the top of a parapet, so you hang and shimmy 4 m around the building corner before climbing up."
+   ],
+   "handsMoments": "This is the hands lesson: four parapet catch-jumps, the scaffold pipes, a 4 m corner shimmy that fits in the base grip, and the optional zipline.",
+   "difficulty": 2,
+   "requiredItems": []
+  },
+  {
+   "index": 3,
+   "nameDa": "Slikøerne",
+   "world": "Giant sweets in a pastel sky.\n- Platforms: pink-frosted donuts with sprinkles (cylinders), chocolate bars (boxes), stacked macarons, a three-tier wedding cake, wafer bridges and lollipop discs.\n- Hang bars are red-and-white candy canes.\n- Bounce pads are marshmallow and jelly cushions that squash when you land.\n- Crumbling platforms are biscuits that break into crumbs.\n- Trapezes are licorice swings.\n- Decoration: gumdrops and gummy bears.\n- Background: a chocolate waterfall pouring from a giant cup between cotton-candy clouds.",
+   "sky": "Pastel afternoon. The zenith is pink (#f7a8d8) and the horizon mint (#b8f5e0). The sun is soft, the clouds are tinted pink and lilac, and sprinkle-like sparkles drift in the air.",
+   "signatureMechanics": [
+    "Bounce pads (marshmallow, jelly)",
+    "Bounce into a hand catch",
+    "Crumbling platforms intro (biscuits)",
+    "Candy-cane monkey bars",
+    "Trapeze intro (licorice swing)"
+   ],
+   "layout": "An S-shape that goes up and then down, about 24 segments and about 260 m. The first half climbs the wedding-cake tower (+15 m). The second half steps down a staircase of donuts and ends with a run across a long wafer bridge.",
+   "setPieces": [
+    "'Bryllupskagen': a bounce pad on each tier throws you just short of the next one, and the hands catch the frosting rim. This repeats on 3 tiers. Missing only drops you back onto the same tier.",
+    "'Kiksebanen': five 3x3 m biscuits in a row that crumble 0.55 s after you land, so you have to keep running.",
+    "'Slikstokkene': four candy canes 2.2 m apart above the chocolate waterfall, then a licorice trapeze that throws you onto a macaron.",
+    "'Geléknappen': a strong jelly pad throws you over a 10 m gap onto a lollipop disc."
+   ],
+   "handsMoments": "Catching the frosting rim after each bounce, the candy-cane monkey bars (about 7 m), and the licorice trapeze, which is a long jump you finish holding on.",
+   "difficulty": 3,
+   "requiredItems": []
+  },
+  {
+   "index": 4,
+   "nameDa": "Gletsjeren",
+   "world": "Drifting glacier blocks and ice floes.\n- The ice is translucent blue and glossy, with icicles fringing the undersides.\n- Snow caps and dark rock knobs are the grippy safe spots: white snow means normal grip, glossy blue ice means slippery.\n- Ledge rims are colour-coded too: snowy rims are normal, blue frosty rims are icy and drain grip twice as fast.\n- Also: a frozen waterfall cliff, igloos, snowy pines, a small red research station with an antenna, and an ice block with a frozen mammoth inside.\n- Background: a giant iceberg arch.",
+   "sky": "Frost overcast. The colours run from #a9c4dc to #eef4fa, with a weak white sun disc behind thin cloud. Steady snowfall, diamond-dust sparkle, and cold blue fog that hides the far distance.",
+   "signatureMechanics": [
+    "Ice surfaces (slippery, you carry momentum)",
+    "Icy ledges (grip drains twice as fast)",
+    "Chalk shown as a pure hand tool (recommended, a pop-up tip)",
+    "Thin-ice crumbling sheets",
+    "Slowly rotating ice floes (turntables)",
+    "First double-jump shortcut to a hidden coin cache"
+   ],
+   "layout": "Downhill, then up, about 26 segments and about 280 m. First you slide down 4 ice terraces. Then you cross a field of rotating floes. Last, you climb the frozen waterfall to the research station, where the portal glows at the antenna.",
+   "setPieces": [
+    "'Skøjtebanen': a 16 m ice sheet that steps down 0.5 m twice and ends at a 6 m gap. You can't stop on ice, so you have to time the jump at the very edge.",
+    "'Isflagekarrusellen': three rotating ice floes at different speeds. Land, ride, and jump off when they line up.",
+    "'Istapperne': an icy shimmy under an overhang, split into 2.5 m sections with snow footholds between them. A chalk route does a 6 m shimmy in one go and picks up 3 coins. Pop-up: 'Kridt (venstreklik): hænderne holder bedre og længere'.",
+    "'Det frosne vandfald': three stacked icy ledges 2 m apart. Catch, climb and catch again quickly before the grip runs out."
+   ],
+   "handsMoments": "This is where grip management first matters: icy climb-ups, the sectioned icicle shimmy, the chalk-only coin route, and catching a floe edge after a slide-jump comes up short.",
+   "difficulty": 4,
+   "requiredItems": []
+  },
+  {
+   "index": 5,
+   "nameDa": "Luftskibshavnen",
+   "world": "A festive sky harbour.\n- White wooden piers with blue railings and bollards, a striped lighthouse, and steel mooring masts with round landing rings on top.\n- Striped hot-air balloons whose wicker baskets are small platforms.\n- Fabric zeppelins carrying wooden gondola decks, which are the moving platforms.\n- Cargo crates swinging from crane hooks.\n- Bunting, windsocks and seagulls.\n- Background: dozens of balloons and airships drifting in front of a towering bank of cumulus.\n- Landing zones are small, 2.5-4 m.",
+   "sky": "Bright afternoon. The zenith is #3d8fd6 and the horizon hazy #d8ecf8. Towering cumulus clouds are lit warm on top, the sun is at about 45 degrees, and flags flap in the wind.",
+   "signatureMechanics": [
+    "Moving platforms on all three axes: rising and sinking balloon baskets, zeppelin decks sliding sideways, a ferry deck moving forward and back",
+    "Smaller landing zones (2.5-4 m)",
+    "Pendulum cargo crates",
+    "Turntable (the rotating top of a mooring mast)",
+    "Moving hang bar: a mooring bar under a drifting airship",
+    "Catches on moving ledges"
+   ],
+   "layout": "Straight out from the harbour through airship 'traffic' to a far dock tower: about 28 segments and about 260 m, mostly forward with sideways swerves, climbing about 10 m. The portal is on top of the lighthouse.",
+   "setPieces": [
+    "'Ballonelevatoren': three 2.5x2.5 m baskets rise and fall 4 m out of phase. Hop from basket to basket at the right moment.",
+    "'Zeppelinerne': two gondola decks slide 6 m sideways at different speeds. Jump when they line up.",
+    "'Krankasserne': three crates swinging on crane cables carry you across a 14 m gap.",
+    "'Fortøjningsstangen': hang under a bar on the bow of a drifting airship as it carries you across an 18 m gap in about 3 s, then drop onto the dock. A cargo zipline takes you down to the lighthouse pier."
+   ],
+   "handsMoments": "Catching the rim of a rising basket (it lifts you), the moving mooring-bar ride (which must stay inside the 4 s grip), and the zipline finale. A double-jump shortcut leads up to a coin zeppelin.",
+   "difficulty": 5,
+   "requiredItems": []
+  },
+  {
+   "index": 6,
+   "nameDa": "Solbanen",
+   "world": "SKATEBOARD LEVEL. A sky highway and skatepark built on floating red sandstone mesas: flat-topped buttes with layered red and orange rock and long tapering undersides.\n- The tops are smooth concrete with painted lane lines.\n- Skate features: quarter pipes, kickers made from plywood billboards, a big bowl, a stair set with a steel handrail, and glowing chevron boost pads.\n- Grind rails: guard rails and a sagging cable.\n- Decoration: graffiti walls, cacti, palm trees, road cones, an old camper van and a neon 'RUL!' sign.\n- Low 0.5 m curbs on the curve edges keep the ride forgiving.\n- Background: giant sandstone arches and hoodoos in dusty haze.",
+   "sky": "Golden hour. The zenith is violet (#5a3d8a) and the horizon blazing orange (#ff9a3c). A huge low sun sits straight ahead along the road, so you ride into the sun, with lens flare, very long shadows and dust motes.",
+   "signatureMechanics": [
+    "Skateboard mode (auto-roll, A/D steer, W push, S brake, Space ollie)",
+    "Downhill ramps, kickers and quarter pipes",
+    "Grind rails and handrails",
+    "Ollie gaps (4-9 m)",
+    "Boost pads",
+    "Coin run (20 bonus coins)"
+   ],
+   "layout": "A one-way sky highway of about 700 m, roughly a 75 s run, across 6 mesas. It runs mostly downhill. At first the road is 8-10 m wide, narrowing to 5 m. It splits once, into a safe road line and a riskier rail line with more coins, and the two merge before the finale. Coin trails mark the ideal racing line throughout.",
+   "setPieces": [
+    "'Kaktusslalom': a narrow road lined with cacti and boost pads, with coins on the racing line.",
+    "'Trappesættet': a 10-step stair set with a handrail grind that leads straight into a kicker over a 6 m gap.",
+    "'Bowlen': carve around a concrete bowl and exit through a banked kicker to the next mesa. On the rail line you ollie from a rail that ends early onto a parallel one.",
+    "'Megarampen': three boost pads and a giant kicker send you over a 20 m canyon through a golden ring of coins. The jump goes into slow motion mid-air and you land on the portal plaza."
+   ],
+   "handsMoments": "None by design: this level gives the hands a rest and is a change of pace. During big airs the runner automatically grabs the board with one hand (an 'indy grab').",
+   "difficulty": 4,
+   "requiredItems": []
+  },
+  {
+   "index": 7,
+   "nameDa": "Tandhjulsfabrikken",
+   "world": "A huge floating clockwork factory.\n- Materials: riveted brass and copper plates and black iron girders.\n- Giant rotating cogs are turntables, with tooth-shaped rims as dressing.\n- Chain-drive conveyor belts carry crates.\n- Pumping pistons are vertical movers.\n- Glowing furnace mouths.\n- Copper steam pipes are the hang bars, rusty grates are the crumbling platforms, and rotating crane arms are the spinners.\n- Steam vents are updrafts, and swinging crane hooks are trapezes.\n- Background: a giant clock tower with exposed gears, and smokestacks reaching down into the smog.",
+   "sky": "Sepia smog. The haze runs from brown (#6b5a45) to amber (#c9944f), the sun is a pale orange disc behind the smoke, and soot and steam puffs drift past in heavy, close fog.",
+   "signatureMechanics": [
+    "Conveyor belts (running with you and against you)",
+    "Turntable cogs",
+    "Vertical pistons",
+    "Steam updraft vents",
+    "Spinners (crane arms)",
+    "Crumbling rusty grates",
+    "Trapeze (swinging crane hook)"
+   ],
+   "layout": "An assembly line of about 30 segments and about 300 m in three halls. Hall 1 is a descending production line: conveyor, then cogs, then pistons. Hall 2 is a vertical climb up a steam-filled chimney. Hall 3 is a network of pipes leading to the clock face, where the portal sits at the centre of the dial.",
+   "setPieces": [
+    "'Samlebåndet': a 14 m belt runs against you toward an edge. Sprint and jump off its end.",
+    "'Tandhjulstrappen': four cogs at rising heights that turn in alternating directions. Jump when the teeth line up.",
+    "'Dampskorstenen': steam vents lift you 12 m up the chimney. At the top of each one, catch a ledge or a copper pipe.",
+    "'Ovnen': monkey bars on a copper pipe (8.5 m) above a glowing furnace while a crane arm sweeps underneath. Then ride a swinging crane hook (trapeze) to the clock tower."
+   ],
+   "handsMoments": "Pipe monkey bars over the furnace (8.5 m, just inside the base grip), catching piston tops as they rise past you, ledge catches at the top of the steam columns, and the crane-hook trapeze. A chalk route takes a 14 m pipe for 3 coins, and a double-jump shortcut skips the cogs. From here on, catch-jumps are routine.",
+   "difficulty": 6,
+   "requiredItems": []
+  },
+  {
+   "index": 8,
+   "nameDa": "Junglekronerne",
+   "world": "Colossal rainforest trees whose trunks plunge into the mist.\n- Platforms: giant horizontal branches (bark-textured long boxes), bracket-fungus shelves on the trunks (small round ledges), thatched treehouses and sagging rope bridges.\n- Huge springy leaves and red spotted mushrooms are bounce pads, and dead grey branches crumble.\n- Thin branches are hang bars, and hanging vines are trapezes.\n- Glowing orange seed pods with the standard cyan ring are the rope anchors.\n- Decoration: orchids, parrots, and waterfalls pouring from hollow trunks.",
+   "sky": "Tropical late afternoon. A green-gold haze (#6fb3a0 to #e6e3a0), with god rays slanting through the canopy, warm low light, layers of mist and floating pollen.",
+   "signatureMechanics": [
+    "Rope introduced and required from here (hook the glowing seed pods)",
+    "Branch hang bars and monkey bars",
+    "Vine trapezes",
+    "Mushroom and leaf bounce pads",
+    "Crumbling dead branches",
+    "Zipline between treehouses"
+   ],
+   "layout": "About 32 segments and about 380 m. First a spiral climb one and a half times around the 'mother tree' (+25 m). Then a crossing out over 4 smaller trees on rope swings, vines and branches, and a zipline down to the portal in a hollow trunk.",
+   "setPieces": [
+    "'Det første sving': a guided, generous 14 m gap with a big glowing seed pod overhead and a wide deck 4 m below to catch misses. A pop-up explains how to throw the rope.",
+    "'Moderstammen': climb around the trunk on fungus shelves and branch stubs using catch-jumps (7 m gaps to stubs 1.8 m higher).",
+    "'Abegrenen': hang under a horizontal branch and go hand over hand for 8 m, with a resting stub halfway.",
+    "'Tarzan-kæden': vine, rope, vine. Three swings in a row without touching the ground, ending in a hand catch on a treehouse balcony."
+   ],
+   "handsMoments": "Fungus-shelf catch-jumps up the trunk, the monkey branch, vine trapezes, and releasing a rope swing a little short on purpose so the hands catch the balcony edge.",
+   "difficulty": 6,
+   "requiredItems": [
+    "rope"
+   ]
+  },
+  {
+   "index": 9,
+   "nameDa": "Stormskibene",
+   "world": "A fleet of wrecked wooden sailing ships hovering in a thunderstorm.\n- Platforms: tilted plank decks (dressed boxes) and crow's nests (small cylinders).\n- Masts with yardarms are the hang bars.\n- Anchors swinging on chains are pendulum platforms.\n- Broken planks crumble.\n- Capstan bars sweeping the deck are spinners.\n- Swinging rigging lines are trapezes.\n- Rain-soaked gunwales count as icy edges (blue rim, grip drains twice as fast).\n- Decoration: torn sails flapping, cannons, barrels and rocking lanterns.\n- Background: dark ship silhouettes that appear in the lightning above ragged cloud 'waves'.",
+   "sky": "Storm. Dark slate green-grey (#1e2a2c to #4d5c58), rolling clouds and rain streaks. Lightning flashes light the whole scene white-blue, followed by delayed thunder.",
+   "signatureMechanics": [
+    "Bobbing ship decks (slow vertical movers)",
+    "Pendulum anchors",
+    "Yardarm ladder (hang bars stacked up a mast)",
+    "Rigging trapezes",
+    "Crumbling planks",
+    "Capstan spinners",
+    "Rope to mast tops",
+    "Wet ledges (grip drains twice as fast)"
+   ],
+   "layout": "A zig-zag from ship to ship through the fleet, climbing from the bow of a low wreck to the flagship's crow's nest: about 34 segments, about 400 m and +30 m.",
+   "setPieces": [
+    "'Gyngende dæk': three ships rise and fall 3 m out of phase. Catch the gunwale of a ship as it rises past you.",
+    "'Ræstigen': climb a mast by jumping up from one yardarm to the next, then shimmy out to the end of the top yard.",
+    "'Ankersvinget': ride a swinging anchor across a 12 m gap while a capstan bar sweeps the landing deck.",
+    "'Udkigstønden': throw the rope from the top of the mast and make a 22 m swing to the flagship's crow's nest, where the portal glows."
+   ],
+   "handsMoments": "The yardarm ladder, catches on wet gunwales (chalk recommended), hanging from the bowsprit, and the rigging trapeze. A double-jump coin route runs over the sails.",
+   "difficulty": 7,
+   "requiredItems": [
+    "rope"
+   ]
+  },
+  {
+   "index": 10,
+   "nameDa": "Himlens ende",
+   "world": "The edge of the sky, where the atmosphere ends.\n- Platforms are tiny glowing crystal shards and meteorite chunks with 1.0-1.4 m tops, many of them crumbling.\n- A broken satellite station has rotating solar-panel arms (spinners) and truss girders (hang bars).\n- Glowing star anchors take the rope.\n- Small shards drift slowly as moving platforms.\n- Background: comets drifting past, the Milky Way, a ringed planet and a nebula.\n- The lava sea far below reads as a red-glowing planet surface.",
+   "sky": "Deep-space night. Near-black violet (#05030f to #2a1446), dense stars, the Milky Way band, nebula clouds, shooting stars and a large ringed planet.",
+   "signatureMechanics": [
+    "Tiny platforms (1.0-1.4 m)",
+    "Massive rope gaps (18-30 m), chained swings",
+    "Crumbling meteorites",
+    "Small drifting shards",
+    "Spinners (solar arrays)",
+    "Catches on tiny shard edges"
+   ],
+   "layout": "An extremely long winding 'star road': about 60 segments and about 650 m, the longest course so far, in three acts. Act 1 is a chain of meteors. Act 2 is the great void and the satellite. Act 3 is a final spiral around a tiny moon. Three small satellite 'rest decks' split the acts. The plain-jump margin is cut almost to nothing. A long-rope shortcut uses a high anchor to skip one swing in the void.",
+   "setPieces": [
+    "'Meteorkæden': eight crumbling 1.2 m meteorites in a row with 5-6 m gaps. You cannot stop.",
+    "'Det store tomrum': three 20-30 m rope swings back to back between star anchors, each landing on a tiny shard. Releasing short is saved by a hand catch on the shard edge.",
+    "'Satellitten': a hub with rotating solar-panel arms. Cross underneath them on the truss bars (9 m, the full base grip) while the arms sweep above.",
+    "'Månespiralen': spiral up around a tiny moon on 1 m shards, finishing with a catch on the rim of the portal ledge."
+   ],
+   "handsMoments": "Catching the edges of tiny shards is often the only way to land them. The truss monkey bars under the satellite, and the last catch onto the portal rim. Chalk is strongly recommended because it extends catch reach.",
+   "difficulty": 9,
+   "requiredItems": [
+    "rope"
+   ]
+  },
+  {
+   "index": 11,
+   "nameDa": "Kirsebærtemplet",
+   "world": "A floating Japanese mountain temple.\n- Multi-tier pagodas with curved red-tile roofs; each tier's eave is a ledge you can grab.\n- Vermilion torii gates whose top beams are hang bars, and bamboo groves with horizontal poles.\n- Red arched wooden bridges, koi-pond islands and stone lanterns.\n- Strings of paper lanterns work as ziplines.\n- Bronze temple bells are the rope anchors.\n- Cherry trees in bloom.\n- Background: misty mountain peaks floating, and a giant pale moon rising.",
+   "sky": "Lilac dusk. The zenith is #4a3a7a and the horizon pink (#f4a6b8). A huge pale moon is rising, the lanterns glow warm orange, and cherry petals drift past.",
+   "signatureMechanics": [
+    "Double jump introduced and required from here",
+    "Climbing pagoda eaves and shimmying around corners",
+    "Torii and bamboo monkey bars",
+    "Lantern-string zipline",
+    "Slowly rotating top pagoda tier (turntable)",
+    "Gentle rope swing to a temple bell"
+   ],
+   "layout": "Act 3 opens a little easier: about 32 segments and about 360 m, with generous platforms again. First up: climb a 5-storey pagoda eave by eave (+20 m). Then down a long lantern zipline. Then through a tunnel of torii gates and a bamboo forest to the portal inside a round moon gate.",
+   "setPieces": [
+    "'Koispringet': an 11 m gap over a koi pond that only a double jump clears. It is marked with a floating arrow, and a hint says 'Tryk mellemrum igen i luften'. Misses land in a shallow pond deck below.",
+    "'Pagodeklatringen': catch each eave and shimmy around the corners to the open side. The top tier rotates.",
+    "'Lanternesnoren': a 40 m zipline down a string of paper lanterns. Let go above an arched bridge.",
+    "'Toriitunnelen': eight torii beams 2 m apart over a gap, crossed hand over hand, with a rest platform after the fourth. Then a double jump into a hand catch (13 m) on the moon-gate platform."
+   ],
+   "handsMoments": "This is the most hand-heavy level so far: pagoda eaves, torii and bamboo monkey bars, the lantern zipline, and the first 'double jump plus hand catch' long jump.",
+   "difficulty": 6,
+   "requiredItems": [
+    "rope",
+    "doubleJump"
+   ]
+  },
+  {
+   "index": 12,
+   "nameDa": "Neonbyen",
+   "world": "A cyberpunk megacity in the rain.\n- Hovering cars, buses and cargo drones fly in traffic lanes; they are moving platforms at different speeds.\n- Rain-slick steel walkways with reflective puddles, and moving walkways (conveyors).\n- Neon sign frames are the hang bars, rooftop vents are updrafts, and power cables are ziplines.\n- Hovering delivery drones with cyan rings are the rope anchors.\n- Holographic billboards.\n- Towers plunge into magenta and cyan neon fog.",
+   "sky": "Rainy night. Deep indigo (#0a0b24), with magenta (#c03aa0) and cyan city glow on the low clouds, rain streaks, a glowing advertising blimp and no stars.",
+   "signatureMechanics": [
+    "Traffic-lane moving platforms (crossing your path, alternating directions)",
+    "Moving walkways (conveyors)",
+    "Rooftop updraft vents",
+    "Neon-sign ladder (hang bars)",
+    "Power-cable ziplines",
+    "Rope to drones",
+    "Double jump between lanes"
+   ],
+   "layout": "About 36 segments and about 420 m. You cross three 'traffic rivers' (4-5 lanes of flying cars each) with rooftop islands between them. Then you climb a tower on a neon ladder. Last, you zipline down power cables to the portal on top of a holographic billboard.",
+   "setPieces": [
+    "'Myldretid': hop across 5 lanes of flying cars moving alternately left and right. A double jump saves a mistimed hop.",
+    "'Rullebåndene': a maze of moving walkways running against you and across your path.",
+    "'Neonstigen': climb a vertical stack of sign frames by jumping from bar to bar, with an updraft vent halfway up.",
+    "'Dronekrogen': throw the rope at a hovering drone to swing across an 18 m gap, then release into a power-cable zipline."
+   ],
+   "handsMoments": "Catching the roof edge of a flying bus as it passes (moving ledge), the neon ladder, and the power-cable ziplines that release into ledge catches.",
+   "difficulty": 7,
+   "requiredItems": [
+    "rope",
+    "doubleJump"
+   ]
+  },
+  {
+   "index": 13,
+   "nameDa": "Vulkanen",
+   "world": "Down by the lava.\n- Black obsidian and basalt hexagonal columns (6-sided cylinders) with glowing magma cracks rise out of the lava sea.\n- Cooled crust plates are the crumbling platforms, geysers are the bounce pads, and heat vents are the updrafts.\n- Hot glowing edges use the icy grip rule (orange rim, grip drains twice as fast).\n- Iron chains between columns are hang bars.\n- Yellow sulphur crystals, ash and lava falls pouring off floating rocks.\n- The course runs low (y between -30 and -40) so the lava fills the view.\n- Background: a huge erupting volcano, with the portal on its crater rim.",
+   "sky": "Volcanic. Black-red ash clouds (#1a0605 to #8a2a0a), no sun, and a dim eruption plume. The main light is strong orange light coming up from the lava, with floating embers and heat shimmer.",
+   "signatureMechanics": [
+    "Hex columns rising and sinking in waves (vertical movers)",
+    "Crumbling crust plates",
+    "Geyser bounce pads",
+    "Heat-vent updrafts",
+    "Hot edges (grip drains twice as fast)",
+    "Chain hang bars",
+    "Rope swings past lava falls",
+    "Double jump"
+   ],
+   "layout": "A V-shaped height profile, about 38 segments and about 440 m. You drop down a cliff toward the lava on crumbling ash steps, cross a tense low stretch only 12-15 m above the lava, then climb the volcano's flank using vents, columns and rope to reach the crater rim.",
+   "setPieces": [
+    "'Basaltorglet': eight hex columns rising and falling in a wave like organ pipes. Run along the top of the wave.",
+    "'Skorpen': cooled lava plates crack and sink just above the glowing lava, with a chain monkey-bar escape (8 m).",
+    "'Lavafaldet': a rope swing right past a pouring lava fall, released into a catch on a hot ledge (chalk helps).",
+    "'Udbruddet': a geyser launches you toward the crater rim. Double jump at the top and the hands catch the rim."
+   ],
+   "handsMoments": "Catching column tops as they rise past you, a shimmy along a hot cliff ledge beside the lava fall (2.5 m sections), the chain monkey bars, and the final catch on the crater rim.",
+   "difficulty": 8,
+   "requiredItems": [
+    "rope",
+    "doubleJump"
+   ]
+  },
+  {
+   "index": 14,
+   "nameDa": "Himmelhavet",
+   "world": "Underwater, but in the sky.\n- Coral reef islands: brain-coral domes, flat table corals (platforms) and tube sponges (cylinders).\n- Giant translucent jellyfish that drift up and down are bounce pads.\n- Gliding manta rays and sea turtles are moving platforms.\n- The ribs of a whale skeleton are monkey bars.\n- Bubble columns are updrafts, and a current stream over a sandbar is a conveyor.\n- Kelp strands are trapezes, and glowing pearls are rope anchors.\n- Anemones, and schools of fish as particle swarms.\n- Caustic light patterns ripple over every surface.",
+   "sky": "Underwater teal. Turquoise (#39c6c0) near the horizon, deep teal (#0b6d8a) above and dark blue (#04213a) below. Sunbeams shine down from above, caustics shimmer, and marine snow drifts.",
+   "signatureMechanics": [
+    "Jellyfish bounce pads (moving vertically)",
+    "Manta and turtle moving platforms",
+    "Bubble-column updrafts",
+    "Whale-rib monkey bars (long, managed with grip rests)",
+    "Current conveyor",
+    "Kelp trapezes",
+    "Rope to pearls",
+    "Double jump"
+   ],
+   "layout": "About 42 segments and about 500 m. Dive into a trench, then rise again: descend along the reef, cross the whale skeleton, ride the mantas over open water, then climb back up through bubble columns to a giant clam where the portal glows like a pearl.",
+   "setPieces": [
+    "'Gopler': five drifting jellyfish bounces in a row, each ending in a hand catch on the rim of a table coral.",
+    "'Hvalskelettet': 12 ribs as monkey bars along the whale's belly, with rest spots on the vertebrae after every 4 ribs. It is just inside the base grip and comfortable with chalk or gloves.",
+    "'Mantaturen': stand on a gliding manta for a 25 m stretch, then double jump off it at the right moment onto a turtle's shell.",
+    "'Perlesvinget': kelp trapeze into a rope swing to a pearl, then up a bubble column to the giant clam."
+   ],
+   "handsMoments": "The whale-rib monkey bars (the hardest grip test outside the finale), catching table-coral rims after jellyfish bounces, kelp trapezes, and catching a turtle shell's edge as it moves.",
+   "difficulty": 9,
+   "requiredItems": [
+    "rope",
+    "doubleJump"
+   ]
+  },
+  {
+   "index": 15,
+   "nameDa": "Nordlystårnet",
+   "world": "A huge spire of glass and crystal with gold filigree, rising above a moonlit sea of clouds.\n- Crystal ledges, and frosted-glass ledges that count as icy (blue rim).\n- Gold rings rotate around the tower as turntables, and rotating gold arms are spinners.\n- Floating prism shards, and glass bridges whose panes shatter (crumbling).\n- Chandeliers swinging on chains are pendulum platforms and trapezes.\n- Beams of light are updrafts.\n- Ziplines run from outer pillars back to the spire.\n- The aurora reflects in the glass.\n- As decoration, small 'souvenir islands' from the earlier worlds orbit the spire (a mini barn, a donut, a cog, a pagoda roof, a jellyfish), so the finale recalls the whole journey.\n- The portal crowns the top of the spire.",
+   "sky": "Aurora night. A dark navy zenith (#050b1e), with green (#4dffb0) and violet (#b06bff) aurora curtains, stars, and a silver moonlit sea of clouds below. A thin gold band of dawn appears on the horizon behind the crown.",
+   "signatureMechanics": [
+    "Every mechanic combined: rope, double jump, catch-jumps, chalk-managed traverses",
+    "Rotating gold rings (turntables) and gold arms (spinners)",
+    "Chandelier pendulums and trapezes",
+    "Light-beam updrafts",
+    "Shattering glass (crumbling)",
+    "Frosted-glass icy ledges",
+    "Ziplines from the outer pillars"
+   ],
+   "layout": "A spiral climb of 3 full turns around the giant spire, about 60 segments, +80 m and about 750 m: the longest course in the game. Each turn is a chapter with its own material: glass and frosted glass first, then gold machinery, then the aurora crown of prisms and light beams. A rest balcony sits between chapters.",
+   "setPieces": [
+    "'Lysekronerne': chandeliers circle the spire. Ride them as pendulum platforms, or hang from them as trapezes and release into catches.",
+    "'Guldringene': three concentric rings turning at different speeds and in different directions, with gold arms sweeping across them.",
+    "'Frostglasset': an icy shimmy around a curved section of the spire in 2.5 m sections with tiny crystal footholds. A chalk route takes the 8 m in one go for coins.",
+    "'Kronespringet': a 30 m rope swing from a light beam, released into a double jump, finishing with a hand catch on the rim of the portal crown."
+   ],
+   "handsMoments": "Everywhere: frosted-glass shimmies, chandelier trapezes, ziplines from the outer pillars, double jump plus catch-jumps (13-14 m), and the final catch on the crown rim at the very top.",
+   "difficulty": 10,
+   "requiredItems": [
+    "rope",
+    "doubleJump"
+   ]
+  }
+ ],
+ "kits": [
+  {
+   "id": "meadow",
+   "usedByLevels": [
+    1
+   ],
+   "platformLook": "Normal platforms: green turf tops with flower specks, sitting on upside-down cones of brown soil and roots that drip small waterfalls. Plank footbridges with rope rails. Upright hay bales as cylinders. The barn roof as a box. No moving, icy or crumbling platforms in this kit.",
+   "barLook": "Weathered wooden fence beams and a low apple branch, wrapped with white grip-tape bands.",
+   "scenery": "Distant floating islands pouring waterfalls into the morning mist, a turning windmill, sheep, a red barn, an apple tree, a ring of standing stones, and a hot-air balloon far away."
+  },
+  {
+   "id": "rooftops",
+   "usedByLevels": [
+    2
+   ],
+   "platformLook": "Normal platforms: flat tar-and-gravel roofs with parapets (the grab edges have a worn chalk-white lip). Building shafts with lit window grids and reflective blue glass go 60-100 m down into the haze. Water towers on stilts are cylinders. Vertical mover: a window-washer gondola. Step-ups: AC boxes and stairwell huts.",
+   "barLook": "Yellow scaffolding pipes with white grip tape. The gondola cable is the zipline.",
+   "scenery": "A dense skyline fading into the haze, antennas with blinking red lights, a helipad, rooftop gardens, laundry lines, a plane contrail, and the level-3 candy clouds faintly visible from the finish."
+  },
+  {
+   "id": "candy",
+   "usedByLevels": [
+    3
+   ],
+   "platformLook": "Normal platforms: donuts with frosting and sprinkles (cylinders), chocolate bars, macarons, wafer bridges, lollipop discs and the wedding-cake tiers. Bounce pads: marshmallow and jelly cushions that squash. Crumbling platforms: cracked biscuits that break into crumbs.",
+   "barLook": "Red-and-white candy canes with white grip bands. The trapeze is a licorice swing.",
+   "scenery": "A chocolate waterfall pouring from a giant cup, cotton-candy clouds, a gumdrop and gummy-bear field, and sprinkle sparkles in the air."
+  },
+  {
+   "id": "glacier",
+   "usedByLevels": [
+    4
+   ],
+   "platformLook": "Normal platforms: snow-capped tops and dark rock knobs. Ice platforms: glossy translucent blue with a fresnel shine and icicles underneath. Icy ledges: blue frosty rim. Crumbling platforms: cracking thin-ice sheets. Turntables: rotating ice floes.",
+   "barLook": "Frozen icicle bars with white grip tape, frosted where they are icy.",
+   "scenery": "Huge glaciers with frozen waterfalls, a giant iceberg arch, igloos, snowy pines, a red research station with an antenna, and steady snowfall in cold blue fog."
+  },
+  {
+   "id": "harbor",
+   "usedByLevels": [
+    5
+   ],
+   "platformLook": "Normal platforms: white wooden piers with blue railings and steel mooring-mast rings. Moving platforms: wicker balloon baskets (vertical) and zeppelin gondola decks (sideways or forward). Pendulums: cargo crates on crane hooks. Turntable: the rotating top of a mooring mast.",
+   "barLook": "Mooring bars and rigging under the airships (moving bars), with white grip tape. A cargo cable is the zipline.",
+   "scenery": "Dozens of striped balloons and airships drifting at different distances, a striped lighthouse, bunting and windsocks, seagulls, and a towering bank of cumulus."
+  },
+  {
+   "id": "skatemesa",
+   "usedByLevels": [
+    6
+   ],
+   "platformLook": "Skate-only pieces: road decks of smooth concrete with painted lines and low curbs, on top of red-orange layered sandstone mesas with tapering undersides. Plus downhill ramps, kickers made from plywood billboards, quarter pipes, a bowl, a stair set, and glowing chevron boost pads.",
+   "barLook": "Grind rails: steel guard rails, handrails and a sagging cable.",
+   "scenery": "Giant sandstone arches and hoodoos in dusty haze, cacti, palm trees, an old camper van, graffiti walls, a neon 'RUL!' sign, and a huge low sun straight ahead."
+  },
+  {
+   "id": "clockwork",
+   "usedByLevels": [
+    7
+   ],
+   "platformLook": "Normal platforms: riveted brass and copper plates and iron catwalks. Turntables: cogs with tooth rims. Vertical movers: pistons. Conveyors: chain-drive belts. Crumbling platforms: rusty grates. Spinners: crane arms. Updrafts: steam vents.",
+   "barLook": "Copper steam pipes with white grip bands. The trapeze is a swinging crane hook.",
+   "scenery": "A giant clock tower with exposed gears and a glowing dial, smokestacks reaching down into the sepia smog, gauges and flywheels, and drifting soot."
+  },
+  {
+   "id": "jungle",
+   "usedByLevels": [
+    8
+   ],
+   "platformLook": "Normal platforms: giant bark branches, bracket-fungus shelves, thatched treehouse decks and sagging rope bridges. Bounce pads: springy leaves and spotted mushrooms. Crumbling platforms: dead grey branches.",
+   "barLook": "Thin branches with white grip bands. Trapezes are vines. Rope anchors are glowing orange seed pods with a cyan ring. The zipline is a vine cable between treehouses.",
+   "scenery": "Colossal trunks plunging into mist, waterfalls pouring from hollow trunks, parrots, orchids, god rays and floating pollen."
+  },
+  {
+   "id": "stormships",
+   "usedByLevels": [
+    9
+   ],
+   "platformLook": "Normal platforms: tilted plank decks and crow's nests. Vertical movers: bobbing hulls. Pendulums: anchors on chains. Crumbling platforms: broken planks. Spinners: capstan bars. Wet icy ledges: rain-soaked gunwales with a blue rim.",
+   "barLook": "Yardarms and bowsprits with white grip tape. Trapezes are rigging lines. Rope anchors are lanterns at the mast tops with a cyan ring.",
+   "scenery": "Torn sails flapping, dark ship silhouettes appearing in lightning flashes, ragged cloud 'waves', and rain streaks."
+  },
+  {
+   "id": "starfield",
+   "usedByLevels": [
+    10
+   ],
+   "platformLook": "Normal platforms: tiny glowing crystal shards and meteorite chunks (1.0-1.4 m tops). Crumbling platforms: cracked meteors. Moving platforms: slowly drifting shards. Rest decks: satellite plates. Spinners: solar-panel arms.",
+   "barLook": "Satellite truss girders with white grip bands. Rope anchors are glowing stars with a cyan ring.",
+   "scenery": "The Milky Way, a ringed planet, a nebula, passing comets and shooting stars, a tiny moon, and the lava reading as a red planet surface far below."
+  },
+  {
+   "id": "temple",
+   "usedByLevels": [
+    11
+   ],
+   "platformLook": "Normal platforms: pagoda tiers with curved red-tile eaves (the grab edges), red arched bridges and koi-pond islands. Turntable: the rotating top pagoda tier.",
+   "barLook": "Torii top beams and bamboo poles with white grip bands. Ziplines are strings of paper lanterns. Rope anchors are bronze bells with a cyan ring.",
+   "scenery": "Misty floating mountain peaks, cherry trees in bloom with drifting petals, stone lanterns, a giant pale rising moon, and a round moon gate."
+  },
+  {
+   "id": "neoncity",
+   "usedByLevels": [
+    12
+   ],
+   "platformLook": "Normal platforms: rain-slick steel walkways with reflective puddles. Moving platforms: flying cars, buses and cargo drones in traffic lanes. Conveyors: moving walkways. Updrafts: rooftop vents.",
+   "barLook": "Neon sign frames with white grip bands. Ziplines are power cables. Rope anchors are hovering drones with a cyan ring.",
+   "scenery": "Towers plunging into magenta and cyan neon fog, holographic billboards, an advertising blimp, rain streaks and streams of traffic lights."
+  },
+  {
+   "id": "volcano",
+   "usedByLevels": [
+    13
+   ],
+   "platformLook": "Normal platforms: obsidian and basalt hex columns with glowing magma cracks. Vertical movers: rising and sinking columns. Crumbling platforms: cooled crust plates. Bounce pads: geysers. Updrafts: heat vents. Hot ledges with an orange rim drain grip twice as fast.",
+   "barLook": "Iron chains between columns, with white grip bands. Rope anchors are glowing obsidian hooks with a cyan ring.",
+   "scenery": "A huge erupting volcano with lava falls, the lava sea very close below, sulphur crystals, ash, embers and heat shimmer."
+  },
+  {
+   "id": "skyreef",
+   "usedByLevels": [
+    14
+   ],
+   "platformLook": "Normal platforms: table corals, brain-coral domes and tube sponges. Bounce pads: drifting jellyfish. Moving platforms: manta rays and turtles. Updrafts: bubble columns. Conveyor: a current stream over a sandbar.",
+   "barLook": "Whale-skeleton ribs with white grip bands. Trapezes are kelp strands. Rope anchors are glowing pearls with a cyan ring.",
+   "scenery": "A kelp forest, anemones, schools of fish, caustic light rippling over everything, sunbeams from above, marine snow, and a giant clam."
+  },
+  {
+   "id": "crystalspire",
+   "usedByLevels": [
+    15
+   ],
+   "platformLook": "Normal platforms: crystal and gold ledges and glass bridges. Icy ledges: frosted glass. Crumbling platforms: shattering glass panes. Turntables: gold rings. Spinners: gold arms. Pendulums: chandeliers. Updrafts: light beams.",
+   "barLook": "Gold filigree rails with white grip bands. Trapezes are chandeliers. Ziplines are light cables from the outer pillars. Rope anchors are prisms with a cyan ring.",
+   "scenery": "Aurora curtains reflecting in the glass, a moonlit sea of clouds, a thin dawn band behind the crown, and small 'souvenir islands' from the earlier worlds orbiting the spire as decoration."
+  }
+ ],
+ "acceptedExtraMechanics": [
+  "ZIPLINE ('Svævebane'), proposed by all 4 designers. What it is: a sloped cable between two points at different heights.\n- Jumping at the cable makes the hands catch it automatically, using the same catch code as hang bars.\n- You then slide along it, accelerating with gravity times the slope minus a little friction, up to about 14-16 m/s.\n- Space lets go and keeps your momentum, which you can carry into a long jump or a ledge catch. S drops. You let go automatically at the end.\n- Grip drains at the normal bar rate, so long lines reward chalk.\nImplementation: a hang bar with two endpoints at different heights plus a 1D speed along the cable. There is no new collision code.\nWhy it is worth it: it is a fast, cinematic way to move with your hands, and it can be dressed for every world.\nUsed in: L2 (window-washer cable), L5 (cargo cable), L8 (vine cable), L11 (lantern string), L12 (power cables), L15 (light cables).",
+  "TRAPEZE / VINE ('Trapez/lian'). What it is: a hang bar hanging from a pivot that swings like the existing pendulum platforms.\n- You catch it in the air, ride the swing, and let go near the top of the arc to fly far.\n- When you let go, the bar's tangential velocity is added to the player.\nImplementation: reuse the pendulum motion code to drive the bar's transform, and have the hanging player follow it.\nWhy it is worth it: it delivers the owner's 'long jumps where you hold on with your hands' in a spectacular way, before the rope is bought.\nUsed in: L3 (licorice), L7 (crane hook), L8 (vines), L9 (rigging), L14 (kelp), L15 (chandeliers).\nNot accepted: wind gusts and pulsing vents. They would be a third extra mechanic, and the weather is carried by visuals instead."
+ ],
+ "characterRealism": [
+  "Real adult proportions: about 1.8 m tall and about 7.5 heads high. Shrink the head from r=0.2 to an ellipsoid about 0.23 m tall. Add a neck cylinder and trapezius slopes. Make the shoulders about 0.42 m wide, wider than the hips. Raise the hips to about 0.95 m so the legs are longer. Shape the torso as a LatheGeometry profile that tapers from chest to waist and is flattened front to back (z about 0.7).",
+  "A real joint hierarchy made of nested Groups: pelvis > spine > chest > neck > head; shoulder > upper arm > elbow > forearm > wrist > hand; hip > thigh > knee > shin > ankle > foot (with a heel/toe pivot). Use tapered capsule or Lathe segments, and hide small spheres at the joints so no gaps show when they bend.",
+  "Optional step up: merge the segments into one procedural SkinnedMesh with about 15 Bones and skin weights based on distance to each bone. This gives a single continuous body with no visible seams, using only standard Three.js and no external model files.",
+  "Readable hands, since hands are now central: a palm box, a thumb capsule and four 2-segment finger capsules. The fingers curl around ledges, bars, rope and zipline handles while holding, spread when falling, and loosely close when running. Shimmying alternates hand over hand.",
+  "Two-bone IK. While hanging, both hands snap exactly to the ledge or bar contact points (offset about ±0.2 m) and the elbows bend naturally. On the ground, raycast the feet to the platform so they plant on edges and steps; this matters most on moving platforms and turntables.",
+  "A run cycle driven by distance so the feet never slide: phase = distance travelled / stride length (about 2.2 m at 9 m/s). It goes through contact, down, passing and up. Arms counter-swing with the elbows bent about 90 degrees, shoulders counter-rotate against the hips, the pelvis bobs twice per cycle, and the torso leans with acceleration. Blend smoothly between idle, jog and sprint.",
+  "Banking and smooth facing: lean into turns in proportion to speed times turn rate, and slerp the facing toward the movement direction instead of snapping. On ice the feet slip and the arms flail; on conveyors the runner staggers slightly.",
+  "Jump phases: an 80 ms anticipation crouch, full extension at takeoff, a knee tuck at the apex, legs reaching down before landing, and a landing squash scaled by impact speed. A parkour forward roll plays after drops of more than about 4-5 m at speed. The double jump is a clear front tuck flip.",
+  "Hanging and climbing poses:\n- A braced hang with the feet against the wall when there is a wall under the ledge; a free hang under bars, with the legs dangling and swinging with pendulum lag after the catch.\n- Climbing up is a mantle sequence: chest to the edge, elbow up, knee on the edge, stand.\n- When grip is below 25-30% the arms tremble and the fingers slip, so grip stamina shows on the body even without the HUD.",
+  "Chalk is shown on the hands only. Using it whitens the palms and fingers and puffs white dust particles when you grab or clap. A chalk bag hangs on the belt once chalk is owned.",
+  "Visible equipment that matches the shop: fingerless gloves when Klatrehandsker are owned, a chalk bag on the hip, and a coiled rope over the shoulder once the rope is bought. On the skate level, add a helmet and knee pads.",
+  "Rope pose: one hand above the other on the rope, the legs together and trailing the swing, the body lined up with the rope, and the arms opening for balance on release. Zipline and trapeze use a two-handed overhead hang with the legs tucked.",
+  "Skateboard pose: sideways stance with the knees bent and the arms out for balance, leaning into turns, pushing with the back foot when W is pressed, an ollie sequence (crouch, pop, knees up, extend), a low crouch on grind rails, and an automatic indy grab on big airs.",
+  "Face and head: white sclera with dark irises, eyelids that blink every 3-6 s, brows, a small nose and ears, and short hair built from a few clumped, slightly noisy spheres. The head turns toward the next ledge or anchor, or the camera's aim, and looks down when standing near an edge.",
+  "Clothing and materials:\n- Hoodie with a hood (a half torus), drawstrings, a kangaroo pocket and cuffs; joggers with ankle cuffs.\n- Sneakers made from an extruded sneaker outline with a white midsole and a lace stripe.\n- Fabric uses MeshPhysicalMaterial with sheen and a CanvasTexture noise normal map. Skin is warm-toned with low roughness and a slight sheen for a soft look.\n- Roughness varies by material: shoes glossier, fabric matte.",
+  "Secondary motion with simple spring-dampers on the hood, drawstrings, hair tufts, the hoodie hem, the chalk bag and the rope coil. They flap during falls and swings and settle when standing still.",
+  "Idle life and weight: breathing (the chest scales by about 1.5%), shifting weight between the feet, glancing around, catching breath with heaving shoulders after long hangs, clapping chalk off the hands, dust puffs on footsteps and a dust ring on landing.",
+  "Readability: a soft contact blob shadow under the feet together with the real cast shadow, so landings are easier to judge, plus a subtle fresnel rim light so the figure stands out against both the bright dawn skies and the dark storm and space skies."
+ ]
+}

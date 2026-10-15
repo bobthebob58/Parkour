@@ -1,0 +1,35 @@
+{
+ "kit": {
+  "id": "rooftops",
+  "usedByLevels": [
+   2
+  ],
+  "platformLook": "Normal platforms: flat tar-and-gravel roofs with parapets (the grab edges have a worn chalk-white lip). Building shafts with lit window grids and reflective blue glass go 60-100 m down into the haze. Water towers on stilts are cylinders. Vertical mover: a window-washer gondola. Step-ups: AC boxes and stairwell huts.",
+  "barLook": "Yellow scaffolding pipes with white grip tape. The gondola cable is the zipline.",
+  "scenery": "A dense skyline fading into the haze, antennas with blinking red lights, a helipad, rooftop gardens, laundry lines, a plane contrail, and the level-3 candy clouds faintly visible from the finish."
+ },
+ "levels": [
+  {
+   "index": 2,
+   "nameDa": "Højhustagene",
+   "world": "The rooftops of glass skyscrapers. Each roof's building continues 60-100 m down into the haze, with a lit window grid and reflective blue glass.\n- Roof props: low parapets (the edges you grab), AC boxes as step-ups, water towers on stilts (cylinders), antennas with red blinking lights, rooftop gardens and laundry lines.\n- One building is still under construction, with yellow scaffolding pipes.\n- A window-washer gondola hangs on a facade.\n- The portal is on a helipad marked with a yellow H.\n- Roofs are 5-10 m wide.",
+   "sky": "Crisp midday. The zenith is deep blue (#2f7fe0) and the horizon pale (#bfe3ff). A high sun about 65 degrees up gives hard short shadows. Big white cumulus, a plane contrail, and the sun glinting on the glass.",
+   "signatureMechanics": [
+    "Catch-jumps: long jumps that only the hands can finish (the core lesson)",
+    "Parapet shimmy (A/D) and shimmying around a corner",
+    "Scaffolding-pipe hang bars",
+    "Slow vertical mover (window-washer gondola)",
+    "Zipline intro: the gondola cable, optional"
+   ],
+   "layout": "A zig-zag up one city block: about 22 roofs and about 240 m. It has three 90-degree turns and climbs about 20 m. Normal gaps are 3-6 m. Four gaps are deliberately 8-8.5 m to a roof 1-1.5 m higher, so the hands must finish them.",
+   "setPieces": [
+    "'Det første lange hop': an 8.3 m gap to a roof 1 m higher. The feet cannot make it and the hands catch the parapet. A hint appears the first time.",
+    "'Stilladset': three scaffold pipes 2.2 m apart over the gap between two towers. Hang from one, swing, and jump to the next.",
+    "'Vinduespudseren': the gondola rides 5 m up and down a facade and lifts you to a high roof. Its cable doubles as a short zipline down to a bonus coin roof.",
+    "'Hjørnet': an antenna fence blocks the top of a parapet, so you hang and shimmy 4 m around the building corner before climbing up."
+   ],
+   "handsMoments": "This is the hands lesson: four parapet catch-jumps, the scaffold pipes, a 4 m corner shimmy that fits in the base grip, and the optional zipline.",
+   "difficulty": 2
+  }
+ ]
+}

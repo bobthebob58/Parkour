@@ -1,0 +1,37 @@
+{
+ "kit": {
+  "id": "crystalspire",
+  "usedByLevels": [
+   15
+  ],
+  "platformLook": "Normal platforms: crystal and gold ledges and glass bridges. Icy ledges: frosted glass. Crumbling platforms: shattering glass panes. Turntables: gold rings. Spinners: gold arms. Pendulums: chandeliers. Updrafts: light beams.",
+  "barLook": "Gold filigree rails with white grip bands. Trapezes are chandeliers. Ziplines are light cables from the outer pillars. Rope anchors are prisms with a cyan ring.",
+  "scenery": "Aurora curtains reflecting in the glass, a moonlit sea of clouds, a thin dawn band behind the crown, and small 'souvenir islands' from the earlier worlds orbiting the spire as decoration."
+ },
+ "levels": [
+  {
+   "index": 15,
+   "nameDa": "Nordlystårnet",
+   "world": "A huge spire of glass and crystal with gold filigree, rising above a moonlit sea of clouds.\n- Crystal ledges, and frosted-glass ledges that count as icy (blue rim).\n- Gold rings rotate around the tower as turntables, and rotating gold arms are spinners.\n- Floating prism shards, and glass bridges whose panes shatter (crumbling).\n- Chandeliers swinging on chains are pendulum platforms and trapezes.\n- Beams of light are updrafts.\n- Ziplines run from outer pillars back to the spire.\n- The aurora reflects in the glass.\n- As decoration, small 'souvenir islands' from the earlier worlds orbit the spire (a mini barn, a donut, a cog, a pagoda roof, a jellyfish), so the finale recalls the whole journey.\n- The portal crowns the top of the spire.",
+   "sky": "Aurora night. A dark navy zenith (#050b1e), with green (#4dffb0) and violet (#b06bff) aurora curtains, stars, and a silver moonlit sea of clouds below. A thin gold band of dawn appears on the horizon behind the crown.",
+   "signatureMechanics": [
+    "Every mechanic combined: rope, double jump, catch-jumps, chalk-managed traverses",
+    "Rotating gold rings (turntables) and gold arms (spinners)",
+    "Chandelier pendulums and trapezes",
+    "Light-beam updrafts",
+    "Shattering glass (crumbling)",
+    "Frosted-glass icy ledges",
+    "Ziplines from the outer pillars"
+   ],
+   "layout": "A spiral climb of 3 full turns around the giant spire, about 60 segments, +80 m and about 750 m: the longest course in the game. Each turn is a chapter with its own material: glass and frosted glass first, then gold machinery, then the aurora crown of prisms and light beams. A rest balcony sits between chapters.",
+   "setPieces": [
+    "'Lysekronerne': chandeliers circle the spire. Ride them as pendulum platforms, or hang from them as trapezes and release into catches.",
+    "'Guldringene': three concentric rings turning at different speeds and in different directions, with gold arms sweeping across them.",
+    "'Frostglasset': an icy shimmy around a curved section of the spire in 2.5 m sections with tiny crystal footholds. A chalk route takes the 8 m in one go for coins.",
+    "'Kronespringet': a 30 m rope swing from a light beam, released into a double jump, finishing with a hand catch on the rim of the portal crown."
+   ],
+   "handsMoments": "Everywhere: frosted-glass shimmies, chandelier trapezes, ziplines from the outer pillars, double jump plus catch-jumps (13-14 m), and the final catch on the crown rim at the very top.",
+   "difficulty": 10
+  }
+ ]
+}

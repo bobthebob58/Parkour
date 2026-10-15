@@ -1,0 +1,36 @@
+{
+ "kit": {
+  "id": "glacier",
+  "usedByLevels": [
+   4
+  ],
+  "platformLook": "Normal platforms: snow-capped tops and dark rock knobs. Ice platforms: glossy translucent blue with a fresnel shine and icicles underneath. Icy ledges: blue frosty rim. Crumbling platforms: cracking thin-ice sheets. Turntables: rotating ice floes.",
+  "barLook": "Frozen icicle bars with white grip tape, frosted where they are icy.",
+  "scenery": "Huge glaciers with frozen waterfalls, a giant iceberg arch, igloos, snowy pines, a red research station with an antenna, and steady snowfall in cold blue fog."
+ },
+ "levels": [
+  {
+   "index": 4,
+   "nameDa": "Gletsjeren",
+   "world": "Drifting glacier blocks and ice floes.\n- The ice is translucent blue and glossy, with icicles fringing the undersides.\n- Snow caps and dark rock knobs are the grippy safe spots: white snow means normal grip, glossy blue ice means slippery.\n- Ledge rims are colour-coded too: snowy rims are normal, blue frosty rims are icy and drain grip twice as fast.\n- Also: a frozen waterfall cliff, igloos, snowy pines, a small red research station with an antenna, and an ice block with a frozen mammoth inside.\n- Background: a giant iceberg arch.",
+   "sky": "Frost overcast. The colours run from #a9c4dc to #eef4fa, with a weak white sun disc behind thin cloud. Steady snowfall, diamond-dust sparkle, and cold blue fog that hides the far distance.",
+   "signatureMechanics": [
+    "Ice surfaces (slippery, you carry momentum)",
+    "Icy ledges (grip drains twice as fast)",
+    "Chalk shown as a pure hand tool (recommended, a pop-up tip)",
+    "Thin-ice crumbling sheets",
+    "Slowly rotating ice floes (turntables)",
+    "First double-jump shortcut to a hidden coin cache"
+   ],
+   "layout": "Downhill, then up, about 26 segments and about 280 m. First you slide down 4 ice terraces. Then you cross a field of rotating floes. Last, you climb the frozen waterfall to the research station, where the portal glows at the antenna.",
+   "setPieces": [
+    "'Skøjtebanen': a 16 m ice sheet that steps down 0.5 m twice and ends at a 6 m gap. You can't stop on ice, so you have to time the jump at the very edge.",
+    "'Isflagekarrusellen': three rotating ice floes at different speeds. Land, ride, and jump off when they line up.",
+    "'Istapperne': an icy shimmy under an overhang, split into 2.5 m sections with snow footholds between them. A chalk route does a 6 m shimmy in one go and picks up 3 coins. Pop-up: 'Kridt (venstreklik): hænderne holder bedre og længere'.",
+    "'Det frosne vandfald': three stacked icy ledges 2 m apart. Catch, climb and catch again quickly before the grip runs out."
+   ],
+   "handsMoments": "This is where grip management first matters: icy climb-ups, the sectioned icicle shimmy, the chalk-only coin route, and catching a floe edge after a slide-jump comes up short.",
+   "difficulty": 4
+  }
+ ]
+}
