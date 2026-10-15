@@ -119,8 +119,11 @@ module.exports = async (page, h) => {
   let peakD = yd;
   const tD = await ev(() => skyhoj.level.time);
   while ((await ev(() => skyhoj.level.time)) < tD + 1.0) {
-    peakD = Math.max(peakD, await ev(() => skyhoj.player.body.position.y));
-    await page.keyboard.up('Space'); await page.keyboard.down('Space'); // hamrer: kun ét ekstra hop må virke
+    const s = await ev(() => ({ y: skyhoj.player.body.position.y, vy: skyhoj.player.body.velocity.y, aj: skyhoj.player.airJumps, g: skyhoj.player.grounded }));
+    peakD = Math.max(peakD, s.y);
+    // Mellemrum holdes, mens dobbelthoppet stiger (at slippe ville skære hoppet af).
+    // På vej ned hamres der løs: der må ikke komme et tredje hop.
+    if (s.aj === 0 && s.vy < 0 && !s.g) { await page.keyboard.up('Space'); await page.keyboard.down('Space'); }
   }
   await page.keyboard.up('Space');
   check('Dobbelthop: præcis ét ekstra hop i luften', peakD - yd > 3.2 && peakD - yd < 5.5, `(top +${(peakD - yd).toFixed(2)} m)`);
