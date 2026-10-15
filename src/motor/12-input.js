@@ -22,7 +22,7 @@ window.addEventListener('keydown', (e) => {
   if (!e.repeat && !wasDown) onKeyPress(e.code);
 });
 window.addEventListener('keyup', (e) => { input.keys[e.code] = false; });
-window.addEventListener('blur', () => { input.keys = Object.create(null); releasePointer(); });
+window.addEventListener('blur', () => { input.keys = Object.create(null); releasePointer(); if (touch.active) resetTouch(); });
 
 function onKeyPress(code) {
   const s = game.state;
@@ -52,14 +52,21 @@ function onKeyPress(code) {
   }
 }
 
+// Brug den valgte evne (venstreklik eller EVNE-knappen på touch-skærme)
+function pressAbility() {
+  if (player.skate) return; // ingen evner på skateboardet
+  const hadRope = !!abilities.rope;
+  useAbility();
+  input.leftHeld = !hadRope && !!abilities.rope; // samme tryk: hold for at hale ind
+}
+// Efter en berøring sender browsere "falske" musehændelser – dem ignorerer vi
+const fromTouch = () => performance.now() - touch.lastTouch < 1000;
+
 canvas.addEventListener('mousedown', (e) => {
   audio.init();
-  if (game.state !== 'playing') return;
+  if (game.state !== 'playing' || fromTouch()) return;
   if (e.button === 0) {
-    if (player.skate) return; // ingen evner på skateboardet
-    const hadRope = !!abilities.rope;
-    useAbility();
-    input.leftHeld = !hadRope && !!abilities.rope; // samme klik: hold for at hale ind
+    pressAbility();
   } else if (e.button === 2) {
     input.rightHeld = true;
     setLooking(true);
@@ -70,6 +77,7 @@ canvas.addEventListener('mousedown', (e) => {
   }
 });
 window.addEventListener('mouseup', (e) => {
+  if (fromTouch()) return;
   if (e.button === 0) input.leftHeld = false;
   if (e.button === 2) releasePointer();
 });

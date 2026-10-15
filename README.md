@@ -13,6 +13,7 @@ Spillet er bygget med [Three.js](https://threejs.org) (grafik) og [cannon-es](ht
 
 - [Spil det](#spil-det)
 - [Styring](#styring)
+- [Spil på telefon og iPad](#spil-på-telefon-og-ipad)
 - [Hænderne, dobbelthop og skateboard](#hænderne-dobbelthop-og-skateboard)
 - [Mønter, butik og kontrolpunkter](#mønter-butik-og-kontrolpunkter)
 - [De 15 baner](#de-15-baner)
@@ -60,6 +61,29 @@ Første gang siden åbnes, skal der være internetforbindelse. Three.js `0.160.0
 **På skateboard (bane 6):** **W** sætter fart, **A/D** styrer, **S** bremser, og **mellemrum** laver en ollie. Lander du på et rækværk, grinder du automatisk hen ad det.
 
 **Med rebet:** Venstreklik skyder rebet mod et lysende krogpunkt. *Hold* venstreklik for at hale dig ind. **W** giver svinget fart, og **mellemrum** hopper af med et ekstra løft.
+
+## Spil på telefon og iPad
+
+Spillet virker også på telefon og tablet. Touch-styringen slår automatisk til, når skærmen er en touch-skærm:
+
+| Berøring | Handling |
+|---|---|
+| **Tommelfinger i venstre side** | Joystick. Det dukker op, hvor du rører. Lidt udslag går, fuldt udslag løber |
+| **Træk i højre side** | Drej kameraet og se dig omkring (virker samtidig med joysticket) |
+| **HOP** | Hop. Hold for et højere hop, og tryk igen i luften for dobbelthop |
+| **EVNE** | Brug den valgte evne. Hold for at hale rebet ind |
+| **Ikonerne forneden** | Skift evne |
+| **❚❚** | Pause med butik, genstart af banen og lyd |
+
+**Når du hænger i hænderne:** joysticket frem eller **HOP** klatrer op, til siden flytter dig, og tilbage giver slip.
+
+**På skateboardet:** joysticket frem giver fart, til siden styrer og tilbage bremser. **HOP** laver en ollie.
+
+Spil helst med telefonen på langs. Holder du den på højkant, foreslår spillet, at du drejer den, men du kan spille videre alligevel. Alle tips i spillet skrives om, så de nævner knapperne i stedet for tasterne. På telefoner og tablets sænkes opløsningen automatisk, hvis billedraten falder.
+
+| Telefon på langs | iPad |
+|---|---|
+| ![Touch-styring på en telefon](docs/images/touch-telefon-spil.jpg) | ![Touch-styring på en iPad](docs/images/touch-ipad-spil.jpg) |
 
 ## Hænderne, dobbelthop og skateboard
 
@@ -300,7 +324,7 @@ src/motor     Motoren, ét afsnit pr. fil:
                00 Start                  09b Verdenssæt-systemet
                01 Konfiguration          10  Baneobjekter i drift (bevægelige, drejeskiver, ventiler …)
                02 Danske tekster         11  Spilleren (fysik, hænder, dobbelthop, skateboard)
-               03 Himmel-temaer          12  Input
+               03 Himmel-temaer          12  Input (12b: touch-styring)
                04 Banernes format        13  Kamera
                05 Hjælpefunktioner       14  Evner (kridt og reb)
                06 Teksturer              15  Lyd (procedurel WebAudio)
@@ -341,9 +365,11 @@ cd tests
 npm install
 npm run baner       # robotten spiller alle 15 baner og tjekker kravene (reb, dobbelthop, hænder)
 npm run e2e         # rigtige mus-/tastaturhændelser end-to-end (36 kontroller)
+npm run touch       # touch-styringen på en telefon og en iPad (rigtige berøringer)
 npm test            # begge dele
 npm run billeder    # startudsigt og perspektiv for alle 15 baner til docs/images
 npm run skaerme     # portal, lavadød, menu, butik, pause og sejr til docs/images
+TOUCH=telefon npm run skaerme   # billeder af touch-styringen (også TOUCH=ipad)
 ```
 
 Slutresultat af `npm run baner`:
@@ -367,6 +393,6 @@ Bane 15 Nordlystårnet        BESTÅET   uden dobbelthop: umulig ✓
 End-to-end: 36/36 kontroller OK – ingen JavaScript-fejl
 ```
 
-Testene køres også automatisk på GitHub ved hvert push og hver pull request (se [`.github/workflows/test.yml`](.github/workflows/test.yml)): byggetjek, e2e og robotten fordelt på tre parallelle job med fem baner hver.
+Testene køres også automatisk på GitHub ved hvert push og hver pull request (se [`.github/workflows/test.yml`](.github/workflows/test.yml)): byggetjek, e2e, touch-testen på telefon og iPad og robotten fordelt på tre parallelle job med fem baner hver.
 
 Se [`tests/README.md`](tests/README.md) for detaljer.

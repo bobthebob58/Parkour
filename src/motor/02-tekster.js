@@ -51,3 +51,21 @@ const T = {
   levelBanner: (n) => `BANE ${n}`,
 };
 
+
+// Samme tekster på telefon og tablet (byttes ind af useTouchTexts, når touch-styringen bruges)
+const T_TOUCH = {
+  abilityReady: 'Klar – tryk på EVNE',
+  ropeAttached: 'Hold EVNE: hal ind · HOP: hop af',
+  ropeTarget: 'Mål fundet – tryk på EVNE!',
+  toastNoAbility: 'Ingen evne valgt – køb evner i butikken (i pausemenuen)',
+  toastNeedRope: 'Denne bane kræver rebet! Åbn butikken i pausemenuen.',
+  toastRopeHint: 'Tip: Vælg rebet forneden, sigt på det lysende krogpunkt og tryk på EVNE. Sving med joysticket, hop af med HOP.',
+  tipSkate: 'Næste bane køres på skateboard! Joystick frem: fart · til siden: styr · tilbage: brems · HOP: ollie.',
+  toastNeedDouble: 'Denne bane kræver dobbelthop! Åbn butikken i pausemenuen.',
+  toastGrabHint: 'Du hænger i hænderne! Joystick frem eller HOP: klatr op · til siden: flyt dig · tilbage: giv slip',
+  toastBarHint: 'Du hænger i en stang! Joysticket: flyt dig langs den · HOP: hop af',
+  toastZipHint: 'Svævebane! Du glider ned – tryk på HOP for at hoppe af',
+  toastSkate: 'Skateboard! Joystick frem: sæt fart · til siden: styr · tilbage: brems · HOP: ollie',
+  toastDoubleOwned: 'Dobbelthop: tryk på HOP igen i luften',
+  tipRopeOwned: 'Næste bane har enorme huller – husk at vælge rebet forneden på skærmen.',
+};

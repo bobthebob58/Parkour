@@ -41,6 +41,30 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
 
+  touch:
+    name: Touch (${{ matrix.enhed }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        enhed: [telefon, ipad]
+    defaults:
+      run:
+        working-directory: tests
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node run.js beroering.js
+        env:
+          TOUCH: ${{ matrix.enhed }}
+
   baner:
     name: Baner ${{ matrix.baner }}
     runs-on: ubuntu-latest

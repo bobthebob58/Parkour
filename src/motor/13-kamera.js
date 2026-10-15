@@ -9,8 +9,8 @@ function updateCamera(dt) {
   if (game.state === 'playing') {
     if (k.KeyQ) cam.yaw += 2.2 * dt;
     if (k.KeyE) cam.yaw -= 2.2 * dt;
-    // På skateboardet følger kameraet automatisk brættet (medmindre man selv drejer med højreklik)
-    if (player.skate && !input.rightHeld && !k.KeyQ && !k.KeyE) {
+    // På skateboardet følger kameraet automatisk brættet (medmindre man selv drejer med højreklik/fingeren)
+    if (player.skate && !input.rightHeld && !input.touchLook && !k.KeyQ && !k.KeyE) {
       cam.yaw = angleDamp(cam.yaw, -player.skate.heading, 3.2, dt);
       cam.pitch = damp(cam.pitch, 0.24, 2, dt);
     }

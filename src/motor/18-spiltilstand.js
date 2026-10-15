@@ -22,6 +22,7 @@ function loadLevel(i) {
   cam.yaw = -level.data.startHeading;
   cam.pitch = 0.3;
   cam.curDist = CFG.camera.dist;
+  renderHotbar(); // skjules på skateboardbanen
 }
 
 function startLevel(i) {
@@ -182,6 +183,7 @@ function frame(now) {
   const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000));
   lastT = now;
   elapsed += dt;
+  updateQuality(dt);
   const s = game.state;
   const simulate = simulateStates.has(s) || (s === 'shop' && (game.shopReturn === 'menu' || game.shopReturn === 'complete'));
   if (simulate && level && !debug.freeze) {
@@ -253,7 +255,7 @@ click('btn-new', () => {
   const hasProgress = s && (s.level > 0 || s.coins > 0 || Object.values(s.owned || {}).some(Boolean));
   if (hasProgress && !newGameArmed) {
     newGameArmed = 1;
-    $('btn-new').textContent = 'Sikker? Klik igen – alt nulstilles';
+    $('btn-new').textContent = forTouch('Sikker? Klik igen – alt nulstilles');
     setTimeout(() => { if (newGameArmed) refreshMenu(); }, 3500);
     return;
   }
@@ -341,8 +343,8 @@ function boot() {
   audio.enabled = game.sound;
   loadLevel(clamp(game.savedLevel, 0, LEVELS.length - 1));
   refreshMenu();
-  // Spillet kræver tastatur og mus – sig det på rene touch-enheder
-  if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) $('touch-note').classList.remove('hidden');
+  // Telefon og tablet: touch-styring (joystick, HOP, EVNE og pause) i stedet for tastatur og mus
+  if (prefersTouch()) setTouchMode(true);
   $('screen-loading').classList.add('hidden');
   setState('menu');
   requestAnimationFrame((t) => { lastT = t; frame(t); });
@@ -356,6 +358,7 @@ function boot() {
       useAbility, selectAbility, openShop, setState, renderShop, renderHotbar, toast, saveGame, applySave,
       fixedStep, respawnPlayer, onKeyPress, updateCamera, camera, renderer, scene, world, debug, particles,
       emitChalk, enterPortal, restartLevel, tryGrab, releaseHang, hangFrame, WORLD_KITS, renderLevelSelect,
+      touch, setTouchMode, forTouch, quality, T,
       get CHARACTER() { return CHARACTER; },
       setLevelDef(i, def) { LEVELS[i] = def; },
       showcaseDef,

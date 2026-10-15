@@ -20,6 +20,11 @@ function renderHotbar() {
     return `<div class="${cls}" data-slot="${id}"><span class="slot-key">${i + 1}</span>${ICONS[id]}<span class="slot-name">${T.abilityNames[id]}</span><div class="slot-cd"></div></div>`;
   }).join('');
   ui.chalkCd = $('hotbar').querySelector('[data-slot="chalk"] .slot-cd');
+  // EVNE-knappen på touch-skærme viser den valgte evne (og er væk på skateboardet)
+  const ab = $('btn-touch-ability');
+  ab.classList.toggle('hidden', !!(level && level.def.skate));
+  ab.classList.toggle('empty', abilities.selected === 'none');
+  ab.innerHTML = `${ICONS[abilities.selected]}<span>EVNE</span>`;
 }
 
 const ui = { chalkCd: null, crosshairState: '' };
@@ -36,7 +41,7 @@ function toast(msg, kind = '', dur = 2400) {
   }
   const el = document.createElement('div');
   el.className = `toast ${kind}`;
-  el.textContent = msg;
+  el.textContent = forTouch(msg);
   el._msg = msg;
   box.appendChild(el);
   while (box.children.length > 4) box.removeChild(box.firstChild);
@@ -124,6 +129,7 @@ function setState(s) {
   $('hud').classList.toggle('hidden', !(s === 'playing' || s === 'dead' || s === 'portal'));
   if (s !== 'playing') {
     releasePointer();
+    resetTouch();
     input.keys = Object.create(null);
   } else {
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
@@ -143,7 +149,7 @@ function renderShop() {
     else if (!reqOk) btn = `<button class="btn" disabled>${T.shopRequires(nameOf(it.requires))}</button>`;
     else if (!afford) btn = `<button class="btn" disabled><span class="si-price"><span class="coin-icon"></span>${it.price} · ${T.shopMissing(it.price - game.coins)}</span></button>`;
     else btn = `<button class="btn btn-primary" data-buy="${it.id}"><span class="si-price">${T.shopBuy} · <span class="coin-icon"></span>${it.price}</span></button>`;
-    return `<div class="shop-item ${owned ? 'owned' : ''}"><div class="si-icon">${ICONS[it.icon]}</div><div class="si-kind">${it.kind}</div><h3>${it.name}</h3><p>${it.desc}</p>${btn}</div>`;
+    return `<div class="shop-item ${owned ? 'owned' : ''}"><div class="si-icon">${ICONS[it.icon]}</div><div class="si-kind">${it.kind}</div><h3>${it.name}</h3><p>${forTouch(it.desc)}</p>${btn}</div>`;
   }).join('');
 }
 

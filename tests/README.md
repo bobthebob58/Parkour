@@ -11,7 +11,8 @@ npx playwright install chromium   # hvis Playwright ikke allerede har en Chromiu
 |---|---|
 | `npm run baner` | Planlægningsrobotten spiller alle 15 baner fra start til portal med den rigtige fysik og tjekker kravene (se nedenfor). `LEVELS=3,7 npm run baner` begrænser til bestemte baner. Afslutter med fejlkode, hvis et krav ikke er opfyldt. |
 | `npm run e2e` | 36 kontroller med rigtige mus- og tastaturhændelser (se nedenfor). |
-| `npm test` | Begge ovenstående. |
+| `npm run touch` | Touch-testen på en telefon (844×390) og en iPad (1180×820) med rigtige berøringer: joystick (også analogt), HOP (kort/holdt/dobbelthop), kamera med to fingre, hotbar og EVNE, kantgreb og klatring, skateboard, pause, tekster omskrevet til touch og forslaget om at dreje telefonen. `TOUCH=telefon node run.js beroering.js` kører én enhed. |
+| `npm test` | Robotten, e2e og touch-testen på telefon. |
 | `npm run bot` | Robotten på én bane med en detaljeret rapport: `LEVEL=8 VERBOSE=1 npm run bot`. Se kommentaren øverst i `bot.js` for alle indstillinger. |
 | `npm run billeder` | Startudsigt og perspektiv for alle 15 baner til `../docs/images`. |
 | `npm run skaerme` | Portalen, døden i lavaen, bane fuldført, butik, pause, sejr og hovedmenuen til `../docs/images`. |
@@ -51,3 +52,4 @@ Miljøvariabler:
 - `OUT_DIR`: hvor billeder gemmes
 - `LEVELS`: begræns baner
 - `TIMEOUT_MS`: grænse for klik og andre handlinger (standard 120 s, fordi software-WebGL gør siden langsom)
+- `TOUCH`: `telefon` eller `ipad` giver en touch-skærm i stedet for mus og tastatur (bruges af `beroering.js` og `skaerme.js`)

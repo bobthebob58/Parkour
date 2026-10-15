@@ -1,8 +1,10 @@
 // Skærmbilleder af portalen, døden i lavaen og menuskærmene (bane fuldført, butik, pause, sejr, hovedmenu).
 // Action-billeder fra selve banerne tages af fysik-botten: SHOTS=../docs/images LEVEL=8 node run.js bot.js
 // ONLY=portal,lava,skaerme,menu begrænser til bestemte billeder.
+// TOUCH=telefon / TOUCH=ipad: billeder af touch-styringen i stedet (touch-<enhed>-spil.jpg og -menu.jpg).
 module.exports = async (page, h) => {
   await page.waitForFunction(() => window.skyhoj && window.skyhoj.game.state === 'menu', null, { timeout: 60000 });
+  if (process.env.TOUCH) return touchShots(page, h, process.env.TOUCH);
   const only = process.env.ONLY ? process.env.ONLY.split(',') : null;
   const want = (n) => !only || only.includes(n);
 
@@ -104,3 +106,34 @@ module.exports = async (page, h) => {
     await h.shot('skaerm-hovedmenu.jpg');
   }
 };
+
+// Touch-styringen midt i en bane: joysticket i brug, en evne valgt og et banetip fremme
+async function touchShots(page, h, dev) {
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  await h.wait(1500);
+  await h.shot(`touch-${dev}-menu.jpg`);
+  await ev(() => {
+    const S = window.skyhoj;
+    Object.assign(S.abilities.owned, { chalk: true, rope: true, double: true });
+    S.startLevel(1);
+    S.abilities.selected = 'chalk';
+    S.renderHotbar();
+    document.getElementById('level-banner').classList.add('hidden');
+  });
+  await h.wait(1200);
+  const vp = page.viewportSize();
+  const cdp = await page.context().newCDPSession(page);
+  const x = vp.width * 0.16, y = vp.height * 0.72;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ id: 1, x, y }] });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ id: 1, x: x + 18, y: y - 44 }] });
+  await h.wait(1500);
+  await ev(() => {
+    const S = window.skyhoj;
+    S.debug.freeze = true;
+    document.getElementById('toasts').innerHTML = '';
+    S.toast(S.LEVELS[1].segs.find((g) => g.hint && /W:/.test(g.hint)).hint, 'gold', 60000);
+  });
+  await h.wait(1500);
+  await h.shot(`touch-${dev}-spil.jpg`);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}

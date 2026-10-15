@@ -9,6 +9,7 @@
 //   OUT_DIR      hvor skærmbilleder gemmes (standard ../docs/images)
 //   LEVELS       f.eks. "1,5,10" – begræns bot/skærmbilleder til bestemte baner
 //   TIMEOUT_MS   grænse for klik og andre handlinger (standard 120000)
+//   TOUCH        "telefon" (844×390, liggende iPhone) eller "ipad" (1180×820): touch-skærm i stedet for mus
 const path = require('path');
 const fs = require('fs');
 const { chromium } = require('playwright');
@@ -29,7 +30,13 @@ async function main() {
     args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
   const width = +(process.env.W || 1280), height = +(process.env.H || 720);
-  const page = await browser.newPage({ viewport: { width, height } });
+  // TOUCH giver en touch-skærm (som en telefon eller tablet) i stedet for mus og tastatur
+  const DEVICES = { telefon: { width: 844, height: 390, deviceScaleFactor: 3 }, ipad: { width: 1180, height: 820, deviceScaleFactor: 2 } };
+  const dev = DEVICES[process.env.TOUCH];
+  if (process.env.TOUCH && !dev) throw new Error(`Ukendt TOUCH=${process.env.TOUCH} (brug telefon eller ipad)`);
+  const page = await browser.newPage(dev
+    ? { viewport: { width: dev.width, height: dev.height }, deviceScaleFactor: dev.deviceScaleFactor, hasTouch: true, isMobile: true }
+    : { viewport: { width, height } });
   // Software-WebGL holder sidens hovedtråd optaget i lange stræk, og et klik venter på hovedtråden
   // (målt: 4 s pr. klik uden belastning, 12 s under belastning). Playwrights standard på 30 s er for
   // stram på en travl CI-maskine, så handlinger får samme rummelige grænse som testenes andre ventetider.

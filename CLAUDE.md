@@ -31,6 +31,7 @@ skateboard level, rope, chalk, coins and a shop. It must keep working by double-
 | `src/motor/09b-verdenssaet.js` | world-kit system + default "sten" kit |
 | `src/motor/10-baneobjekter.js` | `Level` class at runtime: moving/crumble/spin/conveyor/vent…, portal, checkpoints |
 | `src/motor/11a/11b-spilleren.js` | player: body, movement, hands (ledge/bar/zip), double jump, skateboard. The runner model (`src/figur/figur.js`) is inserted between 11a and 11b |
+| `src/motor/12b-beroering.js` | touch controls (phone/iPad): analog joystick, camera drag, HOP/EVNE/pause buttons, hotbar taps, `forTouch()` text rewriting (+ `T_TOUCH` in 02), resolution governor |
 | `src/motor/12…17` | input, camera, abilities (chalk, rope), WebAudio, UI/HUD/shop, save/load |
 | `src/motor/18-spiltilstand.js` | game state, main loop, `debug`, `showcaseDef`, `window.skyhoj` test hooks (only with `?debug`: snapshot/restore, playDef, showcase, camTo …) |
 | `src/baner/L01.json … L15.json` | levels as data (`name, kit, theme, reward, needsRope, needsDouble, skate, segs`). `look` fields are design notes, stripped at build |
@@ -55,9 +56,10 @@ First time in a session: `cd tests && npm ci` (Chromium is preinstalled in cloud
 | `LEVELS=9 npm run baner` | 2–5 min | requirement checks for one level |
 | `npm run baner` | ~20 min | all 15 levels + requirement checks |
 | `npm run e2e` | ~10 min | 36 real mouse/keyboard checks |
+| `TOUCH=telefon node run.js beroering.js` | ~4 min | touch checks on an emulated phone (`TOUCH=ipad` for iPad) |
 
 - **CI runs all of this on every push/PR** (`.github/workflows/test.yml`: build check, e2e, levels
-  in 3 parallel jobs) in about 4 minutes – far faster than in a session. Test only what you changed
+  in 3 parallel jobs, touch on phone + iPad) in about 4 minutes – far faster than in a session. Test only what you changed
   locally, push, and read the CI result.
 - Run long tests in the background and read only the `RESULT`/`BESTÅET`/`FAIL` lines.
 - Level requirements (enforced by `tests/alle-baner.js`): rope required from level 8

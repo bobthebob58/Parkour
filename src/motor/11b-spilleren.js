@@ -47,12 +47,13 @@ function respawnPlayer() {
   cam.target.set(s.x, s.y + CFG.camera.height - CFG.player.radius, s.z);
 }
 
-// Ønsket bevægelsesretning ud fra WASD og kameraets retning
+// Ønsket bevægelsesretning ud fra WASD (eller touch-joysticket) og kameraets retning
 const wish = new THREE.Vector3();
 function readWish() {
-  const k = input.keys;
-  const fwd = (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0);
-  const side = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
+  const k = input.keys, st = input.stick;
+  // Joysticket er analogt: lidt udslag = gå langsomt, fuldt udslag = løb
+  const fwd = st.active ? -st.y : (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0);
+  const side = st.active ? st.x : (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
   const sy = Math.sin(cam.yaw), cy = Math.cos(cam.yaw);
   wish.set(-sy * fwd + cy * side, 0, -cy * fwd - sy * side);
   if (wish.lengthSq() > 1) wish.normalize();
@@ -456,7 +457,8 @@ function jumpOffBar(w) {
    --------------------------------------------------------------------- */
 function skateControl(dt) {
   const b = player.body, v = b.velocity, S = CFG.skate, k = input.keys, sk = player.skate;
-  const steer = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
+  const steer = input.stick.active ? clamp(input.stick.x / 0.8, -1, 1) // joysticket styrer trinløst
+    : (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
   const pushing = !!(k.KeyW || k.ArrowUp), braking = !!(k.KeyS || k.ArrowDown);
   sk.lean = damp(sk.lean, steer, 8, dt);
   sk.pushT = Math.max(0, sk.pushT - dt);
