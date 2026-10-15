@@ -1,0 +1,337 @@
+{
+ "name": "Himmelhavet",
+ "kit": "skyreef",
+ "theme": "skyreef",
+ "reward": 90,
+ "needsRope": true,
+ "needsDouble": true,
+ "chalkTip": false,
+ "skate": false,
+ "segs": [
+  {
+   "t": "start",
+   "w": 10,
+   "d": 10,
+   "look": "sandbank with shells and starfish"
+  },
+  {
+   "g": 3,
+   "w": 7,
+   "d": 7,
+   "coin": true,
+   "look": "table coral",
+   "hint": "Goplerne kaster dig op – grib bordkorallens kant"
+  },
+  {
+   "t": "bounce",
+   "g": 3,
+   "w": 3.2,
+   "d": 3.2,
+   "pow": 16,
+   "mv": {
+    "ax": "y",
+    "amp": 0.8,
+    "per": 3,
+    "ph": 0.0
+   },
+   "look": "bobbing jellyfish 1 (Gopler)"
+  },
+  {
+   "g": 4,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 4,
+   "grab": true,
+   "look": "table coral rim 1"
+  },
+  {
+   "t": "bounce",
+   "g": 3,
+   "w": 3.2,
+   "d": 3.2,
+   "pow": 16,
+   "mv": {
+    "ax": "y",
+    "amp": 0.8,
+    "per": 3,
+    "ph": 0.33
+   },
+   "look": "bobbing jellyfish 2 (Gopler)"
+  },
+  {
+   "g": 4,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 4,
+   "grab": true,
+   "look": "table coral rim 2",
+   "coin": true
+  },
+  {
+   "t": "bounce",
+   "g": 3,
+   "w": 3.2,
+   "d": 3.2,
+   "pow": 16,
+   "mv": {
+    "ax": "y",
+    "amp": 0.8,
+    "per": 3,
+    "ph": 0.66
+   },
+   "look": "bobbing jellyfish 3 (Gopler)"
+  },
+  {
+   "g": 4,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 4,
+   "grab": true,
+   "look": "table coral rim 3",
+   "cp": true
+  },
+  {
+   "g": 3,
+   "w": 6,
+   "d": 6,
+   "look": "whale jaw platform",
+   "hint": "Hvalskelettet: sving fra ribben til ribben – hvil på hvirvlerne"
+  },
+  {
+   "t": "bar",
+   "at": 1.0,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 1 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 3.2,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 2 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 5.4,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 3 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 7.6,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 4 (Hvalskelettet)"
+  },
+  {
+   "g": 9,
+   "w": 2.6,
+   "d": 2.6,
+   "v": "vertebra",
+   "look": "vertebra rest spot",
+   "coin": true
+  },
+  {
+   "t": "bar",
+   "at": 1.0,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 5 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 3.2,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 6 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 5.4,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 7 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 7.6,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 8 (Hvalskelettet)"
+  },
+  {
+   "g": 9,
+   "w": 2.6,
+   "d": 2.6,
+   "v": "vertebra",
+   "look": "vertebra rest spot"
+  },
+  {
+   "t": "bar",
+   "at": 1.0,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 9 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 3.2,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 10 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 5.4,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 11 (Hvalskelettet)"
+  },
+  {
+   "t": "bar",
+   "at": 7.6,
+   "y": 2.5,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "look": "whale rib 12 (Hvalskelettet)"
+  },
+  {
+   "g": 9,
+   "w": 6,
+   "d": 6,
+   "cp": true,
+   "coin": true,
+   "look": "whale tail platform, checkpoint",
+   "hint": "Mantaturen: hop på mantaen, rid med, og dobbelthop over til skildpadden"
+  },
+  {
+   "t": "conveyor",
+   "g": 3,
+   "w": 5,
+   "d": 12,
+   "spd": 3,
+   "look": "sea current carrying you forward"
+  },
+  {
+   "g": 3,
+   "w": 5,
+   "d": 7,
+   "mv": {
+    "ax": "z",
+    "amp": 9,
+    "per": 10,
+    "ph": 0
+   },
+   "v": "manta",
+   "look": "gliding manta ray (Mantaturen)"
+  },
+  {
+   "g": 18,
+   "w": 5,
+   "d": 5,
+   "mv": {
+    "ax": "x",
+    "amp": 1.5,
+    "per": 6
+   },
+   "v": "turtle",
+   "grab": true,
+   "dbl": true,
+   "coin": true,
+   "look": "swimming turtle shell"
+  },
+  {
+   "g": 3,
+   "w": 6,
+   "d": 6,
+   "cp": true,
+   "look": "coral shelf, checkpoint",
+   "hint": "Perlesvinget: tang, reb og boblesøjle"
+  },
+  {
+   "t": "bar",
+   "at": 2.5,
+   "y": 2.4,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "sw": {
+    "len": 5,
+    "amp": 30,
+    "per": 3
+   },
+   "look": "kelp trapeze (Perlesvinget)"
+  },
+  {
+   "g": 10,
+   "w": 5,
+   "d": 5,
+   "dy": -0.5,
+   "grab": true,
+   "look": "brain coral landing"
+  },
+  {
+   "t": "anchor",
+   "at": 9,
+   "y": 8,
+   "look": "pearl"
+  },
+  {
+   "g": 18,
+   "w": 6,
+   "d": 6,
+   "rope": true,
+   "coin": true,
+   "look": "coral landing after the pearl swing"
+  },
+  {
+   "t": "wind",
+   "at": 2.5,
+   "y": -6,
+   "r": 2,
+   "h": 18,
+   "look": "bubble column"
+  },
+  {
+   "g": 6,
+   "w": 6,
+   "d": 6,
+   "dy": 7,
+   "look": "coral shelf above the bubble column"
+  },
+  {
+   "t": "finish",
+   "g": 3,
+   "w": 10,
+   "d": 10,
+   "dy": 0.5,
+   "v": "clam",
+   "look": "giant clam with the pearl portal"
+  }
+ ]
+}

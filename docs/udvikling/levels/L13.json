@@ -1,0 +1,343 @@
+{
+ "name": "Vulkanen",
+ "kit": "volcano",
+ "theme": "volcano",
+ "reward": 85,
+ "needsRope": true,
+ "needsDouble": true,
+ "chalkTip": false,
+ "skate": false,
+ "segs": [
+  {
+   "t": "start",
+   "w": 10,
+   "d": 10,
+   "look": "ash plaza on the volcano's shoulder"
+  },
+  {
+   "g": 3,
+   "w": 6,
+   "d": 6,
+   "dy": -2,
+   "coin": true,
+   "look": "basalt ledge"
+  },
+  {
+   "t": "crumble",
+   "g": 2.5,
+   "w": 3,
+   "d": 3,
+   "dy": -3,
+   "look": "crumbling ash step 1",
+   "hint": "Askeskrænten smuldrer – løb ned uden at stoppe"
+  },
+  {
+   "t": "crumble",
+   "g": 2.5,
+   "w": 3,
+   "d": 3,
+   "dy": -3,
+   "look": "crumbling ash step 2"
+  },
+  {
+   "t": "crumble",
+   "g": 2.5,
+   "w": 3,
+   "d": 3,
+   "dy": -3,
+   "look": "crumbling ash step 3"
+  },
+  {
+   "t": "crumble",
+   "g": 2.5,
+   "w": 3,
+   "d": 3,
+   "dy": -3,
+   "look": "crumbling ash step 4"
+  },
+  {
+   "g": 3,
+   "w": 7,
+   "d": 7,
+   "dy": -3,
+   "cp": true,
+   "look": "basalt terrace, checkpoint",
+   "hint": "Basaltorglet: søjlerne stiger og synker i en bølge – løb med bølgen"
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": -0.5,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.0
+   },
+   "v": "hex",
+   "look": "rising hex column 1 (Basaltorglet)"
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.125
+   },
+   "v": "hex",
+   "look": "rising hex column 2 (Basaltorglet)"
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.25
+   },
+   "v": "hex",
+   "look": "rising hex column 3 (Basaltorglet)"
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.375
+   },
+   "v": "hex",
+   "look": "rising hex column 4 (Basaltorglet)",
+   "coin": true
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.5
+   },
+   "v": "hex",
+   "look": "rising hex column 5 (Basaltorglet)"
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.625
+   },
+   "v": "hex",
+   "look": "rising hex column 6 (Basaltorglet)"
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.75
+   },
+   "v": "hex",
+   "look": "rising hex column 7 (Basaltorglet)",
+   "coin": true
+  },
+  {
+   "shape": "cyl",
+   "g": 2.5,
+   "w": 3,
+   "dy": 0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 4,
+    "ph": 0.875
+   },
+   "v": "hex",
+   "look": "rising hex column 8 (Basaltorglet)"
+  },
+  {
+   "g": 3,
+   "w": 7,
+   "d": 7,
+   "cp": true,
+   "look": "basalt shelf above the crust, checkpoint",
+   "hint": "Skorpen revner! Løb over pladerne og grib kæden"
+  },
+  {
+   "t": "crumble",
+   "g": 3,
+   "w": 4,
+   "d": 4,
+   "dy": -4,
+   "v": "crust",
+   "look": "cooled lava crust plate (Skorpen)"
+  },
+  {
+   "t": "crumble",
+   "g": 3,
+   "w": 4,
+   "d": 4,
+   "dy": -4,
+   "v": "crust",
+   "look": "cooled lava crust plate"
+  },
+  {
+   "t": "crumble",
+   "g": 3,
+   "w": 4,
+   "d": 4,
+   "dy": -4,
+   "v": "crust",
+   "coin": true,
+   "look": "cooled lava crust plate"
+  },
+  {
+   "t": "bar",
+   "at": 0.6,
+   "y": 2.5,
+   "len": 8,
+   "ang": 0,
+   "look": "hanging chain monkey bar (8 m)"
+  },
+  {
+   "g": 10,
+   "w": 6,
+   "d": 6,
+   "cp": true,
+   "look": "low basalt island just above the lava, checkpoint",
+   "hint": "Lavafaldet: sving i rebet forbi faldet og grib den varme kant"
+  },
+  {
+   "t": "anchor",
+   "at": 9,
+   "y": 9,
+   "look": "glowing ember rock"
+  },
+  {
+   "g": 18,
+   "w": 4,
+   "d": 4,
+   "dy": 2,
+   "rope": true,
+   "grab": true,
+   "slick": true,
+   "coin": true,
+   "v": "ledge",
+   "look": "hot ledge beside the lava fall (Lavafaldet)"
+  },
+  {
+   "g": 3,
+   "w": 5,
+   "d": 5,
+   "dy": 0.5,
+   "look": "basalt foot of the flank"
+  },
+  {
+   "t": "vent",
+   "g": 3,
+   "w": 3,
+   "d": 3,
+   "lift": 10,
+   "look": "heat vent",
+   "hint": "Varmeventil! Lad den løfte dig op ad flanken"
+  },
+  {
+   "g": 2,
+   "w": 5,
+   "d": 5,
+   "dy": 9,
+   "grab": true,
+   "slick": true,
+   "look": "hot flank ledge"
+  },
+  {
+   "shape": "cyl",
+   "g": 3,
+   "w": 3,
+   "dy": 2,
+   "mv": {
+    "ax": "y",
+    "amp": 1.5,
+    "per": 3.5,
+    "ph": 0
+   },
+   "v": "hex",
+   "look": "rising column on the flank"
+  },
+  {
+   "shape": "cyl",
+   "g": 3,
+   "w": 3,
+   "dy": 2,
+   "mv": {
+    "ax": "y",
+    "amp": 1.5,
+    "per": 3.5,
+    "ph": 0.5
+   },
+   "v": "hex",
+   "coin": true,
+   "look": "rising column on the flank"
+  },
+  {
+   "g": 3,
+   "w": 7,
+   "d": 7,
+   "dy": 1,
+   "cp": true,
+   "look": "flank terrace below the crater, checkpoint",
+   "hint": "Udbruddet: gejseren kaster dig op – dobbelthop i toppen og grib kraterkanten"
+  },
+  {
+   "t": "bounce",
+   "g": 3,
+   "w": 3.4,
+   "d": 3.4,
+   "pow": 22,
+   "look": "geyser (Udbruddet)"
+  },
+  {
+   "g": 8,
+   "w": 7,
+   "d": 7,
+   "dy": 12,
+   "grab": true,
+   "dbl": true,
+   "coin": true,
+   "v": "rim",
+   "look": "crater rim"
+  },
+  {
+   "t": "finish",
+   "g": 2,
+   "w": 10,
+   "d": 10,
+   "dy": 0.5,
+   "v": "rim",
+   "look": "crater rim with the portal"
+  }
+ ]
+}

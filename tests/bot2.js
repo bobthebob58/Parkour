@@ -324,7 +324,8 @@ async function planner({ def, levelNo, inv, opts }) {
     if (!from) return 'fail:not grounded';
     let r;
     if (prm.wait > 0) {
-      r = run((t) => { keys({}); if (t >= prm.wait) return 'ok'; if (!P.grounded) return 'fail:fell while waiting'; }, prm.wait + 1);
+      let air = 0;
+      r = run((t) => { keys({}); if (t >= prm.wait) return P.grounded ? 'ok' : undefined; air = P.grounded ? 0 : air + dt; if (air > 0.2) return 'fail:fell while waiting'; }, prm.wait + 1);
       if (r !== 'ok') return r;
     }
     if (prm.back > 0 && from.type !== 'crumble' && from.type !== 'ice') {
@@ -586,7 +587,7 @@ async function planner({ def, levelNo, inv, opts }) {
       const per = Math.max(moving ? 4 : 0, goal.kind === 'plat' && goal.pl.def.move ? goal.pl.def.move.per : 0, goal.kind === 'plat' && goal.pl.def.swing ? goal.pl.def.swing.per : 0,
         goal.kind === 'bar' && goal.bar.def.swing ? goal.bar.def.swing.per : 0, goal.kind === 'bar' && goal.bar.def.move ? goal.bar.def.move.per : 0,
         from && from.def.move ? from.def.move.per : 0, from && from.def.swing ? from.def.swing.per : 0, from && from.type === 'rot' ? Math.PI * 2 / Math.abs(from.def.spd || 1) : 0);
-      const waits = from && from.type === 'crumble' ? [0] : moving ? Array.from({ length: Math.min(24, Math.ceil(per / 0.25)) }, (_, i) => i * 0.25) : [0];
+      const waits = from && from.type === 'crumble' ? [0] : moving ? Array.from({ length: Math.min(44, Math.ceil(per / 0.25)) }, (_, i) => i * 0.25) : [0];
       const backs = from && (from.type === 'crumble' || from.type === 'ice') ? [0] : [3, 0, 6, 1.5];
       const leads = [0.3, 0.9, 1.6];
       for (const dbl of dblOpts) for (const wait of waits) for (const back of backs) for (const lead of leads) {

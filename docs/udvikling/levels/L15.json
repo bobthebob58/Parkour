@@ -1,0 +1,423 @@
+{
+ "name": "Nordlystårnet",
+ "kit": "crystalspire",
+ "theme": "crystalspire",
+ "reward": 100,
+ "needsRope": true,
+ "needsDouble": true,
+ "chalkTip": false,
+ "skate": false,
+ "segs": [
+  {
+   "t": "start",
+   "w": 10,
+   "d": 10,
+   "look": "marble rest balcony at the foot of the spire",
+   "hint": "Nordlystårnet! Klatr hele vejen rundt om tårnet til kronen"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 1.2,
+   "v": "glass",
+   "look": "crystal glass platform"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 1.2,
+   "v": "glass",
+   "look": "crystal glass platform"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 1.2,
+   "v": "glass",
+   "look": "crystal glass platform",
+   "coin": true
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4.5,
+   "d": 4.5,
+   "dy": 1.2,
+   "v": "glass",
+   "look": "crystal glass platform"
+  },
+  {
+   "turn": 22,
+   "g": 8.5,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "grab": true,
+   "slick": true,
+   "v": "frost",
+   "look": "frosted glass ledge (Frostglasset)",
+   "hint": "Frostglas er glat – kridt hjælper hænderne"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 4,
+   "d": 4,
+   "dy": 1,
+   "v": "frost",
+   "look": "frosted glass step"
+  },
+  {
+   "t": "crumble",
+   "turn": 22,
+   "g": 3,
+   "w": 3,
+   "d": 3,
+   "dy": 0.8,
+   "look": "shattering glass pane"
+  },
+  {
+   "t": "crumble",
+   "turn": 22,
+   "g": 3,
+   "w": 3,
+   "d": 3,
+   "dy": 0.8,
+   "look": "shattering glass pane"
+  },
+  {
+   "t": "crumble",
+   "turn": 22,
+   "g": 3,
+   "w": 3,
+   "d": 3,
+   "dy": 0.8,
+   "look": "shattering glass pane"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 6,
+   "d": 6,
+   "dy": 1,
+   "cp": true,
+   "v": "balcony",
+   "look": "rest balcony 1, checkpoint",
+   "hint": "Lysekronerne svinger – hop på, når de kommer tæt på"
+  },
+  {
+   "t": "swing",
+   "turn": 22,
+   "g": 4,
+   "w": 4,
+   "d": 4,
+   "len": 8,
+   "amp": 25,
+   "per": 4,
+   "look": "swinging chandelier (Lysekronerne)"
+  },
+  {
+   "t": "swing",
+   "g": 4,
+   "w": 4,
+   "d": 4,
+   "len": 8,
+   "amp": 25,
+   "per": 4.5,
+   "look": "swinging chandelier"
+  },
+  {
+   "g": 4,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "v": "glass",
+   "coin": true,
+   "look": "glass landing"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4,
+   "d": 4,
+   "dy": 1.5,
+   "v": "glass",
+   "look": "glass platform"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4,
+   "d": 4,
+   "dy": 1.5,
+   "v": "glass",
+   "look": "glass platform"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4,
+   "d": 4,
+   "dy": 1.5,
+   "v": "glass",
+   "look": "glass platform"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 7,
+   "d": 7,
+   "dy": 1,
+   "cp": true,
+   "v": "balcony",
+   "look": "rest balcony 2, checkpoint",
+   "hint": "Guldringene drejer hver sin vej"
+  },
+  {
+   "t": "rot",
+   "turn": 22,
+   "shape": "cyl",
+   "g": 3,
+   "w": 6,
+   "spd": 0.5,
+   "dy": 1,
+   "v": "gold",
+   "look": "rotating gold ring 1 (Guldringene)"
+  },
+  {
+   "t": "rot",
+   "turn": 22,
+   "shape": "cyl",
+   "g": 3,
+   "w": 6,
+   "spd": -0.6,
+   "dy": 1,
+   "v": "gold",
+   "look": "rotating gold ring 2 (Guldringene)",
+   "coin": true
+  },
+  {
+   "t": "rot",
+   "turn": 22,
+   "shape": "cyl",
+   "g": 3,
+   "w": 6,
+   "spd": 0.7,
+   "dy": 1,
+   "v": "gold",
+   "look": "rotating gold ring 3 (Guldringene)"
+  },
+  {
+   "t": "spin",
+   "turn": 22,
+   "g": 3,
+   "w": 7,
+   "spd": 0.7,
+   "dy": 1,
+   "look": "gold disc with sweeping gold arms"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "v": "gold",
+   "look": "gold plate"
+  },
+  {
+   "t": "bar",
+   "at": 0.6,
+   "y": 2.5,
+   "len": 6,
+   "ang": 0,
+   "look": "gold monkey bar"
+  },
+  {
+   "g": 7.5,
+   "w": 5,
+   "d": 5,
+   "v": "gold",
+   "coin": true,
+   "look": "gold plate after the monkey bar"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "look": "outer pillar top"
+  },
+  {
+   "t": "zip",
+   "at": -1,
+   "y": 3.4,
+   "len": 16,
+   "drop": 3,
+   "look": "glowing zipline from the outer pillar"
+  },
+  {
+   "g": 13,
+   "w": 7,
+   "d": 7,
+   "dy": -4.6000000000000005,
+   "v": "balcony",
+   "cp": true,
+   "look": "rest balcony 3, checkpoint"
+  },
+  {
+   "t": "bar",
+   "at": 2.5,
+   "y": 2.4,
+   "len": 3,
+   "ang": 90,
+   "x": -1.5,
+   "sw": {
+    "len": 5,
+    "amp": 30,
+    "per": 3
+   },
+   "look": "chandelier trapeze"
+  },
+  {
+   "g": 10,
+   "w": 5,
+   "d": 5,
+   "dy": -0.5,
+   "grab": true,
+   "v": "gold",
+   "look": "gold landing after the chandelier"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4,
+   "d": 4,
+   "dy": 1.5,
+   "v": "glass",
+   "look": "spire step"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4,
+   "d": 4,
+   "dy": 1.5,
+   "v": "gold",
+   "look": "spire step"
+  },
+  {
+   "turn": 22,
+   "g": 3.5,
+   "w": 4,
+   "d": 4,
+   "dy": 1.5,
+   "v": "glass",
+   "look": "spire step"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 6,
+   "d": 6,
+   "dy": 1,
+   "cp": true,
+   "v": "balcony",
+   "look": "rest balcony 4, checkpoint",
+   "hint": "Kronen: prismer, lysstråler – og til sidst det store reb-spring"
+  },
+  {
+   "turn": 22,
+   "g": 12,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "dbl": true,
+   "v": "prism",
+   "coin": true,
+   "look": "prism (double jump gap)"
+  },
+  {
+   "t": "vent",
+   "turn": 22,
+   "g": 3,
+   "w": 3,
+   "d": 3,
+   "lift": 10,
+   "look": "light-beam updraft"
+  },
+  {
+   "g": 2,
+   "w": 5,
+   "d": 5,
+   "dy": 9,
+   "grab": true,
+   "v": "prism",
+   "look": "prism ledge above the light beam"
+  },
+  {
+   "turn": 22,
+   "g": 12,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "dbl": true,
+   "v": "prism",
+   "look": "prism (double jump gap)"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 4,
+   "d": 4,
+   "dy": 1.2,
+   "v": "glass",
+   "look": "crystal step"
+  },
+  {
+   "turn": 22,
+   "g": 3,
+   "w": 7,
+   "d": 7,
+   "dy": 1,
+   "cp": true,
+   "v": "balcony",
+   "look": "launch balcony, checkpoint (Kronespringet)",
+   "hint": "Kronespringet: sving i rebet, slip, dobbelthop – og grib kronens kant!"
+  },
+  {
+   "t": "anchor",
+   "at": 11,
+   "y": 10,
+   "look": "floating crystal anchor"
+  },
+  {
+   "g": 22,
+   "w": 6,
+   "d": 6,
+   "dy": 2,
+   "rope": true,
+   "grab": true,
+   "dbl": true,
+   "v": "crown",
+   "coin": true,
+   "look": "rim of the portal crown"
+  },
+  {
+   "t": "finish",
+   "g": 1,
+   "w": 10,
+   "d": 10,
+   "dy": 0.5,
+   "v": "crown",
+   "look": "the crown of the aurora spire with the portal"
+  }
+ ]
+}
