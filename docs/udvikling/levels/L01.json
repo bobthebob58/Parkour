@@ -1,0 +1,41 @@
+{ "name": "Himmelengen", "kit": "meadow", "theme": "meadow", "reward": 20,
+  "needsRope": false, "needsDouble": false, "chalkTip": false, "skate": false,
+  "segs": [
+    { "t": "start", "w": 12, "d": 10, "look": "porch of the runner's cottage on a floating turf island",
+      "hint": "Velkommen! WASD: løb · Mellemrum: hop · Saml mønterne" },
+
+    { "g": 2.5, "w": 5, "d": 14, "h": 0.8, "look": "wide plank footbridge with rope rails (Plankebroen)" },
+    { "t": "coin", "at": -12.5, "y": 1.3 }, { "t": "coin", "at": -10, "y": 1.3 }, { "t": "coin", "at": -7.5, "y": 1.3 },
+    { "t": "coin", "at": -5, "y": 1.3 }, { "t": "coin", "at": -2.5, "y": 1.3 },
+
+    { "g": 2.5, "w": 11, "d": 10, "dy": 0.5, "look": "sheep meadow island with grazing sheep" },
+
+    { "turn": 90, "shape": "cyl", "g": 3, "w": 9, "h": 1.4, "look": "round flower-garden island with a stone well" },
+
+    { "shape": "cyl", "g": 3, "w": 4, "dy": 0.5, "coin": true, "look": "upright hay bale 1 (Høballerne)",
+      "hint": "Høballerne! Hop fra bal til bal – hver er lidt højere" },
+    { "shape": "cyl", "g": 2.5, "w": 4, "dy": 0.5, "turn": -15, "coin": true, "look": "upright hay bale 2" },
+    { "shape": "cyl", "g": 2.5, "w": 4, "dy": 0.5, "turn": -15, "coin": true, "look": "upright hay bale 3" },
+    { "shape": "cyl", "g": 2.5, "w": 4, "dy": 0.5, "turn": -15, "coin": true, "look": "upright hay bale 4" },
+    { "shape": "cyl", "g": 2.5, "w": 4, "dy": 0.5, "turn": -15, "coin": true, "look": "upright hay bale 5" },
+
+    { "turn": -30, "g": 3, "w": 12, "d": 10, "dy": 0.5, "cp": true, "look": "wide hayfield island with a turning windmill",
+      "hint": "Kontrolpunkt! Falder du, starter du igen herfra" },
+
+    { "t": "bar", "at": 2.5, "y": 2.4, "len": 4, "ang": 90, "x": -2, "look": "weathered fence beam wrapped in grip tape (optional hang bar over the dip)" },
+    { "t": "coin", "at": 2.5, "y": 1.0, "x": 0 },
+    { "g": 5, "w": 9, "d": 9, "dy": -1, "look": "orchard terrace below the fence" },
+
+    { "g": 3, "w": 10, "d": 9, "look": "barnyard in front of the red barn",
+      "hint": "Laden er for høj at hoppe op på. Hop mod kanten – hænderne griber selv! W: klatr op" },
+    { "g": 3, "w": 10, "d": 14, "h": 6, "dy": 3.2, "grab": true, "coin": true,
+      "look": "red barn roof with gutter (Laderyggen), solid barn wall below" },
+
+    { "g": 3.5, "shape": "cyl", "w": 9, "dy": -1.5, "turn": 55, "look": "apple orchard island with the apple tree" },
+    { "g": 2.5, "w": 4, "d": 9, "h": 0.8, "dy": 0.5, "turn": -25, "look": "short plank footbridge with rope rails" },
+    { "g": 2.5, "w": 7, "d": 7, "dy": 1, "turn": -30, "look": "mossy stepping island" },
+    { "g": 3, "shape": "cyl", "w": 6, "dy": 1, "look": "grassy foothill step" },
+
+    { "t": "finish", "g": 3, "w": 12, "d": 12, "dy": 1,
+      "look": "apple-tree hilltop with a ring of standing stones and the portal; windmill sails turn behind" }
+  ] }

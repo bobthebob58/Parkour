@@ -1,0 +1,49 @@
+{ "name": "Højhustagene", "kit": "rooftops", "theme": "rooftops", "reward": 25,
+  "needsRope": false, "needsDouble": false, "chalkTip": false, "skate": false,
+  "segs": [
+    { "t": "start", "w": 9, "d": 9, "look": "start rooftop with stairwell hut and a laundry line" },
+
+    { "g": 3.5, "w": 8, "d": 6, "dy": 0.5, "coin": true, "look": "gravel roof with AC boxes" },
+    { "g": 4, "shape": "cyl", "w": 6, "dy": 0.5, "x": 2, "coin": true, "look": "water tower on stilts (round tank top)" },
+    { "g": 4.5, "w": 7, "d": 8, "dy": 1, "x": -3, "look": "rooftop garden with planters" },
+    { "g": 4, "w": 6, "d": 8, "dy": 0, "x": 2, "look": "glass penthouse roof with low parapet",
+      "hint": "Næste tag er for langt til fødderne! Løb og hop alligevel – hænderne griber parapeten. W: klatr op" },
+    { "g": 8.3, "w": 8, "d": 7, "dy": 1, "grab": true, "coin": true,
+      "look": "taller tower roof, parapet with worn chalk-white lip (Det første lange hop)" },
+
+    { "g": 4, "w": 8, "d": 8, "dy": 1.5, "look": "corner roof with antenna fence along the east parapet",
+      "hint": "Hjørnet! Grib røret på facaden, tryk W for at hænge dig langs det, og spring over til taget" },
+    { "t": "bar", "at": -4, "x": 5, "y": 2.4, "len": 4.5, "ang": 90, "look": "yellow pipe railing along the facade corner (Hjørnet), grip-tape bands" },
+    { "t": "coin", "at": -4, "x": 7.5, "y": 1.2 },
+
+    { "turn": 90, "g": 10.5, "w": 8, "d": 8, "dy": 0.5, "look": "corner tower roof across the alley" },
+    { "g": 4.5, "w": 6, "d": 7, "dy": 1, "x": 1.5, "look": "AC-unit roof" },
+    { "t": "coin", "at": 7.7, "x": -1.5, "y": 0.2, "look": "shimmy coin hanging under the next parapet" },
+    { "g": 8, "w": 7, "d": 7, "dy": 1.5, "grab": true, "coin": true, "look": "tower roof with antenna mast, chalk-white parapet lip" },
+
+    { "g": 3.5, "w": 7, "d": 8, "dy": 1, "look": "construction slab with yellow scaffolding poles",
+      "hint": "Stilladset! Hop op og grib det første rør – Mellemrum + W: sving videre fra rør til rør" },
+    { "t": "bar", "at": 1.8, "x": -2, "y": 2.4, "len": 4, "ang": 90, "look": "scaffold pipe 1, yellow with grip tape" },
+    { "t": "bar", "at": 4.0, "x": -2, "y": 2.4, "len": 4, "ang": 90, "look": "scaffold pipe 2" },
+    { "t": "bar", "at": 6.2, "x": -2, "y": 2.4, "len": 4, "ang": 90, "look": "scaffold pipe 3" },
+    { "t": "coin", "at": 4.0, "x": 0, "y": 1.0 },
+    { "g": 11.2, "w": 9, "d": 9, "dy": 0.5, "cp": true, "look": "wide concrete deck of the second tower" },
+
+    { "turn": -90, "g": 4, "w": 7, "d": 7, "dy": 1.5, "look": "roof with water tank" },
+    { "g": 4.5, "w": 8, "d": 8, "dy": 1, "look": "roof beside the glass facade",
+      "hint": "Vinduespudseren! Hop på gondolen, når den er lav – den løfter dig op til taget" },
+    { "g": 3, "w": 4.5, "d": 3.5, "h": 0.6, "dy": 2.5, "mv": { "ax": "y", "amp": 2.5, "per": 8, "ph": 0 }, "coin": true,
+      "look": "window-washer gondola hanging on cables on the facade" },
+    { "g": 3, "w": 9, "d": 8, "dy": 2, "look": "high roof with the gondola winch" },
+    { "t": "zip", "at": -1, "x": 0, "y": 3, "len": 8.5, "drop": 4.8, "look": "gondola cable used as a short zipline" },
+    { "g": 7, "w": 6, "d": 7, "dy": -4, "coin": true, "look": "bonus balcony roof with coins" },
+    { "t": "coin", "at": -2.5, "x": 0, "y": 1.3 }, { "t": "coin", "at": -4.5, "x": 0, "y": 1.3 },
+
+    { "g": 8.2, "w": 7, "d": 7, "dy": 1.5, "grab": true, "look": "tower roof, parapet with chalk-white lip" },
+    { "turn": -90, "g": 4, "shape": "cyl", "w": 6, "dy": 1.5, "look": "second water tower on stilts" },
+    { "g": 4, "w": 7, "d": 7, "dy": 1, "look": "roof with a satellite dish" },
+    { "t": "coin", "at": 7.9, "x": 3.5, "y": 0.2, "look": "shimmy coin hanging under the last parapet" },
+    { "g": 8.5, "w": 8, "d": 7, "dy": 1.5, "grab": true, "coin": true, "look": "glass tower roof, parapet with chalk-white lip" },
+
+    { "t": "finish", "g": 4, "w": 12, "d": 12, "dy": 1.5, "look": "helipad marked with a yellow H on the tallest roof" }
+  ] }

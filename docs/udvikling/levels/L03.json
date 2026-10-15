@@ -1,0 +1,357 @@
+{
+ "name": "Slikøerne",
+ "kit": "candy",
+ "theme": "candy",
+ "reward": 30,
+ "needsRope": false,
+ "needsDouble": false,
+ "chalkTip": false,
+ "skate": false,
+ "segs": [
+  {
+   "t": "start",
+   "w": 10,
+   "d": 10,
+   "look": "pink sugar plate, start landing"
+  },
+  {
+   "g": 3,
+   "w": 4.6,
+   "d": 9,
+   "look": "chocolate bar"
+  },
+  {
+   "g": 3.5,
+   "w": 7,
+   "shape": "cyl",
+   "dy": 0.5,
+   "coin": true,
+   "look": "pink-frosted donut with sprinkles"
+  },
+  {
+   "g": 4,
+   "w": 4.4,
+   "shape": "cyl",
+   "dy": 0.5,
+   "look": "macaron stack"
+  },
+  {
+   "t": "bounce",
+   "turn": 40,
+   "g": 3.2,
+   "w": 3.6,
+   "shape": "cyl",
+   "pow": 16,
+   "look": "marshmallow cushion",
+   "hint": "Skumfidus! Løb ind på puden - den kaster dig op i luften. Hold W, så flyver du fremad."
+  },
+  {
+   "g": 3,
+   "w": 7,
+   "d": 6.5,
+   "dy": 2.6,
+   "look": "wide chocolate slab"
+  },
+  {
+   "g": 3.5,
+   "w": 16,
+   "shape": "cyl",
+   "dy": -1.4,
+   "h": 2.6,
+   "look": "wedding cake base tier with frosting rim"
+  },
+  {
+   "t": "bounce",
+   "turn": 50,
+   "g": -14.2,
+   "w": 3.4,
+   "shape": "cyl",
+   "dy": 0.06,
+   "pow": 14,
+   "look": "marshmallow cushion on the tier",
+   "hint": "Bryllupskagen: hop på puden og hold W mod næste etage. Du lander lige under kanten - hænderne griber selv. Tryk W for at kravle op."
+  },
+  {
+   "t": "coin",
+   "at": 3.4,
+   "y": 4.2
+  },
+  {
+   "g": 3.8999999999999995,
+   "w": 12,
+   "shape": "cyl",
+   "dy": 4.54,
+   "h": 2.6,
+   "grab": true,
+   "look": "second wedding cake tier with frosting rim"
+  },
+  {
+   "t": "bounce",
+   "turn": 50,
+   "g": -11.2,
+   "w": 3.4,
+   "shape": "cyl",
+   "dy": 0.06,
+   "pow": 14,
+   "look": "marshmallow cushion on the tier"
+  },
+  {
+   "t": "coin",
+   "at": 3.4,
+   "y": 4.2
+  },
+  {
+   "g": 3.8999999999999995,
+   "w": 9.0,
+   "shape": "cyl",
+   "dy": 4.54,
+   "h": 2.6,
+   "grab": true,
+   "look": "third wedding cake tier with frosting rim"
+  },
+  {
+   "t": "bounce",
+   "turn": 50,
+   "g": -8.7,
+   "w": 3.4,
+   "shape": "cyl",
+   "dy": 0.06,
+   "pow": 15,
+   "look": "jelly cushion on the top tier"
+  },
+  {
+   "g": 4.1,
+   "w": 8,
+   "shape": "cyl",
+   "dy": 4.94,
+   "h": 2.6,
+   "grab": true,
+   "cp": true,
+   "coin": true,
+   "look": "cake top plate with a cherry ring, checkpoint"
+  },
+  {
+   "t": "crumble",
+   "turn": -60,
+   "g": 3.6,
+   "w": 3,
+   "d": 3,
+   "dy": -0.3,
+   "look": "butter biscuit",
+   "hint": "Kiks! De knækker et halvt sekund efter, du lander - bliv ved med at løbe!"
+  },
+  {
+   "t": "crumble",
+   "g": 4.4,
+   "w": 3,
+   "d": 3,
+   "dy": -0.3,
+   "x": -1.0,
+   "look": "chocolate-chip biscuit"
+  },
+  {
+   "t": "crumble",
+   "turn": 30,
+   "g": 4.6,
+   "w": 3,
+   "d": 3,
+   "dy": -0.3,
+   "look": "digestive biscuit"
+  },
+  {
+   "t": "crumble",
+   "g": 4.4,
+   "w": 3,
+   "d": 3,
+   "dy": -0.3,
+   "x": 1.2,
+   "look": "cracker biscuit"
+  },
+  {
+   "t": "crumble",
+   "turn": -35,
+   "g": 4.8,
+   "w": 3,
+   "d": 3,
+   "dy": -0.3,
+   "coin": true,
+   "look": "jam-filled shortbread"
+  },
+  {
+   "g": 4.4,
+   "w": 8,
+   "d": 6.5,
+   "dy": -0.5,
+   "cp": true,
+   "look": "wide chocolate platform with gold foil, checkpoint",
+   "hint": "Bolsjestokke! Hop op og grib fat. Tryk Mellemrum + W for at svinge videre til næste stok - til sidst venter en lakridsgynge."
+  },
+  {
+   "t": "bar",
+   "at": 1.2,
+   "y": 2.4,
+   "x": -1.5,
+   "len": 3,
+   "ang": 90,
+   "look": "red-and-white candy cane"
+  },
+  {
+   "t": "bar",
+   "at": 3.4,
+   "y": 2.4,
+   "x": -1.5,
+   "len": 3,
+   "ang": 90,
+   "look": "red-and-white candy cane"
+  },
+  {
+   "t": "bar",
+   "at": 5.6,
+   "y": 2.4,
+   "x": -1.5,
+   "len": 3,
+   "ang": 90,
+   "look": "red-and-white candy cane"
+  },
+  {
+   "t": "bar",
+   "at": 7.8,
+   "y": 2.4,
+   "x": -1.5,
+   "len": 3,
+   "ang": 90,
+   "look": "red-and-white candy cane"
+  },
+  {
+   "t": "coin",
+   "at": 4.5,
+   "y": 2.0
+  },
+  {
+   "t": "bar",
+   "at": 11.4,
+   "y": 2.4,
+   "x": -1.5,
+   "len": 3,
+   "ang": 90,
+   "sw": {
+    "len": 5,
+    "amp": 28,
+    "per": 3.2
+   },
+   "look": "licorice swing (trapeze)"
+  },
+  {
+   "t": "coin",
+   "at": 9.6,
+   "y": 2.2
+  },
+  {
+   "g": 16,
+   "w": 5,
+   "shape": "cyl",
+   "dy": -1.0,
+   "look": "pastel macaron"
+  },
+  {
+   "turn": -40,
+   "g": 4.5,
+   "w": 7,
+   "shape": "cyl",
+   "dy": -1.8,
+   "cp": true,
+   "look": "big pink donut"
+  },
+  {
+   "turn": -40,
+   "g": 5,
+   "w": 3.2,
+   "d": 7,
+   "dy": -2.2,
+   "look": "chocolate bar, long and narrow"
+  },
+  {
+   "g": 5.5,
+   "w": 5,
+   "shape": "cyl",
+   "dy": -2.2,
+   "coin": true,
+   "look": "glazed donut with sprinkles"
+  },
+  {
+   "turn": 70,
+   "g": 6,
+   "w": 4,
+   "shape": "cyl",
+   "dy": -2.4,
+   "look": "macaron stack"
+  },
+  {
+   "turn": 40,
+   "g": 5.5,
+   "w": 6.5,
+   "shape": "cyl",
+   "dy": -2,
+   "coin": true,
+   "look": "jam donut"
+  },
+  {
+   "g": 6,
+   "w": 7,
+   "d": 8,
+   "dy": -1.5,
+   "cp": true,
+   "look": "chocolate slab, run-up"
+  },
+  {
+   "t": "bounce",
+   "g": 3,
+   "w": 4,
+   "d": 4,
+   "pow": 22,
+   "look": "big jelly pad",
+   "hint": "Gelé-puden er ekstra stærk! Løb ind på den og hold W hele vejen over kløften."
+  },
+  {
+   "t": "coin",
+   "at": 6.2,
+   "y": 9.8
+  },
+  {
+   "g": 10,
+   "w": 6.5,
+   "shape": "cyl",
+   "dy": 1.5,
+   "look": "rainbow lollipop disc"
+  },
+  {
+   "g": 3.5,
+   "w": 2.4,
+   "d": 22,
+   "dy": -0.5,
+   "look": "long wafer bridge"
+  },
+  {
+   "t": "coin",
+   "at": -4,
+   "y": 1.3
+  },
+  {
+   "t": "coin",
+   "at": -10,
+   "y": 1.3
+  },
+  {
+   "t": "coin",
+   "at": -16,
+   "y": 1.3
+  },
+  {
+   "t": "finish",
+   "g": 3.5,
+   "w": 10,
+   "d": 10,
+   "look": "sugar-sprinkle finish plate with portal"
+  }
+ ]
+}

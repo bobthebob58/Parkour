@@ -46,6 +46,44 @@ module.exports = async (page, h) => {
   await page.keyboard.up('Space');
   check('Ingen uendelige hop (kun fra jorden)', peak - yb > 0.3 && peak - yb < 2.6, `(top +${(peak - yb).toFixed(2)} m)`);
 
+  // 3c. Double jump once bought: exactly one extra jump in the air
+  await ev(() => { skyhoj.abilities.owned.double = true; });
+  await page.waitForFunction(() => skyhoj.player.grounded, null, { timeout: 60000, polling: 50 });
+  await simWait(0.2);
+  const yd = await ev(() => skyhoj.player.body.position.y);
+  let peakD = yd;
+  await page.keyboard.down('Space');
+  const tD = await ev(() => skyhoj.level.time);
+  let kd = 0;
+  while ((await ev(() => skyhoj.level.time)) < tD + 1.3) {
+    if (kd++ % 2 === 0) { await page.keyboard.up('Space'); await page.keyboard.down('Space'); }
+    peakD = Math.max(peakD, await ev(() => skyhoj.player.body.position.y));
+  }
+  await page.keyboard.up('Space');
+  check('Dobbelthop: præcis ét ekstra hop i luften', peakD - yd > 2.6 && peakD - yd < 6, `(top +${(peakD - yd).toFixed(2)} m)`);
+  await ev(() => { skyhoj.abilities.owned.double = false; });
+
+  // 3d. Hands: jump at a ledge that is too high – the hands catch it, W climbs up
+  await ev(() => {
+    skyhoj.playDef({ name: 'Greb', kit: 'sten', theme: 'day', reward: 0, segs: [
+      { t: 'start', w: 10, d: 10 }, { g: 0.5, w: 6, d: 6, dy: 3.2 }, { t: 'finish', g: 3, w: 10, d: 10 }] });
+    const S = skyhoj, L = S.level, wall = L.platforms[1], b = S.player.body;
+    b.position.set(wall.body.position.x, L.platforms[0].def.top + 0.45, wall.body.position.z + wall.def.d / 2 + 2.2);
+    b.velocity.set(0, 0, 0); S.cam.yaw = 0; S.cam.pitch = 0.2;
+  });
+  await simWait(0.3);
+  await page.keyboard.down('KeyW');
+  await page.keyboard.press('Space');
+  let grabbed = false;
+  const tG = await ev(() => skyhoj.level.time);
+  while ((await ev(() => skyhoj.level.time)) < tG + 3) {
+    if (await ev(() => !!skyhoj.player.hang)) grabbed = true;
+    if (grabbed && await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1])) break;
+  }
+  await page.keyboard.up('KeyW');
+  check('Hænderne griber en for høj kant', grabbed);
+  check('W klatrer op over kanten', await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1]));
+
   // 4. Right-drag rotates the camera
   await h.wait(1200);
   const yawA = await ev(() => skyhoj.cam.yaw);
@@ -86,15 +124,15 @@ module.exports = async (page, h) => {
   const hudName = await ev(() => document.getElementById('hud-ability-name').textContent);
   check('HUD viser valgt evne', hudName === 'Kridt', `(${hudName})`);
 
-  // 7. Left click with rope at an anchor (level 8)
-  await ev(() => { skyhoj.startLevel(7); });
+  // 7. Left click with rope at an anchor (first level that needs the rope)
+  await ev(() => { skyhoj.startLevel(skyhoj.LEVELS.findIndex((d) => d.needsRope)); });
   await h.wait(500);
   await ev(() => {
-    const S = skyhoj, L = S.level, from = L.platforms[3], to = L.platforms[4];
+    const S = skyhoj, L = S.level, a = L.anchors[0], from = L.platforms[a.def.after];
     const b = S.player.body;
     b.position.set(from.body.position.x, from.def.top + 0.45, from.body.position.z);
     b.velocity.set(0, 0, 0);
-    const dx = to.body.position.x - b.position.x, dz = to.body.position.z - b.position.z;
+    const dx = a.pos.x - b.position.x, dz = a.pos.z - b.position.z;
     S.cam.yaw = Math.atan2(-dx, -dz); S.cam.pitch = 0.15;
     S.selectAbility('rope');
   });
@@ -145,20 +183,55 @@ module.exports = async (page, h) => {
   const back = await ev(() => { const s = skyhoj.level.spawn, b = skyhoj.player.body.position; return Math.hypot(s.x - b.x, s.z - b.z); });
   check('Banen nulstilles til start efter døden', back < 1.5, `(afstand til start ${back.toFixed(2)} m)`);
 
+  // 10b. Checkpoint: after touching one, lava sends you back to it (not to the start)
+  await ev(() => {
+    skyhoj.playDef({ name: 'Kontrolpunkt', kit: 'sten', theme: 'day', reward: 0, segs: [
+      { t: 'start', w: 10, d: 10 }, { g: 3, w: 6, d: 6 }, { g: 3, w: 6, d: 6, cp: true }, { t: 'finish', g: 3, w: 10, d: 10 }] });
+    const S = skyhoj, cp = S.level.platforms[2], b = S.player.body;
+    b.position.set(cp.body.position.x, cp.def.top + 1, cp.body.position.z); b.velocity.set(0, 0, 0);
+  });
+  await page.waitForFunction(() => skyhoj.level.checkpoint === skyhoj.level.platforms[2], null, { timeout: 20000 }).catch(() => {});
+  check('Kontrolpunkt aktiveres', await ev(() => skyhoj.level.checkpoint === skyhoj.level.platforms[2]));
+  await ev(() => { const b = skyhoj.player.body; b.position.set(b.position.x + 30, -45, b.position.z); b.velocity.set(0, -20, 0); });
+  await page.waitForFunction(() => skyhoj.game.state === 'dead', null, { timeout: 10000 }).catch(() => {});
+  await page.waitForFunction(() => skyhoj.game.state === 'playing', null, { timeout: 30000 }).catch(() => {});
+  const cpDist = await ev(() => { const c = skyhoj.level.platforms[2].body.position, b = skyhoj.player.body.position; return Math.hypot(c.x - b.x, c.z - b.z); });
+  check('Efter døden genstarter man ved kontrolpunktet', cpDist < 1, `(afstand ${cpDist.toFixed(2)} m)`);
+  await ev(() => { skyhoj.startLevel(0); });
+  await h.wait(400);
+
   // 11. Portal -> complete -> next level via click
   const coinsBefore = await ev(() => skyhoj.game.coins);
   await ev(() => { const c = skyhoj.level.portal.center; const b = skyhoj.player.body; b.position.set(c.x, skyhoj.level.portal.top + 0.5, c.z); b.velocity.set(0, 0, 0); });
   await page.waitForFunction(() => skyhoj.game.state === 'complete', null, { timeout: 15000 }).catch(() => {});
   check('Portalen fuldfører banen', await ev(() => skyhoj.game.state === 'complete'));
   const coinsAfter = await ev(() => skyhoj.game.coins);
-  check('Mønter udbetales for banen', coinsAfter - coinsBefore === 25, `(+${coinsAfter - coinsBefore})`);
+  const reward1 = await ev(() => skyhoj.LEVELS[0].reward);
+  check('Mønter udbetales for banen', coinsAfter - coinsBefore === reward1, `(+${coinsAfter - coinsBefore}, forventet ${reward1})`);
   const saved = await ev(() => JSON.parse(localStorage.getItem('skyhoj-parkour-v1')));
   check('Fremskridt gemmes', saved && saved.level === 1 && saved.coins === coinsAfter, JSON.stringify(saved && { level: saved.level, coins: saved.coins }));
   await page.click('#btn-next');
   await h.wait(800);
   check('"Næste bane" teleporterer til bane 2', await ev(() => skyhoj.game.state === 'playing' && skyhoj.game.levelIndex === 1));
   const bannerTxt = await ev(() => document.getElementById('level-banner-name').textContent);
-  check('Banebanner vises', bannerTxt === 'Himmeltrappen', `(${bannerTxt})`);
+  const name2 = await ev(() => skyhoj.LEVELS[1].name);
+  check('Banebanner vises', bannerTxt === name2, `(${bannerTxt})`);
+
+  // 11b. Skateboard level: W pushes the board
+  const skateIdx = await ev(() => skyhoj.LEVELS.findIndex((d) => d.skate));
+  if (skateIdx < 0) check('Skatebanen findes', false);
+  else {
+    await ev((i) => { skyhoj.startLevel(i); }, skateIdx);
+    await h.wait(600);
+    check('Skatebanen starter på skateboard', await ev(() => !!skyhoj.player.skate));
+    await page.keyboard.down('KeyW');
+    await simWait(1.2);
+    const skSpeed = await ev(() => Math.hypot(skyhoj.player.body.velocity.x, skyhoj.player.body.velocity.z));
+    await page.keyboard.up('KeyW');
+    check('W sætter fart på skateboardet', skSpeed > 5, `(${skSpeed.toFixed(1)} m/s)`);
+  }
+  await ev(() => { skyhoj.startLevel(1); });
+  await h.wait(400);
 
   // 12. Reload -> main menu offers "Fortsæt – bane 2"
   await page.reload();

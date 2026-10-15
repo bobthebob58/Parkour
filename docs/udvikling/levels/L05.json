@@ -1,0 +1,350 @@
+{
+ "name": "Luftskibshavnen",
+ "kit": "harbor",
+ "theme": "harbor",
+ "reward": 40,
+ "needsRope": false,
+ "needsDouble": false,
+ "chalkTip": false,
+ "skate": false,
+ "segs": [
+  {
+   "t": "start",
+   "w": 10,
+   "d": 10,
+   "look": "harbour pier with blue railings and bollards"
+  },
+  {
+   "g": 3,
+   "w": 5,
+   "d": 9,
+   "dy": 0.5,
+   "look": "plank gangway along the quay"
+  },
+  {
+   "g": 4,
+   "shape": "cyl",
+   "w": 4.2,
+   "dy": 0.5,
+   "turn": 25,
+   "look": "mooring-mast landing ring"
+  },
+  {
+   "g": 4.5,
+   "w": 3.6,
+   "d": 3.6,
+   "dy": 0.5,
+   "turn": -45,
+   "look": "stack of cargo crates",
+   "hint": "Nogle dæk bevæger sig. Vent på det rette øjeblik, og hop!"
+  },
+  {
+   "g": 4.5,
+   "w": 4,
+   "d": 4.5,
+   "mv": {
+    "ax": "z",
+    "amp": 2.2,
+    "per": 5.6,
+    "ph": 0.25
+   },
+   "look": "ferry deck gliding to and fro"
+  },
+  {
+   "g": 4.5,
+   "w": 8,
+   "d": 7,
+   "dy": 0.5,
+   "cp": true,
+   "coin": true,
+   "look": "wide cargo dock with crane base",
+   "hint": "Ballonerne stiger og falder. Hop, når kurven er i din højde – eller grib kanten med hænderne!"
+  },
+  {
+   "g": 5,
+   "shape": "cyl",
+   "w": 2.8,
+   "h": 1.0,
+   "dy": 1,
+   "turn": 50,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 5.6,
+    "ph": 0.0
+   },
+   "look": "wicker balloon basket"
+  },
+  {
+   "t": "coin",
+   "at": 2.25,
+   "y": 2.4,
+   "look": "coin on a balloon string"
+  },
+  {
+   "g": 4.5,
+   "shape": "cyl",
+   "w": 2.8,
+   "h": 1.0,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 5.6,
+    "ph": 0.33
+   },
+   "look": "wicker balloon basket"
+  },
+  {
+   "g": 4.5,
+   "shape": "cyl",
+   "w": 2.8,
+   "h": 1.0,
+   "dy": 1,
+   "grab": true,
+   "mv": {
+    "ax": "y",
+    "amp": 2,
+    "per": 5.6,
+    "ph": 0.67
+   },
+   "look": "wicker balloon basket"
+  },
+  {
+   "g": 4.5,
+   "w": 6,
+   "d": 6,
+   "dy": 0.5,
+   "turn": -20,
+   "look": "balloon quay with striped bollards"
+  },
+  {
+   "g": 4.5,
+   "w": 3,
+   "d": 13,
+   "dy": 0.5,
+   "turn": -40,
+   "look": "long timber jetty with a blue railing"
+  },
+  {
+   "t": "coin",
+   "at": -1.8,
+   "x": 1.97,
+   "y": -1.2,
+   "look": "coin hanging beside the jetty edge (chalk route)"
+  },
+  {
+   "t": "coin",
+   "at": -5.1,
+   "x": 1.97,
+   "y": -1.2,
+   "look": "coin hanging beside the jetty edge (chalk route)"
+  },
+  {
+   "t": "coin",
+   "at": -8.4,
+   "x": 1.97,
+   "y": -1.2,
+   "look": "coin hanging beside the jetty edge (chalk route)"
+  },
+  {
+   "t": "coin",
+   "at": -11.7,
+   "x": 1.97,
+   "y": -1.2,
+   "look": "coin hanging beside the jetty edge (chalk route)"
+  },
+  {
+   "g": 4.5,
+   "w": 4.6,
+   "d": 4.2,
+   "dy": 0.5,
+   "mv": {
+    "ax": "x",
+    "amp": 3,
+    "per": 5.0,
+    "ph": 0.0
+   },
+   "look": "zeppelin gondola deck"
+  },
+  {
+   "g": 5,
+   "w": 4.6,
+   "d": 4.2,
+   "dy": 0.5,
+   "turn": 15,
+   "mv": {
+    "ax": "x",
+    "amp": 3,
+    "per": 7.5,
+    "ph": 0.4
+   },
+   "look": "zeppelin gondola deck"
+  },
+  {
+   "g": 5,
+   "w": 6,
+   "d": 6,
+   "dy": 0.5,
+   "cp": true,
+   "coin": true,
+   "look": "zeppelin mooring platform",
+   "hint": "Langt hop! Hænderne griber kanten af taget. Tryk W for at klatre op."
+  },
+  {
+   "t": "coin",
+   "at": -3.5,
+   "y": 5.6,
+   "look": "coin on the belly of a small coin zeppelin (double-jump route)"
+  },
+  {
+   "t": "coin",
+   "at": -1.0,
+   "y": 5.6,
+   "look": "coin on the belly of a small coin zeppelin (double-jump route)"
+  },
+  {
+   "t": "coin",
+   "at": 1.5,
+   "y": 5.6,
+   "look": "coin on the belly of a small coin zeppelin (double-jump route)"
+  },
+  {
+   "g": 8.6,
+   "w": 5,
+   "d": 5,
+   "dy": 1,
+   "turn": 45,
+   "grab": true,
+   "look": "warehouse roof"
+  },
+  {
+   "t": "rot",
+   "g": 4,
+   "w": 5,
+   "spd": 0.5,
+   "look": "rotating top of a mooring mast"
+  },
+  {
+   "g": 4.5,
+   "shape": "cyl",
+   "w": 3.0,
+   "dy": 1.5,
+   "turn": -50,
+   "look": "mast cap with lantern ring"
+  },
+  {
+   "g": 4.5,
+   "w": 5,
+   "d": 5,
+   "dy": 0.5,
+   "turn": -15,
+   "hint": "Kasserne svinger på kranerne. Hop på, når de svinger mod dig!",
+   "look": "crane landing"
+  },
+  {
+   "t": "swing",
+   "g": 3.5,
+   "w": 2.6,
+   "d": 2.6,
+   "len": 7,
+   "amp": 22,
+   "per": 4.2,
+   "ph": 0.0,
+   "ax": "z",
+   "look": "cargo crate on a crane hook"
+  },
+  {
+   "t": "swing",
+   "g": 3.5,
+   "w": 2.6,
+   "d": 2.6,
+   "len": 7,
+   "amp": 22,
+   "per": 4.2,
+   "ph": 0.12,
+   "ax": "z",
+   "look": "cargo crate on a crane hook"
+  },
+  {
+   "t": "swing",
+   "g": 3.5,
+   "w": 2.6,
+   "d": 2.6,
+   "len": 7,
+   "amp": 22,
+   "per": 4.2,
+   "ph": 0.28,
+   "ax": "z",
+   "look": "cargo crate on a crane hook"
+  },
+  {
+   "g": 3.5,
+   "w": 7,
+   "d": 7,
+   "dy": 1.5,
+   "cp": true,
+   "coin": true,
+   "look": "crane dock"
+  },
+  {
+   "g": 3.5,
+   "w": 4.5,
+   "d": 7,
+   "dy": 1,
+   "turn": 35,
+   "hint": "Hop op på stangen under luftskibet! Den sejler dig over. Slip og hop (mellemrum + W), eller tryk S.",
+   "look": "boarding pier at the airship berth"
+  },
+  {
+   "t": "bar",
+   "at": 14,
+   "y": 2.4,
+   "x": -2.5,
+   "len": 5,
+   "ang": 90,
+   "mv": {
+    "ax": "z",
+    "amp": 6,
+    "per": 6.0,
+    "ph": 0.0
+   },
+   "look": "mooring bar under the bow of a drifting airship"
+  },
+  {
+   "g": 18,
+   "w": 7,
+   "d": 7,
+   "dy": -0.5,
+   "cp": true,
+   "look": "dock tower"
+  },
+  {
+   "t": "coin",
+   "at": 6,
+   "y": 0.8,
+   "look": "coin along the cargo cable"
+  },
+  {
+   "t": "coin",
+   "at": 12,
+   "y": 0.1,
+   "look": "coin along the cargo cable"
+  },
+  {
+   "t": "zip",
+   "at": -1.5,
+   "y": 3.2,
+   "len": 22,
+   "drop": 3.5,
+   "look": "cargo cable"
+  },
+  {
+   "t": "finish",
+   "g": 19.5,
+   "w": 10,
+   "d": 10,
+   "dy": -2.5,
+   "look": "gallery at the top of the striped lighthouse"
+  }
+ ]
+}
