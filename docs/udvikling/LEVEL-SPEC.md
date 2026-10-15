@@ -1,17 +1,19 @@
+> Oprindeligt skrevet som opgavebeskrivelse til underagenter under byggeriet af version 2. Stierne er opdateret til repoets struktur (`src/`, `tests/`, `docs/udvikling/`); se `CLAUDE.md` i roden for den aktuelle arbejdsgang.
+
 # Skyhøj Parkour – level authoring specification
 
 You design ONE level (sometimes two) of the 15-level Danish 3D parkour game in
 `/home/user/Parkour/game.js` (Three.js + cannon-es). A level is pure data: a JSON object with a list
 of segments that the engine (`buildLevelData` in game.js – read it) turns into platforms and helpers.
-Its look comes from a world kit (written by artists in `<SCR>/kits/<kit>.js`), its sky from the
+Its look comes from a world kit (written by artists in `src/verdener/<kit>.js`), its sky from the
 kit's theme. **Do NOT edit game.js, the kits or the harness.** You write
-`<SCR>/levels/L<NN>.json` (NN = 01..15) and prove it with the planner bot.
+`src/baner/L<NN>.json` (NN = 01..15) and prove it with the planner bot.
 
 The game owner asked (Danish): more varied levels; **longer jumps where the hands must catch and
 hold on**; buyable double jump; chalk only improves the hands' grip; not just hopping on stones –
 come up with good ideas; 15 levels; one level on a skateboard. The approved design for every level
-(world, sky, mechanics, set pieces, hands moments, difficulty) is in `<SCR>/dev/design-plan.json`
-(`result.levels[i]`) and `<SCR>/dev/briefs/<kit>.json`. Follow it closely: implement every named
+(world, sky, mechanics, set pieces, hands moments, difficulty) is in `docs/udvikling/design-plan.json`
+(`result.levels[i]`) and `docs/udvikling/briefs/<kit>.json`. Follow it closely: implement every named
 set piece – they are what makes each level memorable – then fill the rest with varied, fun flow.
 
 ## Level object
@@ -73,7 +75,7 @@ heading, `x` = lateral offset, `y` = height above its top.
   previous top, default −8; height `h`; radius `r`).
 - Do NOT use `gust` (rejected by the design).
 
-## What the runner can do (measured with the real physics – see <SCR>/dev/MEASURED.md)
+## What the runner can do (measured with the real physics – see docs/udvikling/MEASURED.md)
 
 Run 9 m/s, jump 10.5 m/s (≈2.3 m high), gravity 24. Hands catch ledges automatically when the
 player falls past an edge (window ≈0.55 m, reach ≈0.95 m; chalk +0.4 m), then W/Space climbs up.
@@ -81,7 +83,7 @@ Bars catch automatically too; Space+direction leaps to the next bar/platform (�
 5 m/s up), Space alone hops straight up (for vertically stacked bars), S drops. Grip lasts ≈4.2 s
 on a ledge, ≈5.5 s on a bar (×0.77 while moving; ×2 drain on icy/slick ledges); it refills on the
 ground. Double jump: a second jump in the air (9.8 m/s), resets on landing/grab/rope.
-Exact gap tables: `<SCR>/dev/MEASURED.md` (max plain gap per height difference, double jump, bar
+Exact gap tables: `docs/udvikling/MEASURED.md` (max plain gap per height difference, double jump, bar
 spacing, vent/bounce heights). Use them while designing, then prove it with the bot.
 
 ## Design rules (from the approved plan)
@@ -122,8 +124,8 @@ crumble/bounce. 20 coins on the racing line.
 ## Prove it with the planner bot (mandatory)
 
 ```
-cd <SCR>/harness && GAME_DIR=/home/user/Parkour Q=debug LEVEL_FILE=<SCR>/levels/L<NN>.json \
-  INV=<items> VERBOSE=1 timeout 1200 node run.js bot2.js
+cd tests && LEVEL_FILE=../src/baner/L<NN>.json \
+  INV=<items> VERBOSE=1 timeout 1200 node run.js bot.js
 ```
 `INV`: L1–L7 empty (`INV=`), L8–L10 `INV=rope`, L11–L15 `INV=rope,double`. The bot plays the whole
 level with the real physics (it runs, jumps, catches ledges, climbs, moves along bars, leaps, rides
@@ -134,7 +136,7 @@ the failure reasons per variant (`DEBUG_STAGE=<k>` prints every variant of stage
 Also prove the item requirements: L8 with `INV=` must FAIL (rope needed), L11 with `INV=rope` must FAIL
 (double jump needed) – apply the same check to every level that sets needsRope/needsDouble.
 
-Screenshots of the route in the real kit: add `KITS_DIR=<SCR>/kits SHOTS=<SCR>/preview/L<NN>`
+Screenshots of the route in the real kit: add `KITS_DIR=../src/verdener SHOTS=/tmp/forhaandsvisning/L<NN>`
 (slow – software rendering on a shared 4-CPU machine; one process at a time, timeout 1800). Look at
 them with Read: does the level look like the plan's world, varied and readable?
 

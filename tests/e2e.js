@@ -1,7 +1,13 @@
 // Real-time end-to-end test using real browser input events.
 module.exports = async (page, h) => {
   const results = [];
-  const check = (name, ok, extra = '') => { results.push(`${ok ? 'OK  ' : 'FAIL'} ${name} ${extra}`); };
+  const start = Date.now();
+  // Hvert tjek skrives straks (med tiden siden start), så en fejl midt i testen kan læses i loggen
+  const check = (name, ok, extra = '') => {
+    const line = `${ok ? 'OK  ' : 'FAIL'} ${name} ${extra}`;
+    results.push(line);
+    console.log(`${line} [${Math.round((Date.now() - start) / 1000)} s]`);
+  };
   const ev = (fn, arg) => page.evaluate(fn, arg);
   // wait for `secs` of *simulated* time (software rendering runs at a few FPS)
   const simWait = async (secs) => { const t0 = await ev(() => skyhoj.level.time); await page.waitForFunction((t) => skyhoj.level.time >= t, t0 + secs, { timeout: 120000, polling: 50 }); };
@@ -250,6 +256,6 @@ module.exports = async (page, h) => {
 
   const errors = h.logs.filter((l) => l.startsWith('[pageerror]') || (l.startsWith('[error]') && !l.includes('Failed to load resource')));
   check('Ingen JavaScript-fejl i konsollen', errors.length === 0, errors.join(' | '));
-  console.log(results.join('\n'));
+  console.log(`${results.filter((r) => r.startsWith('OK')).length}/${results.length} kontroller OK`);
   if (results.some((r) => r.startsWith('FAIL'))) throw new Error('End-to-end-test fejlede');
 };

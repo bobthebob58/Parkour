@@ -295,21 +295,29 @@ Testene fra version 1 fandt allerede dengang reelle fejl:
 ```
 index.html   Import map (Three.js + cannon-es fra CDN), HUD og alle menuskærme
 style.css    HUD, hotbar, grebsmåler, menuer, butik, banevalg (glas-look, responsivt)
-game.js      Hele spillet (ca. 12.800 linjer), opdelt i afsnit:
-               1  Konfiguration          9c  De 15 verdenssæt (ét pr. bane)
-               2  Danske tekster         10  Baneobjekter i drift (bevægelige, drejeskiver, ventiler …)
-               3  Himmel-temaer          11  Spilleren (fysik, hænder, dobbelthop, skateboard, løberen)
-               4  De 15 baner            12  Input
-               5  Hjælpefunktioner       13  Kamera
-               6  Teksturer              14  Evner (kridt og reb)
-               7  Himmel, lava, lys      15  Lyd (procedurel WebAudio)
-               8  Fysikverden            16  Brugerflade
-               9  Banebygger             17  Gem / indlæs
-               9b Verdenssæt-systemet    18  Spiltilstand og hovedløkke
+game.js      Hele spillet i én fil (ca. 12.800 linjer). Den BYGGES af src/ – ret aldrig i den direkte
+src/motor     Motoren, ét afsnit pr. fil:
+               00 Start                  09b Verdenssæt-systemet
+               01 Konfiguration          10  Baneobjekter i drift (bevægelige, drejeskiver, ventiler …)
+               02 Danske tekster         11  Spilleren (fysik, hænder, dobbelthop, skateboard)
+               03 Himmel-temaer          12  Input
+               04 Banernes format        13  Kamera
+               05 Hjælpefunktioner       14  Evner (kridt og reb)
+               06 Teksturer              15  Lyd (procedurel WebAudio)
+               07 Himmel, lava, lys      16  Brugerflade
+               08 Fysikverden            17  Gem / indlæs
+               09 Banebygger             18  Spiltilstand og hovedløkke
+src/baner     De 15 baner som data (L01.json … L15.json)
+src/verdener  De 15 verdenssæt + fælles værktøjskasse (_lib.js)
+src/figur     Løberen (figur.js)
+tools/byg.js  Samler src/ til game.js
 docs/images     Skærmbilleder brugt i denne README
-docs/udvikling  Specifikationer, målinger, verdenssæt, baner og figur som separate kildefiler
+docs/udvikling  Specifikationer, målinger og designnoter fra udviklingen
 tests/          Testrobot, end-to-end-test og skærmbillede-scripts
+CLAUDE.md       Arbejdsgang og projektkort for Claude (og andre udviklere)
 ```
+
+**Byg spillet efter en ændring i `src/`:** `node tools/byg.js`. Det skriver `game.js`, som committes sammen med ændringen, så spillet stadig kan startes med et dobbeltklik på `index.html`. `node tools/byg.js --tjek` fejler, hvis `game.js` ikke svarer til `src/`. Det tjekker GitHub også ved hver ændring.
 
 - **Fysikken:**
   - Tidsskridtet er fast: 1/120 s.
@@ -319,7 +327,7 @@ tests/          Testrobot, end-to-end-test og skærmbillede-scripts
   - *Coyote time:* man kan hoppe 0,11 s efter at have forladt en kant.
   - En hop-buffer og variabel hophøjde.
   - En rund skygge under spilleren, der viser, hvor man lander.
-- **Verdenssæt:** Hvert sæt registrerer sig som `window.SKYHOJ_KITS[id]` og leverer funktioner, der bygger platforme, stænger, svævebaner, krogpunkter og pynt. Banen beskriver kun *hvor* tingene er. Verdenssættet bestemmer, *hvordan* de ser ud. Kildefilerne ligger i [`docs/udvikling/kits`](docs/udvikling/kits) og samles ind i `game.js` med `docs/udvikling/assemble.py`.
+- **Verdenssæt:** Hvert sæt registrerer sig som `window.SKYHOJ_KITS[id]` og leverer funktioner, der bygger platforme, stænger, svævebaner, krogpunkter og pynt. Banen beskriver kun *hvor* tingene er. Verdenssættet bestemmer, *hvordan* de ser ud. Kildefilerne ligger i [`src/verdener`](src/verdener).
 - **Lyd:** Alle lydeffekter syntetiseres med WebAudio, så der er ingen lydfiler.
 - **Virker fra disken:** `index.html` indlæser bibliotekerne som ES-moduler og starter derefter `game.js` som et klassisk script, fordi browsere blokerer lokale modulfiler under `file://`.
 - **Udvikler-hooks:** Med `?debug` i adressen får testene adgang til `window.skyhoj`. Det giver bl.a. gem/gendan af hele simulationen, frys og fri kamera.
@@ -358,5 +366,7 @@ Bane 14 Himmelhavet          BESTÅET   uden dobbelthop: umulig ✓
 Bane 15 Nordlystårnet        BESTÅET   uden dobbelthop: umulig ✓
 End-to-end: 36/36 kontroller OK – ingen JavaScript-fejl
 ```
+
+Testene køres også automatisk på GitHub ved hvert push og hver pull request (se [`.github/workflows/test.yml`](.github/workflows/test.yml)): byggetjek, e2e og robotten fordelt på tre parallelle job med fem baner hver.
 
 Se [`tests/README.md`](tests/README.md) for detaljer.

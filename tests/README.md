@@ -15,8 +15,8 @@ npx playwright install chromium   # hvis Playwright ikke allerede har en Chromiu
 | `npm run bot` | Robotten på én bane med en detaljeret rapport: `LEVEL=8 VERBOSE=1 npm run bot`. Se kommentaren øverst i `bot.js` for alle indstillinger. |
 | `npm run billeder` | Startudsigt og perspektiv for alle 15 baner til `../docs/images`. |
 | `npm run skaerme` | Portalen, døden i lavaen, bane fuldført, butik, pause, sejr og hovedmenuen til `../docs/images`. |
-| `npm run verden` | Fotograferer et verdenssæt med alle dets platformtyper: `KIT_FILE=../docs/udvikling/kits/candy.js KIT_ID=candy npm run verden`. |
-| `npm run figur` | Fotograferer løberen i alle stillinger (løb, hop, hænder, skateboard, reb). |
+| `npm run verden` | Fotograferer et verdenssæt med alle dets platformtyper: `KIT_FILE=../src/verdener/candy.js KIT_ID=candy npm run verden`. |
+| `npm run figur` | Fotograferer løberen i alle stillinger (løb, hop, hænder, skateboard, reb). Med `CHAR_FILE=../src/figur/figur.js` testes en ændret figur uden at bygge spillet først. |
 | `npm run maal` | Måler med robotten, hvad fysikken tillader (hoplængder med og uden greb osv.). Resultatet ligger i `../docs/udvikling/MEASURED.md`. |
 
 **`npm run baner`** tjekker for hver bane:
@@ -50,3 +50,4 @@ Miljøvariabler:
 - `W`/`H`: vinduesstørrelse
 - `OUT_DIR`: hvor billeder gemmes
 - `LEVELS`: begræns baner
+- `TIMEOUT_MS`: grænse for klik og andre handlinger (standard 120 s, fordi software-WebGL gør siden langsom)

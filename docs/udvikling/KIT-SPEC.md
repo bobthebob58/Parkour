@@ -1,3 +1,5 @@
+> Oprindeligt skrevet som opgavebeskrivelse til underagenter under byggeriet af version 2. Stierne er opdateret til repoets struktur (`src/`, `tests/`, `docs/udvikling/`); se `CLAUDE.md` i roden for den aktuelle arbejdsgang.
+
 # Skyhøj Parkour – World Kit specification
 
 The game (`/home/user/Parkour/game.js`, Three.js r160 + cannon-es) builds every level from
@@ -11,7 +13,7 @@ kit and the fallback. Also read `makeKitContext`, `courseHelpers`, `Level.buildP
 
 ## File format
 
-One file per kit: `<SCRATCH>/kits/<id>.js`, a self-contained classic script (no imports):
+One file per kit: `src/verdener/<id>.js`, a self-contained classic script (no imports):
 
 ```js
 (function () {
@@ -164,8 +166,8 @@ contrasting with the background). Danger reads as danger (cracks, glowing heat, 
 Preview tool (headless Chromium, software GL – slow, ~1–3 FPS, be patient, timeout 400 s):
 
 ```
-cd <SCRATCH>/harness && GAME_DIR=/home/user/Parkour Q=debug KIT_FILE=<SCRATCH>/kits/<id>.js KIT_ID=<id> \
-  OUT=<SCRATCH>/preview/<id> timeout 400 node run.js preview-kit.js
+cd tests && KIT_FILE=../src/verdener/<id>.js KIT_ID=<id> \
+  OUT=/tmp/forhaandsvisning/<id> timeout 400 node run.js preview-kit.js
 ```
 
 It builds a showcase level with every platform type (plus a moving bar, slick and grab ledges,
@@ -179,7 +181,7 @@ Look at every screenshot with the Read tool, fix what looks wrong, repeat (at le
 `ERRORS` must be `none`. Also syntax-check: `node -e "new Function(require('fs').readFileSync('<file>','utf8'))"`.
 Run only ONE preview process at a time (the machine is shared with other agents).
 
-When done, also write `<SCRATCH>/kits/<id>.summary.json`:
+When done, also write `src/verdener/<id>.summary.json`:
 `{"id","name","variants":[{"name","types","shape","sizes","look"}],"barVariants","themeSummary","decorSummary","meshes","tris","knownIssues"}`
 – the variants list is what the level authors will read, so give precise guidance (types, box/cyl,
 size ranges, look).

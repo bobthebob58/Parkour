@@ -1,3 +1,5 @@
+> Oprindeligt skrevet som opgavebeskrivelse til underagenter under byggeriet af version 2. Stierne er opdateret til repoets struktur (`src/`, `tests/`, `docs/udvikling/`); se `CLAUDE.md` i roden for den aktuelle arbejdsgang.
+
 # Skyhøj Parkour – realistic runner specification
 
 The game (`/home/user/Parkour/game.js`, Three.js r160) currently draws the player with a toy-like
@@ -7,7 +9,7 @@ realistic, well-proportioned, well-animated adult parkour runner – procedural 
 external models/textures/network), standard Three.js r160 classes only (no addons such as
 BufferGeometryUtils/GLTFLoader – they are not loaded).
 
-**Do NOT edit game.js.** Write `<SCRATCH>/character/character.js`, a classic script defining
+**Do NOT edit game.js.** Write `src/figur/figur.js`, a classic script defining
 
 ```js
 window.createCharacterModule = function (THREE) {
@@ -72,7 +74,7 @@ gear: { gloves, chalk, rope, helmet } – owned equipment to show on the body: f
 
 ## What "realistic" means here (from the design plan – implement as much as possible)
 
-See `<SCRATCH>/dev/briefs/character.json` for the full list. Priorities, in order:
+See `docs/udvikling/briefs/character.json` for the full list. Priorities, in order:
 1. **Proportions & anatomy**: 1.80 m tall, ~7.5 heads, shoulders wider than hips, hips at ~0.95 m,
    long legs, neck + trapezius, tapered torso (LatheGeometry flattened front/back), real joint
    hierarchy (pelvis › spine › chest › neck › head; shoulder › upper arm › forearm › hand with palm,
@@ -107,8 +109,8 @@ Colour identity: keep the existing palette so screenshots/docs stay recognisable
 ## Verify (mandatory)
 
 ```
-cd <SCRATCH>/harness && GAME_DIR=/home/user/Parkour Q=debug CHAR_FILE=<SCRATCH>/character/character.js \
-  OUT=<SCRATCH>/preview/char timeout 400 node run.js preview-char.js
+cd tests && CHAR_FILE=../src/figur/figur.js \
+  OUT=/tmp/forhaandsvisning/char timeout 400 node run.js preview-char.js
 ```
 
 Saves `char-a-run-{side,front}.png` (idle + 4 run phases), `char-b-air-*` (rise, fall, flip 0.3,
@@ -121,7 +123,7 @@ no intersecting body parts, readable silhouette. Syntax-check with
 `node -e "new Function(require('fs').readFileSync('<file>','utf8'))"`. `ERRORS` must be `none`.
 Run only ONE preview process at a time (the machine is shared by many agents). The software
 renderer is slow (~1–3 FPS); use timeout 900; `W=960 H=540` speeds up iteration rounds.
-When done write `<SCRATCH>/character/summary.json`: `{"file","meshes","tris","lines","features":[...],"knownIssues"}`.
+When done write `docs/udvikling/figur-oversigt.json`: `{"file","meshes","tris","lines","features":[...],"knownIssues"}`.
 
-Also run the live-game check: `CHAR_FILE=… node run.js <SCRATCH>/harness/char-live.js` (if it exists)
+Also run the live-game check: `CHAR_FILE=… node run.js char-live.js` (if it exists)
 which plays a few seconds of real movement with your character.
