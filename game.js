@@ -72,6 +72,9 @@ const CFG = {
     moveMul: 1.3,            // det koster ekstra greb at flytte sig
     regen: 1.6,              // greb genvindes pr. sekund på fast grund
     cooldown: 0.28,          // pause før man kan gribe igen efter at have sluppet
+    leapFwd: 6.5,            // spring fra en stang: fart fremad …
+    leapUp: 5,               // … og opad (lavt, så hænderne kan gribe næste stang i farten)
+    hopUp: 7.6,              // hop lige op fra en stang (uden retning)
   },
   // Kridt påvirker KUN hænderne
   chalk: { duration: 8, cooldown: 12, cooldownUpgraded: 6, drainMul: 0.25, reachBonus: 0.4, windowBonus: 0.35 },
@@ -1321,12 +1324,14 @@ const NO_LEDGE = new Set(['ramp', 'rail', 'boost']);
 
 function buildLevelData(def) {
   const plats = [], anchors = [], coins = [], bars = [], winds = [], zips = [], gusts = [];
-  let heading = 0, prev = null, seed = 7;
+  let heading = 0, prev = null, seed = 7, seq = -1;
   for (const s of def.segs) {
+    seq++;
     const t = s.t || 'p';
     if (t === 'anchor' || t === 'coin' || t === 'bar' || t === 'wind' || t === 'zip' || t === 'gust') {
       const f = fwdVec(heading), r = rightVec(heading);
       const e = footprintSupport(prev, f.x, f.z), lat = s.x || 0;
+      const after = prev.index; // hjælperen hører til overgangen fra platform `after` til den næste (seq = rækkefølge)
       const bx = prev.x + f.x * (e + (s.at ?? 0)) + r.x * lat;
       const bz = prev.z + f.z * (e + (s.at ?? 0)) + r.z * lat;
       if (t === 'bar') {
@@ -1334,7 +1339,7 @@ function buildLevelData(def) {
         const yaw = heading + (s.ang || 0) * DEG, dv = fwdVec(yaw), len = s.len ?? 4;
         bars.push({
           x: bx + dv.x * len / 2, y: prev.top + (s.y ?? 2.6), z: bz + dv.z * len / 2,
-          dx: dv.x, dz: dv.z, yaw, len, r: s.r ?? 0.06, v: s.v || null, index: bars.length,
+          dx: dv.x, dz: dv.z, yaw, len, r: s.r ?? 0.06, v: s.v || null, index: bars.length, after, seq,
           move: s.mv ? makeMove(s.mv, heading) : null, // stang, der flytter sig (fx under et luftskib)
           // Trapez: stangen hænger i reb og svinger som et pendul
           swing: s.sw ? makeSwing({ ax: s.sw.ax || 'z', len: s.sw.len ?? 5, amp: s.sw.amp ?? 30, per: s.sw.per ?? 3, ph: s.sw.ph ?? 0 }, heading) : null,
@@ -1345,20 +1350,20 @@ function buildLevelData(def) {
         const ay = prev.top + (s.y ?? 3.2);
         zips.push({
           ax: bx, ay, az: bz, bx: bx + dv.x * len, by: ay - drop, bz: bz + dv.z * len,
-          len, drop, dx: dv.x, dz: dv.z, yaw, v: s.v || null, index: zips.length,
+          len, drop, dx: dv.x, dz: dv.z, yaw, v: s.v || null, index: zips.length, after, seq,
         });
       } else if (t === 'gust') {
         // Vindstød: et område, der med mellemrum skubber spilleren sidelæns
         const yaw = heading + (s.ang ?? 90) * DEG, dv = fwdVec(yaw);
         gusts.push({
           x: bx, y: prev.top + (s.y ?? -2), z: bz, w: s.w ?? 8, d: s.d ?? 10, h: s.h ?? 12, yaw: heading,
-          dx: dv.x, dz: dv.z, power: s.pow ?? 14, per: s.per ?? 4, duty: s.duty ?? 0.5, ph: s.ph ?? 0,
+          dx: dv.x, dz: dv.z, power: s.pow ?? 14, per: s.per ?? 4, duty: s.duty ?? 0.5, ph: s.ph ?? 0, after, seq,
         });
       } else if (t === 'wind') {
         // Opvind (søjle af luft/damp), der løfter spilleren
-        winds.push({ x: bx, y: prev.top + (s.y ?? -8), z: bz, r: s.r ?? 1.8, h: s.h ?? 12, power: s.pow ?? CFG.vent.power });
+        winds.push({ x: bx, y: prev.top + (s.y ?? -8), z: bz, r: s.r ?? 1.8, h: s.h ?? 12, power: s.pow ?? CFG.vent.power, after, seq });
       } else {
-        const item = { x: bx, y: prev.top + s.y, z: bz, move: s.ax ? makeMove(s, heading) : null };
+        const item = { x: bx, y: prev.top + s.y, z: bz, move: s.ax ? makeMove(s, heading) : null, after, seq };
         (t === 'anchor' ? anchors : coins).push(item);
       }
       continue;
@@ -1371,7 +1376,7 @@ function buildLevelData(def) {
     const p = {
       type: t, shape, w, d, yaw: heading + (s.yaw || 0) * DEG, heading, index: plats.length,
       gap: s.g ?? 3, rope: !!s.rope, grab: !!s.grab, dbl: !!s.dbl, v: s.v || null, seed,
-      slick: !!s.slick, lip: s.lip ?? true,
+      slick: !!s.slick, lip: s.lip ?? true, hint: s.hint || null,
     };
     if (!prev) { p.x = 0; p.z = 0; p.top = 0; }
     else {
@@ -1510,8 +1515,49 @@ function markSharedGpu() {
   for (const t of Object.values(TEX)) (Array.isArray(t) ? t : [t]).forEach((x) => SHARED_GPU.add(x));
 }
 
+// Hjælpere til sættenes kulisser: hold banen fri, og find ud af, hvor dybt noget må hænge ned under en platform
+function courseHelpers(data) {
+  const pr = (p) => (p.shape === 'cyl' ? p.w / 2 : Math.hypot(p.w, p.d) / 2);
+  const segs = [];
+  for (let i = 0; i + 1 < data.plats.length; i++) {
+    const a = data.plats[i], b = data.plats[i + 1];
+    segs.push({ ax: a.x, az: a.z, ay: a.top, ar: pr(a), bx: b.x, bz: b.z, by: b.top, br: pr(b) });
+  }
+  for (const b of data.bars) {
+    segs.push({ ax: b.x - (b.dx * b.len) / 2, az: b.z - (b.dz * b.len) / 2, ay: b.y - 2, ar: 1.5, bx: b.x + (b.dx * b.len) / 2, bz: b.z + (b.dz * b.len) / 2, by: b.y - 2, br: 1.5 });
+  }
+  for (const z of data.zips) segs.push({ ax: z.ax, az: z.az, ay: z.ay - 2, ar: 1.5, bx: z.bx, bz: z.bz, by: z.by - 2, br: 1.5 });
+  return {
+    // true, hvis punktet (x, y, z) ligger mindst `margin` meter fra banens "korridor" (platforme, stænger, svævebaner)
+    clearOfCourse(x, y, z, margin = 4) {
+      for (const s of segs) {
+        const dx = s.bx - s.ax, dz = s.bz - s.az, L2 = dx * dx + dz * dz;
+        const t = L2 > 0 ? clamp(((x - s.ax) * dx + (z - s.az) * dz) / L2, 0, 1) : 0;
+        const cy = s.ay + (s.by - s.ay) * t;
+        if (y < cy - 9 || y > cy + 12) continue;
+        const r = s.ar + (s.br - s.ar) * t + margin;
+        const hx = s.ax + dx * t - x, hz = s.az + dz * t - z;
+        if (hx * hx + hz * hz < r * r) return false;
+      }
+      return true;
+    },
+    // Hvor mange meter under platformens bund er der frit (før en anden del af banen eller lavaen)?
+    freeBelow(p) {
+      const bottom = p.top - p.h, rp = pr(p);
+      let free = bottom - CFG.lavaY + 2;
+      for (const q of data.plats) {
+        if (q === p || q.top >= bottom) continue;
+        if (Math.hypot(q.x - p.x, q.z - p.z) < rp + pr(q) + 2.5) free = Math.min(free, bottom - (q.top + 4.5));
+      }
+      return Math.max(0, free);
+    },
+  };
+}
+
 function makeKitContext(level) {
   return {
+    ...courseHelpers(level.data),
+    lavaY: CFG.lavaY,
     THREE, TEX, MAT, DEG, clamp, lerp, damp, mulberry32,
     rng: mulberry32(4242 + level.index * 131),
     boxGeometry, cylGeometry, rockGeometry, makeCanvas, toTexture, paintPixels, tileNoise, textTexture,
@@ -2370,6 +2416,7 @@ class Particles {
   }
 
   emit(x, y, z, vx, vy, vz, color, size, life, grav = 0, drag = 0) {
+    if (debug.quiet) return;
     const i = this.cursor;
     this.cursor = (this.cursor + 1) % this.max;
     this.pos[i * 3] = x; this.pos[i * 3 + 1] = y; this.pos[i * 3 + 2] = z;
@@ -2966,6 +3013,9 @@ function hangControl(dt, w) {
       h.shimmy = along;
     }
     if (player.jumpBuffer > 0) { player.jumpBuffer = 0; jumpOffBar(w); return; }
+    // S (uden at det flytter en langs stangen) = giv slip
+    const k = input.keys;
+    if ((k.KeyS || k.ArrowDown) && !(k.KeyW || k.ArrowUp) && Math.abs(along) < 0.3) { releaseHang('drop'); return; }
   } else {
     if (Math.abs(along) > 0.3 && Math.abs(toward) < 0.6) {
       const d = h.plat.def, step = along * H.shimmy * dt;
@@ -3012,12 +3062,13 @@ function releaseHang(reason) {
 }
 
 function jumpOffBar(w) {
-  let dx = w.x, dz = w.z;
-  if (!dx && !dz) { dx = -Math.sin(cam.yaw); dz = -Math.cos(cam.yaw); }
+  // Med retning: et langt fremadspring (til næste stang eller en platform).
+  // Uden retning: lige op (til en stang lige over, fx en ræstige i en mast).
+  const dir = w.x || w.z, H = CFG.hang;
   // Stangens egen fart (trapez/bevægelig stang) følger med, så man kan kaste sig langt
   const F = hangFrame(player.hang), bvx = F.vx, bvy = F.vy, bvz = F.vz;
   releaseHang('jump');
-  player.body.velocity.set(dx * 5.5 + bvx, 7.5 + Math.max(0, bvy) * 0.6, dz * 5.5 + bvz);
+  player.body.velocity.set(w.x * H.leapFwd + bvx, (dir ? H.leapUp : H.hopUp) + Math.max(0, bvy) * 0.6, w.z * H.leapFwd + bvz);
   player.jumping = true;
   audio.play('jump');
 }
@@ -3156,6 +3207,7 @@ function postStep(dt, playing) {
   if (grounded && !player.wasGrounded) onLand(prevVy);
   if (grounded) {
     const plat = player.groundPlat;
+    if (plat.def.hint && !plat.hintShown) { plat.hintShown = true; toast(plat.def.hint, 'gold', 5000); } // banens egne tips
     if (plat.type === 'bounce') {
       b.velocity.y = plat.def.pow;
       player.grounded = false;
@@ -3771,7 +3823,7 @@ const audio = {
     s.stop(t0 + dur + 0.05);
   },
   play(name, k = 1) {
-    if (!this.ctx || !this.enabled) return;
+    if (!this.ctx || !this.enabled || debug.quiet) return;
     switch (name) {
       case 'jump': this.tone(300, 0.14, { type: 'square', vol: 0.05, to: 560 }); this.noise(0.08, { vol: 0.08, freq: 900 }); break;
       case 'land': this.noise(0.16, { vol: 0.25 * k, freq: 500, to: 120 }); break;
@@ -3846,6 +3898,7 @@ function setText(id, text) {
 }
 
 function toast(msg, kind = '', dur = 2400) {
+  if (debug.quiet) return;
   const box = $('toasts');
   for (const el of box.children) {
     if (el._msg === msg && !el.classList.contains('out')) { clearTimeout(el._timer); el._timer = setTimeout(() => removeToast(el), dur); return; }
@@ -4037,6 +4090,7 @@ function refreshMenu() {
    ===================================================================== */
 const SAVE_KEY = 'skyhoj-parkour-v1';
 function saveGame() {
+  if (debug.quiet) return;
   storage.set(SAVE_KEY, JSON.stringify({
     v: 1, level: game.savedLevel, coins: game.coins, owned: abilities.owned, selected: abilities.selected,
     deaths: game.deaths, totalTime: Math.round(game.totalTime), sound: game.sound,
@@ -4223,7 +4277,7 @@ function fixedStep(dt) {
 }
 
 const simulateStates = new Set(['playing', 'dead', 'portal', 'menu', 'complete', 'victory']);
-const debug = { freeze: false, freeCam: false }; // kun til automatiske tests/skærmbilleder (?debug)
+const debug = { freeze: false, freeCam: false, quiet: false }; // kun til automatiske tests/skærmbilleder (?debug)
 let lastT = performance.now(), acc = 0, elapsed = 0;
 
 function frame(now) {
@@ -4408,6 +4462,64 @@ function boot() {
       get CHARACTER() { return CHARACTER; },
       setLevelDef(i, def) { LEVELS[i] = def; },
       showcaseDef,
+      // Gem/gendan hele simulationens tilstand (testrobotten prøver handlinger af og spoler tilbage)
+      snapshot() {
+        const v3 = (v) => ({ x: v.x, y: v.y, z: v.z });
+        const q4 = (q) => ({ x: q.x, y: q.y, z: q.z, w: q.w });
+        const b = player.body, P = player, A = abilities;
+        const keys = ['grounded', 'wasGrounded', 'groundPlat', 'coyote', 'jumpBuffer', 'jumpCooldown', 'jumping', 'knockCooldown',
+          'facing', 'runPhase', 'squash', 'lastVy', 'stepTimer', 'grip', 'grabCooldown', 'airJumps', 'flipT'];
+        const pl = {};
+        for (const k of keys) pl[k] = P[k];
+        return {
+          game: { state: game.state, coins: game.coins, levelCoins: game.levelCoins, deaths: game.deaths, deadTimer: game.deadTimer, portalTimer: game.portalTimer, levelTime: game.levelTime },
+          body: { p: v3(b.position), v: v3(b.velocity) },
+          pl, gv: v3(P.groundVel), gn: v3(P.groundNormal),
+          hang: P.hang ? { ...P.hang, climb: P.hang.climb ? { ...P.hang.climb } : null } : null,
+          skate: P.skate ? { ...P.skate, grind: P.skate.grind ? { ...P.skate.grind } : null } : null,
+          abil: { chalkActive: A.chalkActive, chalkCooldown: A.chalkCooldown, selected: A.selected, ropeShoot: A.ropeShoot, target: A.target,
+            rope: A.rope ? { ...A.rope, point: A.rope.point.clone(), vel: A.rope.vel.clone(), local: A.rope.local ? A.rope.local.clone() : null } : null },
+          time: level.time, wtime: world.time,
+          plats: level.platforms.map((p) => ({ p: v3(p.body.position), v: v3(p.body.velocity), q: q4(p.body.quaternion), w: v3(p.body.angularVelocity),
+            inWorld: !!p.body.world, state: p.state, timer: p.timer, fallVel: p.fallVel, squash: p.squash,
+            mp: v3(p.mesh.position), mq: q4(p.mesh.quaternion), mvis: p.mesh.visible,
+            bar: p.bar ? { q: q4(p.bar.body.quaternion), w: v3(p.bar.body.angularVelocity) } : null })),
+          bars: level.bars.map((r) => ({ a: v3(r.a), v: v3(r.vel) })),
+          anchors: level.anchors.map((a) => ({ p: v3(a.pos), v: v3(a.vel) })),
+          coins: level.coins.map((c) => c.collected),
+        };
+      },
+      restore(s) {
+        const b = player.body, P = player, A = abilities;
+        Object.assign(game, s.game);
+        b.position.set(s.body.p.x, s.body.p.y, s.body.p.z);
+        b.previousPosition.copy(b.position);
+        b.velocity.set(s.body.v.x, s.body.v.y, s.body.v.z);
+        Object.assign(P, s.pl);
+        P.groundVel.set(s.gv.x, s.gv.y, s.gv.z);
+        P.groundNormal.set(s.gn.x, s.gn.y, s.gn.z);
+        P.hang = s.hang ? { ...s.hang, climb: s.hang.climb ? { ...s.hang.climb } : null } : null;
+        P.skate = s.skate ? { ...s.skate, grind: s.skate.grind ? { ...s.skate.grind } : null } : null;
+        const r = s.abil.rope;
+        Object.assign(A, s.abil, { rope: r ? { ...r, point: r.point.clone(), vel: r.vel.clone(), local: r.local ? r.local.clone() : null } : null });
+        level.time = s.time; world.time = s.wtime;
+        level.platforms.forEach((p, i) => {
+          const o = s.plats[i];
+          p.body.position.set(o.p.x, o.p.y, o.p.z); p.body.previousPosition.copy(p.body.position);
+          p.body.velocity.set(o.v.x, o.v.y, o.v.z);
+          p.body.quaternion.set(o.q.x, o.q.y, o.q.z, o.q.w);
+          p.body.angularVelocity.set(o.w.x, o.w.y, o.w.z);
+          if (o.inWorld && !p.body.world) world.addBody(p.body);
+          if (!o.inWorld && p.body.world) world.removeBody(p.body);
+          Object.assign(p, { state: o.state, timer: o.timer, fallVel: o.fallVel, squash: o.squash });
+          p.mesh.position.set(o.mp.x, o.mp.y, o.mp.z); p.mesh.quaternion.set(o.mq.x, o.mq.y, o.mq.z, o.mq.w); p.mesh.visible = o.mvis;
+          if (o.bar) { p.bar.body.quaternion.set(o.bar.q.x, o.bar.q.y, o.bar.q.z, o.bar.q.w); p.bar.body.angularVelocity.set(o.bar.w.x, o.bar.w.y, o.bar.w.z); }
+        });
+        level.bars.forEach((r, i) => { r.a.set(s.bars[i].a.x, s.bars[i].a.y, s.bars[i].a.z); r.vel.set(s.bars[i].v.x, s.bars[i].v.y, s.bars[i].v.z); });
+        level.anchors.forEach((a, i) => { a.pos.set(s.anchors[i].p.x, s.anchors[i].p.y, s.anchors[i].p.z); a.vel.set(s.anchors[i].v.x, s.anchors[i].v.y, s.anchors[i].v.z); });
+        level.coins.forEach((c, i) => { c.collected = s.coins[i]; });
+        if (game.state === 'playing') { $('screen-complete').classList.add('hidden'); }
+      },
       // Start en vilkårlig banedefinition (uden at ændre LEVELS permanent)
       playDef(def, slot = 0) {
         const keep = LEVELS[slot];
