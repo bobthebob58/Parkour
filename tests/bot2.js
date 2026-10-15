@@ -275,7 +275,18 @@ async function planner({ def, levelNo, inv, opts }) {
       yawTo(a.x, a.z);
       const v = P.body.velocity;
       // nær en stang/svævebane: slip W, så hænderne ikke skyder forbi
-      keys({ W: dist > (goal.kind === 'plat' || goal.kind === 'wind' ? 0.25 : 0.6), Space: S.input.keys.Space && v.y > 0 });
+      let W = dist > (goal.kind === 'plat' || goal.kind === 'wind' ? 0.25 : 0.6), Sb = false;
+      if (goal.kind === 'plat' && dist > 0.05) {
+        // ankomst-styring: hav præcis den fart, der lander midt på målet (vigtigt for små platforme)
+        const feet = pos().y - radius, top = goal.top();
+        const disc = v.y * v.y + 2 * CFG.gravity * (feet - top);
+        const tLand = disc < 0 ? 0.6 : Math.max(0.08, (v.y + Math.sqrt(disc)) / CFG.gravity);
+        const toward = (v.x * (a.x - pos().x) + v.z * (a.z - pos().z)) / dist;
+        const want = dist / tLand;
+        W = toward < want - 0.3;
+        Sb = toward > want + 0.8;
+      }
+      keys({ W, S: Sb, Space: S.input.keys.Space && v.y > 0 });
       if (dbl && !jumpedAgain && P.airJumps > 0) {
         let fire = false;
         if (dbl === 'apex') fire = v.y < 0.5;
