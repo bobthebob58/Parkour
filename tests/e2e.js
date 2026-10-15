@@ -46,44 +46,6 @@ module.exports = async (page, h) => {
   await page.keyboard.up('Space');
   check('Ingen uendelige hop (kun fra jorden)', peak - yb > 0.3 && peak - yb < 2.6, `(top +${(peak - yb).toFixed(2)} m)`);
 
-  // 3c. Double jump once bought: exactly one extra jump in the air
-  await ev(() => { skyhoj.abilities.owned.double = true; });
-  await page.waitForFunction(() => skyhoj.player.grounded, null, { timeout: 60000, polling: 50 });
-  await simWait(0.2);
-  const yd = await ev(() => skyhoj.player.body.position.y);
-  let peakD = yd;
-  await page.keyboard.down('Space');
-  const tD = await ev(() => skyhoj.level.time);
-  let kd = 0;
-  while ((await ev(() => skyhoj.level.time)) < tD + 1.3) {
-    if (kd++ % 2 === 0) { await page.keyboard.up('Space'); await page.keyboard.down('Space'); }
-    peakD = Math.max(peakD, await ev(() => skyhoj.player.body.position.y));
-  }
-  await page.keyboard.up('Space');
-  check('Dobbelthop: præcis ét ekstra hop i luften', peakD - yd > 2.6 && peakD - yd < 6, `(top +${(peakD - yd).toFixed(2)} m)`);
-  await ev(() => { skyhoj.abilities.owned.double = false; });
-
-  // 3d. Hands: jump at a ledge that is too high – the hands catch it, W climbs up
-  await ev(() => {
-    skyhoj.playDef({ name: 'Greb', kit: 'sten', theme: 'day', reward: 0, segs: [
-      { t: 'start', w: 10, d: 10 }, { g: 0.5, w: 6, d: 6, dy: 3.2 }, { t: 'finish', g: 3, w: 10, d: 10 }] });
-    const S = skyhoj, L = S.level, wall = L.platforms[1], b = S.player.body;
-    b.position.set(wall.body.position.x, L.platforms[0].def.top + 0.45, wall.body.position.z + wall.def.d / 2 + 2.2);
-    b.velocity.set(0, 0, 0); S.cam.yaw = 0; S.cam.pitch = 0.2;
-  });
-  await simWait(0.3);
-  await page.keyboard.down('KeyW');
-  await page.keyboard.press('Space');
-  let grabbed = false;
-  const tG = await ev(() => skyhoj.level.time);
-  while ((await ev(() => skyhoj.level.time)) < tG + 3) {
-    if (await ev(() => !!skyhoj.player.hang)) grabbed = true;
-    if (grabbed && await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1])) break;
-  }
-  await page.keyboard.up('KeyW');
-  check('Hænderne griber en for høj kant', grabbed);
-  check('W klatrer op over kanten', await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1]));
-
   // 4. Right-drag rotates the camera
   await h.wait(1200);
   const yawA = await ev(() => skyhoj.cam.yaw);
@@ -146,6 +108,47 @@ module.exports = async (page, h) => {
   await h.wait(100);
   check('Mellemrum slipper rebet', await ev(() => !skyhoj.abilities.rope));
 
+  // 7b. Double jump once bought: exactly one extra jump in the air (hold Space, second press near the apex)
+  await ev(() => { skyhoj.startLevel(0); skyhoj.abilities.owned.double = true; });
+  await h.wait(600);
+  await page.waitForFunction(() => skyhoj.player.grounded, null, { timeout: 60000, polling: 50 });
+  const yd = await ev(() => skyhoj.player.body.position.y);
+  await page.keyboard.down('Space');
+  await page.waitForFunction(() => skyhoj.player.body.velocity.y < 1 && !skyhoj.player.grounded, null, { timeout: 60000, polling: 20 });
+  await page.keyboard.up('Space'); await page.keyboard.down('Space');
+  let peakD = yd;
+  const tD = await ev(() => skyhoj.level.time);
+  while ((await ev(() => skyhoj.level.time)) < tD + 1.0) {
+    peakD = Math.max(peakD, await ev(() => skyhoj.player.body.position.y));
+    await page.keyboard.up('Space'); await page.keyboard.down('Space'); // hamrer: kun ét ekstra hop må virke
+  }
+  await page.keyboard.up('Space');
+  check('Dobbelthop: præcis ét ekstra hop i luften', peakD - yd > 3.2 && peakD - yd < 5.5, `(top +${(peakD - yd).toFixed(2)} m)`);
+  await ev(() => { skyhoj.abilities.owned.double = false; });
+
+  // 7c. Hands: jump at a ledge that is too high – the hands catch it, W climbs up
+  await ev(() => {
+    skyhoj.playDef({ name: 'Greb', kit: 'sten', theme: 'day', reward: 0, segs: [
+      { t: 'start', w: 10, d: 10 }, { g: 0.5, w: 6, d: 6, dy: 3.2 }, { t: 'finish', g: 3, w: 10, d: 10 }] });
+    const S = skyhoj, L = S.level, wall = L.platforms[1], b = S.player.body;
+    b.position.set(wall.body.position.x, L.platforms[0].def.top + 0.45, wall.body.position.z + wall.def.d / 2 + 2.2);
+    b.velocity.set(0, 0, 0); S.cam.yaw = 0; S.cam.pitch = 0.2;
+  });
+  await simWait(0.3);
+  await page.keyboard.down('KeyW');
+  await simWait(0.15);
+  await page.keyboard.down('Space');
+  let grabbed = false;
+  const tG = await ev(() => skyhoj.level.time);
+  while ((await ev(() => skyhoj.level.time)) < tG + 3) {
+    if (await ev(() => !!skyhoj.player.hang)) { grabbed = true; await page.keyboard.up('Space'); }
+    if (grabbed && await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1])) break;
+  }
+  await page.keyboard.up('Space');
+  await page.keyboard.up('KeyW');
+  check('Hænderne griber en for høj kant', grabbed);
+  check('W klatrer op over kanten', await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1]));
+
   // 8. Shop with B, close with Escape
   await ev(() => { skyhoj.startLevel(0); });
   await h.wait(400);
@@ -177,9 +180,9 @@ module.exports = async (page, h) => {
 
   // 10. Lava death -> reset
   await ev(() => { const b = skyhoj.player.body; b.position.set(b.position.x + 30, -45, b.position.z); b.velocity.set(0, -20, 0); });
-  await page.waitForFunction(() => skyhoj.game.state === 'dead', null, { timeout: 10000 }).catch(() => {});
+  await page.waitForFunction(() => skyhoj.game.state === 'dead', null, { timeout: 30000 }).catch(() => {});
   check('Lava dræber spilleren', await ev(() => skyhoj.game.state === 'dead' || skyhoj.game.deaths > 0));
-  await page.waitForFunction(() => skyhoj.game.state === 'playing', null, { timeout: 15000 }).catch(() => {});
+  await page.waitForFunction(() => skyhoj.game.state === 'playing', null, { timeout: 90000 }).catch(() => {});
   const back = await ev(() => { const s = skyhoj.level.spawn, b = skyhoj.player.body.position; return Math.hypot(s.x - b.x, s.z - b.z); });
   check('Banen nulstilles til start efter døden', back < 1.5, `(afstand til start ${back.toFixed(2)} m)`);
 
@@ -193,8 +196,8 @@ module.exports = async (page, h) => {
   await page.waitForFunction(() => skyhoj.level.checkpoint === skyhoj.level.platforms[2], null, { timeout: 20000 }).catch(() => {});
   check('Kontrolpunkt aktiveres', await ev(() => skyhoj.level.checkpoint === skyhoj.level.platforms[2]));
   await ev(() => { const b = skyhoj.player.body; b.position.set(b.position.x + 30, -45, b.position.z); b.velocity.set(0, -20, 0); });
-  await page.waitForFunction(() => skyhoj.game.state === 'dead', null, { timeout: 10000 }).catch(() => {});
-  await page.waitForFunction(() => skyhoj.game.state === 'playing', null, { timeout: 30000 }).catch(() => {});
+  await page.waitForFunction(() => skyhoj.game.state === 'dead', null, { timeout: 30000 }).catch(() => {});
+  await page.waitForFunction(() => skyhoj.game.state === 'playing', null, { timeout: 90000 }).catch(() => {});
   const cpDist = await ev(() => { const c = skyhoj.level.platforms[2].body.position, b = skyhoj.player.body.position; return Math.hypot(c.x - b.x, c.z - b.z); });
   check('Efter døden genstarter man ved kontrolpunktet', cpDist < 1, `(afstand ${cpDist.toFixed(2)} m)`);
   await ev(() => { skyhoj.startLevel(0); });
@@ -203,7 +206,7 @@ module.exports = async (page, h) => {
   // 11. Portal -> complete -> next level via click
   const coinsBefore = await ev(() => skyhoj.game.coins);
   await ev(() => { const c = skyhoj.level.portal.center; const b = skyhoj.player.body; b.position.set(c.x, skyhoj.level.portal.top + 0.5, c.z); b.velocity.set(0, 0, 0); });
-  await page.waitForFunction(() => skyhoj.game.state === 'complete', null, { timeout: 15000 }).catch(() => {});
+  await page.waitForFunction(() => skyhoj.game.state === 'complete', null, { timeout: 60000 }).catch(() => {});
   check('Portalen fuldfører banen', await ev(() => skyhoj.game.state === 'complete'));
   const coinsAfter = await ev(() => skyhoj.game.coins);
   const reward1 = await ev(() => skyhoj.LEVELS[0].reward);

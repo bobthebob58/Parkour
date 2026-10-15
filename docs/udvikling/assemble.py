@@ -98,6 +98,8 @@ def main():
     kit_code = [KITS_BEGIN, """/* =====================================================================
    9c. VERDENERNE – ét verdenssæt (og ét himmeltema) pr. bane
    ===================================================================== */"""]
+    lib = open(os.path.join(SCR, 'kits', '_lib.js'), encoding='utf8').read().strip()
+    kit_code.append(f'// ---------------------------------------------------------------- fælles værktøjskasse\n{lib}')
     for k in KIT_ORDER:
         code = open(os.path.join(SCR, 'kits', f'{k}.js'), encoding='utf8').read().strip()
         kit_code.append(f'// ---------------------------------------------------------------- {k}\n{code}')

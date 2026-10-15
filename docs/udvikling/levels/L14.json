@@ -310,6 +310,15 @@
    "look": "coral landing after the pearl swing"
   },
   {
+   "g": 12.5,
+   "w": 5,
+   "d": 5,
+   "dbl": true,
+   "coin": true,
+   "look": "coral pinnacle across the open water (double jump)",
+   "hint": "For langt til ét hop – dobbelthop!"
+  },
+  {
    "t": "wind",
    "at": 2.5,
    "y": -6,
