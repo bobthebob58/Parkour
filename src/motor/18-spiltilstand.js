@@ -23,6 +23,7 @@ function loadLevel(i) {
   cam.pitch = 0.3;
   cam.curDist = CFG.camera.dist;
   renderHotbar(); // skjules på skateboardbanen
+  resetQualityFloor();
 }
 
 function startLevel(i) {

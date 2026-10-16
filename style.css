@@ -671,23 +671,23 @@ body.touch #hotbar { pointer-events: auto; bottom: calc(14px + env(safe-area-ins
 body.touch .slot .slot-key { display: none; }
 body.touch #hud-dbl { left: 50%; right: auto; transform: translateX(-50%); bottom: calc(102px + env(safe-area-inset-bottom)); }
 
-/* Lave skærme (telefon på langs): mindre HUD, så der er plads til fingrene */
+/* Lave skærme (telefon på langs): mindre HUD, så der er plads til fingrene.
+   HUD-delen gælder kun touch; menuerne gøres kompakte på alle lave skærme. */
 @media (max-height: 500px) {
-  #hud-level, #hud-ability { min-width: 0; padding: 6px 10px; }
-  #hud-level-num { font-size: 22px; }
-  .hud-level-of { font-size: 13px; }
-  #hud-level-name { font-size: 12px; margin: 0 0 4px; }
-  .hud-stats { gap: 8px; font-size: 13px; }
-  #hud-ability-name { font-size: 15px; }
-  #hud-ability-status { font-size: 11px; min-height: 13px; }
-  #hud-ability-bar { margin-top: 5px; }
-  .slot { width: 52px; height: 52px; border-radius: 12px; }
-  .slot svg { width: 24px; height: 24px; }
-  .slot .slot-name { font-size: 9px; }
-  #help-hint { display: none; }
-  #toasts { top: 24%; }
-  .toast { font-size: 13px; padding: 6px 12px; }
-  #level-banner-name { font-size: 30px; }
+  body.touch #hud-level, body.touch #hud-ability { min-width: 0; padding: 6px 10px; }
+  body.touch #hud-level-num { font-size: 22px; }
+  body.touch .hud-level-of { font-size: 13px; }
+  body.touch #hud-level-name { font-size: 12px; margin: 0 0 4px; }
+  body.touch .hud-stats { gap: 8px; font-size: 13px; }
+  body.touch #hud-ability-name { font-size: 15px; }
+  body.touch #hud-ability-status { font-size: 11px; min-height: 13px; }
+  body.touch #hud-ability-bar { margin-top: 5px; }
+  body.touch .slot { width: 52px; height: 52px; border-radius: 12px; }
+  body.touch .slot svg { width: 24px; height: 24px; }
+  body.touch .slot .slot-name { font-size: 9px; }
+  body.touch #toasts { top: 24%; }
+  body.touch .toast { font-size: 13px; padding: 6px 12px; }
+  body.touch #level-banner-name { font-size: 30px; }
   #btn-touch-jump { width: 84px; height: 84px; }
   #btn-touch-ability { width: 64px; height: 64px; right: calc(118px + env(safe-area-inset-right)); bottom: calc(30px + env(safe-area-inset-bottom)); }
   #touch-stick { left: calc(28px + env(safe-area-inset-left)); bottom: calc(24px + env(safe-area-inset-bottom)); }
@@ -701,6 +701,11 @@ body.touch #hud-dbl { left: 50%; right: auto; transform: translateX(-50%); botto
 @media (orientation: portrait) and (max-width: 600px) {
   body.touch #hotbar { bottom: calc(150px + env(safe-area-inset-bottom)); }
   body.touch #hud-dbl { bottom: calc(225px + env(safe-area-inset-bottom)); }
+  /* For smalt til to paneler side om side: evne-panelet under bane-panelet, pause-knappen i hjørnet */
+  body.touch #hud-ability { top: calc(124px + env(safe-area-inset-top)); left: calc(16px + env(safe-area-inset-left)); right: auto; text-align: left; }
+  body.touch #btn-touch-pause { left: auto; right: calc(16px + env(safe-area-inset-right)); transform: none; }
+  body.touch #btn-touch-pause.down { transform: scale(0.93); }
+  body.touch #toasts { top: 36%; }
 }
 
 /* Telefon på højkant: foreslå at dreje den */

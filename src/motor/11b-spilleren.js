@@ -92,15 +92,17 @@ function playerControl(dt) {
   } else if (hasInput) {
     // Luftkontrol: farten langs input-retningen bevares (momentum fra reb og springpuder),
     // mens sidelæns drift kan styres væk – stramt, men stadig med fart.
-    const along = v.x * w.x + v.z * w.z;
-    let px = v.x - w.x * along, pz = v.z - w.z * along;
-    const add = M.speed - along;
+    // Retningen normaliseres, så et halvt udslag på joysticket ikke bremser i luften.
+    const wm = Math.hypot(w.x, w.z), ux = w.x / wm, uz = w.z / wm;
+    const along = v.x * ux + v.z * uz;
+    let px = v.x - ux * along, pz = v.z - uz * along;
+    const add = M.speed * wm - along;
     const a = add > 0 ? Math.min(add, M.airAccel * dt) : 0;
     const perp = Math.hypot(px, pz), cut = M.airAccel * 0.7 * dt;
     const k = perp > cut ? (perp - cut) / perp : 0;
     px *= k; pz *= k;
-    v.x = w.x * (along + a) + px;
-    v.z = w.z * (along + a) + pz;
+    v.x = ux * (along + a) + px;
+    v.z = uz * (along + a) + pz;
   } else {
     const k = Math.max(0, 1 - M.airDrag * dt);
     v.x *= k; v.z *= k;
@@ -139,10 +141,11 @@ function doubleJump(w) {
   const v = player.body.velocity, D = CFG.dbl;
   v.y = D.vel;
   const hs = Math.hypot(v.x, v.z);
-  if (w.x || w.z) { // skift retning i luften, men behold farten
+  const wm = Math.hypot(w.x, w.z);
+  if (wm > 0) { // skift retning i luften, men behold farten (også ved et halvt udslag på joysticket)
     const sp = Math.max(hs, CFG.move.speed * 0.8);
-    v.x = v.x * (1 - D.steer) + w.x * sp * D.steer;
-    v.z = v.z * (1 - D.steer) + w.z * sp * D.steer;
+    v.x = v.x * (1 - D.steer) + (w.x / wm) * sp * D.steer;
+    v.z = v.z * (1 - D.steer) + (w.z / wm) * sp * D.steer;
   }
   player.airJumps--;
   player.jumpBuffer = 0;
@@ -443,11 +446,13 @@ function releaseHang(reason) {
 function jumpOffBar(w) {
   // Med retning: et langt fremadspring (til næste stang eller en platform).
   // Uden retning: lige op (til en stang lige over, fx en ræstige i en mast).
-  const dir = w.x || w.z, H = CFG.hang;
+  // (et lille udslag på joysticket tæller som "uden retning"; retningen normaliseres)
+  const wm = Math.hypot(w.x, w.z), dir = wm > 0.3, H = CFG.hang;
+  const ux = dir ? w.x / wm : 0, uz = dir ? w.z / wm : 0;
   // Stangens egen fart (trapez/bevægelig stang) følger med, så man kan kaste sig langt
   const F = hangFrame(player.hang), bvx = F.vx, bvy = F.vy, bvz = F.vz;
   releaseHang('jump');
-  player.body.velocity.set(w.x * H.leapFwd + bvx, (dir ? H.leapUp : H.hopUp) + Math.max(0, bvy) * 0.6, w.z * H.leapFwd + bvz);
+  player.body.velocity.set(ux * H.leapFwd + bvx, (dir ? H.leapUp : H.hopUp) + Math.max(0, bvy) * 0.6, uz * H.leapFwd + bvz);
   player.jumping = true;
   audio.play('jump');
 }

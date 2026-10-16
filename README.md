@@ -30,7 +30,7 @@ Spillet består af tre filer: **`index.html`**, **`style.css`** og **`game.js`**
 1. **Dobbeltklik på `index.html`**. Det virker direkte fra disken (`file://`).
 2. Eller kør en lokal webserver i mappen, f.eks. `npx serve .` eller `python3 -m http.server`, og åbn adressen.
 
-Første gang siden åbnes, skal der være internetforbindelse. Three.js `0.160.0` og cannon-es `0.20.0` hentes nemlig fra jsDelivr-CDN'en via et *import map*. Spillet kræver en moderne browser med WebGL (Chrome, Edge, Firefox eller Safari 16.4+). Fremskridt, mønter og køb gemmes automatisk i browseren. Når du har klaret en bane, kan du også vælge den direkte fra hovedmenuen under **Vælg bane**.
+Første gang siden åbnes, skal der være internetforbindelse. Three.js `0.160.0` og cannon-es `0.20.0` hentes nemlig fra jsDelivr-CDN'en med faste versioner. Spillet kræver en moderne browser med WebGL (Chrome, Edge, Firefox eller Safari, også på iPhone og iPad). Fremskridt, mønter og køb gemmes automatisk i browseren. Når du har klaret en bane, kan du også vælge den direkte fra hovedmenuen under **Vælg bane**.
 
 ![Hovedmenuen](docs/images/skaerm-hovedmenu.jpg)
 
@@ -317,7 +317,7 @@ Testene fra version 1 fandt allerede dengang reelle fejl:
 ## Teknisk overblik
 
 ```
-index.html   Import map (Three.js + cannon-es fra CDN), HUD og alle menuskærme
+index.html   Indlæser Three.js + cannon-es fra CDN, HUD, touch-knapper og alle menuskærme
 style.css    HUD, hotbar, grebsmåler, menuer, butik, banevalg (glas-look, responsivt)
 game.js      Hele spillet i én fil (ca. 12.800 linjer). Den BYGGES af src/ – ret aldrig i den direkte
 src/motor     Motoren, ét afsnit pr. fil:

@@ -25,6 +25,18 @@ module.exports = async (page, h) => {
   // frozen() trykker, mens fysikken står stille, så tidspunktet i spillet bliver præcist.
   const frozen = async (fn) => { await ev(() => { skyhoj.debug.freeze = true; }); await fn(); await ev(() => { skyhoj.debug.freeze = false; }); };
   const freezeWhen = (pred) => page.waitForFunction(new Function(`const ok = (${pred})(); if (ok) skyhoj.debug.freeze = true; return ok;`), null, { timeout: 60000, polling: 20 });
+  // Kontroller og vigtig HUD, der ikke må overlappe hinanden
+  const CONTROLS = ['#hud-level', '#hud-ability', '#btn-touch-pause', '#hotbar', '#btn-touch-ability', '#btn-touch-jump', '#touch-stick', '#hud-dbl'];
+  const overlaps = () => ev((sels) => {
+    const R = sels.map((s) => [s, document.querySelector(s)]).filter(([, e]) => e && e.getBoundingClientRect().width > 0).map(([s, e]) => [s, e.getBoundingClientRect()]);
+    const out = [];
+    for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++) {
+      const a = R[i][1], b = R[j][1];
+      if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) out.push(`${R[i][0]} / ${R[j][0]}`);
+    }
+    for (const [sel, r] of R) if (r.left < 0 || r.top < 0 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) out.push(`${sel} uden for skærmen`);
+    return out;
+  }, CONTROLS);
   const visible = (sel) => ev((s) => { const el = document.querySelector(s); if (!el) return false; const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; }, sel);
 
   await page.waitForFunction(() => window.skyhoj && window.skyhoj.game.state === 'menu', null, { timeout: 90000 });
@@ -61,6 +73,28 @@ module.exports = async (page, h) => {
   const half = await speedWith(-24);
   check('Lille udslag går langsommere (analogt)', half.s > 0.5 && half.s < full.s * 0.7, `(${half.s.toFixed(1)} m/s)`);
   check('Slip joysticket: ingen bevægelse og ingen hængende taster', await ev(() => !skyhoj.input.stick.active && !skyhoj.input.keys.KeyW && !skyhoj.input.keys.KeyS));
+  const ov1 = await overlaps();
+  check('Ingen kontroller overlapper (liggende)', ov1.length === 0, ov1.join(', '));
+
+  // 3b. En tommelfinger tæt ved kanten giver ikke udslag af sig selv (fx "tilbage" = slip en stang)
+  await frozen(() => down(1, sx, vp.height - 12));
+  const edge = await ev(() => ({ y: skyhoj.input.stick.y, s: skyhoj.input.keys.KeyS }));
+  await frozen(() => up(1));
+  check('Tryk tæt ved kanten giver intet udslag', Math.abs(edge.y) < 0.01 && !edge.s, `(y ${edge.y.toFixed(2)})`);
+
+  // 3c. Holder man joysticket, mens man dør i lavaen, virker det igen efter genstarten
+  await ev(() => skyhoj.restartLevel(false));
+  await page.waitForFunction(() => skyhoj.player.grounded, null, { timeout: 60000, polling: 50 });
+  await frozen(async () => { await down(1, sx, sy); await move(1, sx, sy - 60); });
+  await ev(() => skyhoj.die());
+  await page.waitForFunction(() => skyhoj.game.state === 'playing', null, { timeout: 60000, polling: 50 });
+  await page.waitForFunction(() => skyhoj.player.grounded, null, { timeout: 60000, polling: 50 });
+  await move(1, sx, sy - 62);
+  await simWait(0.5);
+  const afterDeath = await ev(() => { const v = skyhoj.player.body.velocity; return Math.hypot(v.x, v.z); });
+  await frozen(() => up(1));
+  await ev(() => skyhoj.restartLevel(false)); // tilbage til start (han er løbet et stykke)
+  check('Joysticket virker efter døden uden at løfte tommelfingeren', afterDeath > 5, `(${afterDeath.toFixed(1)} m/s)`);
 
   // 4. HOP: kort tryk hopper; holdt nede hopper højere
   const jumpHeight = async (holdSecs) => {
@@ -190,8 +224,14 @@ module.exports = async (page, h) => {
     await page.setViewportSize({ width: vp.height, height: vp.width });
     await h.wait(400);
     check('Højkant: "Drej skærmen" vises', await visible('#rotate-hint'));
+    await page.waitForFunction(() => skyhoj.game.state === 'paused', null, { timeout: 20000, polling: 50 }).catch(() => {});
+    check('Drejes telefonen midt i en bane, sættes spillet på pause', await ev(() => skyhoj.game.state === 'paused'));
     await tap('#btn-rotate-ok');
     check('"Spil alligevel" skjuler forslaget', !(await visible('#rotate-hint')));
+    await tap('#btn-resume');
+    await h.wait(300);
+    const ov2 = await overlaps();
+    check('Ingen kontroller overlapper (højkant)', ov2.length === 0, ov2.join(', '));
     await page.setViewportSize(vp);
   }
 

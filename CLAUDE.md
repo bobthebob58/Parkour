@@ -1,6 +1,6 @@
 # Skyhøj Parkour – working notes for Claude
 
-A Danish 3D parkour browser game (Three.js 0.160 + cannon-es 0.20 from jsDelivr via an import map).
+A Danish 3D parkour browser game (Three.js 0.160 + cannon-es 0.20 loaded from jsDelivr by full, pinned URLs in index.html – no import map, so Safari < 16.4 works).
 15 levels over a lava sea, one world kit per level, hands that catch ledges/bars, double jump,
 skateboard level, rope, chalk, coins and a shop. It must keep working by double-clicking
 `index.html` (file://), so `game.js` is a single **classic** script (one IIFE), not ES modules.
@@ -12,7 +12,7 @@ skateboard level, rope, chalk, coins and a shop. It must keep working by double-
   (`node tools/byg.js --tjek`).
 - Everything the player sees is **Danish** (UI texts live in `src/motor/02-tekster.js`). README,
   docs and commit messages are Danish too. Never put model names in commits or code.
-- Keep library versions pinned (index.html import map, `tests/package.json`). No new runtime deps,
+- Keep library versions pinned (the URLs at the bottom of index.html, `tests/package.json`, and the CDN map in `tests/run.js`). No new runtime deps,
   no build step in the browser.
 - One task per session. Commit + push before the session ends; if a task is unfinished, say what
   is done and what is next in the GitHub issue (template: `.github/ISSUE_TEMPLATE/opgave.md`).

@@ -75,6 +75,7 @@ function setTouchMode(on) {
   useTouchTexts(on);
   if (on) {
     // Telefoner og tablets: lavere opløsning og mindre skyggekort; resten styres løbende af updateQuality
+    resetQualityFloor();
     quality.pr = Math.min(window.devicePixelRatio || 1, quality.max);
     renderer.setPixelRatio(quality.pr);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -100,25 +101,33 @@ function restStick() {
 }
 function startStick(e) {
   touch.stickId = e.pointerId;
-  // Hold hele joysticket inde på skærmen
-  touch.x0 = clamp(e.clientX, STICK_R + 8, window.innerWidth - STICK_R - 8);
-  touch.y0 = clamp(e.clientY, STICK_R + 8, window.innerHeight - STICK_R - 8);
+  // Joystickets midte er der, hvor tommelfingeren rører (så der ikke kommer udslag af sig selv
+  // tæt ved kanten); kun ringen tegnes flyttet ind, så den er helt på skærmen
+  touch.x0 = e.clientX; touch.y0 = e.clientY;
+  const bx = clamp(e.clientX, STICK_R + 8, window.innerWidth - STICK_R - 8);
+  const by = clamp(e.clientY, STICK_R + 8, window.innerHeight - STICK_R - 8);
+  touch.ox = touch.x0 - bx; touch.oy = touch.y0 - by;
   $('touch-stick').classList.add('on');
-  placeStick(touch.x0, touch.y0);
+  placeStick(bx, by);
   moveStick(e);
 }
 function moveStick(e) {
   let dx = e.clientX - touch.x0, dy = e.clientY - touch.y0;
   const len = Math.hypot(dx, dy);
   if (len > STICK_R) { dx *= STICK_R / len; dy *= STICK_R / len; }
-  setKnob(dx, dy);
+  setKnob(dx + touch.ox, dy + touch.oy);
   let x = dx / STICK_R, y = dy / STICK_R;
   const m = Math.hypot(x, y);
   if (m < STICK_DEAD) { x = 0; y = 0; } else { const k = (m - STICK_DEAD) / (1 - STICK_DEAD) / m; x *= k; y *= k; }
-  const st = input.stick, k = input.keys;
+  const st = input.stick;
   st.active = true; st.x = x; st.y = y;
-  // Virtuelle taster til klatring (frem = op, tilbage = giv slip), stænger og skateboard
-  k.KeyW = y < -0.5; k.KeyS = y > 0.5; k.KeyA = x < -0.5; k.KeyD = x > 0.5;
+  applyStickKeys();
+}
+// Virtuelle taster til klatring (frem = op, tilbage = giv slip), stænger og skateboard
+function applyStickKeys() {
+  const st = input.stick, k = input.keys;
+  if (!st.active) return;
+  k.KeyW = st.y < -0.5; k.KeyS = st.y > 0.5; k.KeyA = st.x < -0.5; k.KeyD = st.x > 0.5;
 }
 function endStick() {
   touch.stickId = null;
@@ -143,13 +152,18 @@ function resetTouch() {
   input.stick.active = false;
   for (const id of ['btn-touch-jump', 'btn-touch-ability']) $(id).classList.remove('down');
 }
+// Kort død i lavaen: fingrene, der rører skærmen, følges stadig (så joysticket virker igen efter genstart),
+// men alle udslag nulstilles, indtil fingeren flyttes
+function pauseTouchOutputs() {
+  input.stick.x = 0; input.stick.y = 0;
+}
 
 canvas.addEventListener('pointerdown', (e) => {
   if (e.pointerType !== 'touch') return;
   touch.lastTouch = performance.now();
   setTouchMode(true);
   audio.init();
-  if (game.state !== 'playing') return;
+  if (game.state !== 'playing' && game.state !== 'dead') return;
   e.preventDefault();
   if (e.clientX < window.innerWidth * STICK_ZONE) {
     if (touch.stickId !== null) return;
@@ -220,14 +234,27 @@ $('hotbar').addEventListener('pointerdown', (e) => {
 document.addEventListener('touchmove', (e) => {
   if (!(e.target.closest && e.target.closest('.screen'))) e.preventDefault();
 }, { passive: false });
-document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturestart', (e) => { if (touch.active) e.preventDefault(); }); // ikke knib-zoom på Mac-trackpads
 
-// Lodret telefon: foreslå at dreje den – men lad spilleren fortsætte alligevel
+// Lodret telefon: foreslå at dreje den – men lad spilleren fortsætte alligevel.
+// Drejes telefonen midt i en bane, sættes spillet på pause, så man ikke dør bag beskeden.
 $('btn-rotate-ok').addEventListener('click', () => document.body.classList.add('rotate-ok'));
+const portraitMq = window.matchMedia ? window.matchMedia('(orientation: portrait) and (max-width: 600px)') : null;
+function onPortraitChange() {
+  if (portraitMq && portraitMq.matches && touch.active && game.state === 'playing' && !document.body.classList.contains('rotate-ok')) pauseGame();
+}
+if (portraitMq) {
+  if (portraitMq.addEventListener) portraitMq.addEventListener('change', onPortraitChange);
+  else if (portraitMq.addListener) portraitMq.addListener(onPortraitChange); // ældre Safari
+  window.addEventListener('resize', onPortraitChange);
+}
 
 // ---- Billedkvalitet på telefon og tablet ----
 // Opløsningen sænkes, hvis billedraten falder under ca. 40, og hæves igen, når der er luft.
-const quality = { pr: 1, max: 1.5, min: 0.75, t: 0, n: 0 };
+// En sænkning beholdes kun, hvis den hjalp: er billedraten låst (fx 30 i iOS' strømsparetilstand),
+// gør færre pixels ingen forskel, og så går den tilbage og prøver ikke lavere igen på banen.
+const quality = { pr: 1, max: 1.5, min: 0.75, floor: 0.75, trial: null, t: 0, n: 0 };
+function resetQualityFloor() { quality.floor = quality.min; quality.trial = null; }
 function updateQuality(dt) {
   if (!touch.active || game.state !== 'playing' || debug.freeze) { quality.t = 0; quality.n = 0; return; }
   quality.t += dt; quality.n++;
@@ -236,8 +263,13 @@ function updateQuality(dt) {
   quality.t = 0; quality.n = 0;
   const cap = Math.min(window.devicePixelRatio || 1, quality.max);
   let pr = quality.pr;
-  if (fps < 40) pr = Math.max(quality.min, pr - 0.25);
-  else if (fps > 56) pr = Math.min(cap, pr + 0.125);
+  if (quality.trial) {
+    if (fps < quality.trial.fps * 1.1) { pr = quality.trial.pr; quality.floor = quality.trial.pr; } // hjalp ikke
+    quality.trial = null;
+  } else if (fps < 40 && pr > quality.floor) {
+    quality.trial = { fps, pr };
+    pr = Math.max(quality.floor, pr - 0.25);
+  } else if (fps > 56) pr = Math.min(cap, pr + 0.125);
   if (pr !== quality.pr) {
     quality.pr = pr;
     renderer.setPixelRatio(pr);

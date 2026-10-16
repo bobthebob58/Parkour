@@ -129,9 +129,10 @@ function setState(s) {
   $('hud').classList.toggle('hidden', !(s === 'playing' || s === 'dead' || s === 'portal'));
   if (s !== 'playing') {
     releasePointer();
-    resetTouch();
+    if (s === 'dead') pauseTouchOutputs(); else resetTouch();
     input.keys = Object.create(null);
   } else {
+    applyStickKeys(); // en tommelfinger, der stadig holder joysticket efter døden, virker med det samme
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     canvas.focus({ preventScroll: true });
   }

@@ -15,15 +15,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Biblioteker hentes fra CDN: Three.js (grafik) og cannon-es (fysik) -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
-      }
-    }
-  </script>
 </head>
 <body>
   <canvas id="game-canvas" tabindex="0"></canvas>
@@ -237,7 +228,11 @@
       if (msg) document.getElementById('error-text').textContent = msg;
     };
     try {
-      const [THREE, CANNON] = await Promise.all([import('three'), import('cannon-es')]);
+      // Bibliotekerne hentes fra CDN'en med faste versioner. Fulde adresser i stedet for et import map,
+      // så spillet også starter i Safari før 16.4 (ældre iPhones og iPads).
+      const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+      const CANNON_URL = 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
+      const [THREE, CANNON] = await Promise.all([import(THREE_URL), import(CANNON_URL)]);
       window.THREE = THREE;
       window.CANNON = CANNON;
       status.textContent = 'Bygger verdenen…';
