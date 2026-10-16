@@ -189,6 +189,24 @@ const T = {
   levelBanner: (n) => `BANE ${n}`,
 };
 
+
+// Samme tekster på telefon og tablet (byttes ind af useTouchTexts, når touch-styringen bruges)
+const T_TOUCH = {
+  abilityReady: 'Klar – tryk på EVNE',
+  ropeAttached: 'Hold EVNE: hal ind · HOP: hop af',
+  ropeTarget: 'Mål fundet – tryk på EVNE!',
+  toastNoAbility: 'Ingen evne valgt – køb evner i butikken (i pausemenuen)',
+  toastNeedRope: 'Denne bane kræver rebet! Åbn butikken i pausemenuen.',
+  toastRopeHint: 'Tip: Vælg rebet forneden, sigt på det lysende krogpunkt og tryk på EVNE. Sving med joysticket, hop af med HOP.',
+  tipSkate: 'Næste bane køres på skateboard! Joystick frem: fart · til siden: styr · tilbage: brems · HOP: ollie.',
+  toastNeedDouble: 'Denne bane kræver dobbelthop! Åbn butikken i pausemenuen.',
+  toastGrabHint: 'Du hænger i hænderne! Joystick frem eller HOP: klatr op · til siden: flyt dig · tilbage: giv slip',
+  toastBarHint: 'Du hænger i en stang! Joysticket: flyt dig langs den · HOP: hop af',
+  toastZipHint: 'Svævebane! Du glider ned – tryk på HOP for at hoppe af',
+  toastSkate: 'Skateboard! Joystick frem: sæt fart · til siden: styr · tilbage: brems · HOP: ollie',
+  toastDoubleOwned: 'Dobbelthop: tryk på HOP igen i luften',
+  tipRopeOwned: 'Næste bane har enorme huller – husk at vælge rebet forneden på skærmen.',
+};
 /* =====================================================================
    3. HIMMEL-TEMAER
    ===================================================================== */
@@ -10871,12 +10889,13 @@ function respawnPlayer() {
   cam.target.set(s.x, s.y + CFG.camera.height - CFG.player.radius, s.z);
 }
 
-// Ønsket bevægelsesretning ud fra WASD og kameraets retning
+// Ønsket bevægelsesretning ud fra WASD (eller touch-joysticket) og kameraets retning
 const wish = new THREE.Vector3();
 function readWish() {
-  const k = input.keys;
-  const fwd = (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0);
-  const side = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
+  const k = input.keys, st = input.stick;
+  // Joysticket er analogt: lidt udslag = gå langsomt, fuldt udslag = løb
+  const fwd = st.active ? -st.y : (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0);
+  const side = st.active ? st.x : (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
   const sy = Math.sin(cam.yaw), cy = Math.cos(cam.yaw);
   wish.set(-sy * fwd + cy * side, 0, -cy * fwd - sy * side);
   if (wish.lengthSq() > 1) wish.normalize();
@@ -10915,15 +10934,17 @@ function playerControl(dt) {
   } else if (hasInput) {
     // Luftkontrol: farten langs input-retningen bevares (momentum fra reb og springpuder),
     // mens sidelæns drift kan styres væk – stramt, men stadig med fart.
-    const along = v.x * w.x + v.z * w.z;
-    let px = v.x - w.x * along, pz = v.z - w.z * along;
-    const add = M.speed - along;
+    // Retningen normaliseres, så et halvt udslag på joysticket ikke bremser i luften.
+    const wm = Math.hypot(w.x, w.z), ux = w.x / wm, uz = w.z / wm;
+    const along = v.x * ux + v.z * uz;
+    let px = v.x - ux * along, pz = v.z - uz * along;
+    const add = M.speed * wm - along;
     const a = add > 0 ? Math.min(add, M.airAccel * dt) : 0;
     const perp = Math.hypot(px, pz), cut = M.airAccel * 0.7 * dt;
     const k = perp > cut ? (perp - cut) / perp : 0;
     px *= k; pz *= k;
-    v.x = w.x * (along + a) + px;
-    v.z = w.z * (along + a) + pz;
+    v.x = ux * (along + a) + px;
+    v.z = uz * (along + a) + pz;
   } else {
     const k = Math.max(0, 1 - M.airDrag * dt);
     v.x *= k; v.z *= k;
@@ -10962,10 +10983,11 @@ function doubleJump(w) {
   const v = player.body.velocity, D = CFG.dbl;
   v.y = D.vel;
   const hs = Math.hypot(v.x, v.z);
-  if (w.x || w.z) { // skift retning i luften, men behold farten
+  const wm = Math.hypot(w.x, w.z);
+  if (wm > 0) { // skift retning i luften, men behold farten (også ved et halvt udslag på joysticket)
     const sp = Math.max(hs, CFG.move.speed * 0.8);
-    v.x = v.x * (1 - D.steer) + w.x * sp * D.steer;
-    v.z = v.z * (1 - D.steer) + w.z * sp * D.steer;
+    v.x = v.x * (1 - D.steer) + (w.x / wm) * sp * D.steer;
+    v.z = v.z * (1 - D.steer) + (w.z / wm) * sp * D.steer;
   }
   player.airJumps--;
   player.jumpBuffer = 0;
@@ -11266,11 +11288,13 @@ function releaseHang(reason) {
 function jumpOffBar(w) {
   // Med retning: et langt fremadspring (til næste stang eller en platform).
   // Uden retning: lige op (til en stang lige over, fx en ræstige i en mast).
-  const dir = w.x || w.z, H = CFG.hang;
+  // (et lille udslag på joysticket tæller som "uden retning"; retningen normaliseres)
+  const wm = Math.hypot(w.x, w.z), dir = wm > 0.3, H = CFG.hang;
+  const ux = dir ? w.x / wm : 0, uz = dir ? w.z / wm : 0;
   // Stangens egen fart (trapez/bevægelig stang) følger med, så man kan kaste sig langt
   const F = hangFrame(player.hang), bvx = F.vx, bvy = F.vy, bvz = F.vz;
   releaseHang('jump');
-  player.body.velocity.set(w.x * H.leapFwd + bvx, (dir ? H.leapUp : H.hopUp) + Math.max(0, bvy) * 0.6, w.z * H.leapFwd + bvz);
+  player.body.velocity.set(ux * H.leapFwd + bvx, (dir ? H.leapUp : H.hopUp) + Math.max(0, bvy) * 0.6, uz * H.leapFwd + bvz);
   player.jumping = true;
   audio.play('jump');
 }
@@ -11280,7 +11304,8 @@ function jumpOffBar(w) {
    --------------------------------------------------------------------- */
 function skateControl(dt) {
   const b = player.body, v = b.velocity, S = CFG.skate, k = input.keys, sk = player.skate;
-  const steer = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
+  const steer = input.stick.active ? clamp(input.stick.x / 0.8, -1, 1) // joysticket styrer trinløst
+    : (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0);
   const pushing = !!(k.KeyW || k.ArrowUp), braking = !!(k.KeyS || k.ArrowDown);
   sk.lean = damp(sk.lean, steer, 8, dt);
   sk.pushT = Math.max(0, sk.pushT - dt);
@@ -11616,7 +11641,7 @@ window.addEventListener('keydown', (e) => {
   if (!e.repeat && !wasDown) onKeyPress(e.code);
 });
 window.addEventListener('keyup', (e) => { input.keys[e.code] = false; });
-window.addEventListener('blur', () => { input.keys = Object.create(null); releasePointer(); });
+window.addEventListener('blur', () => { input.keys = Object.create(null); releasePointer(); if (touch.active) resetTouch(); });
 
 function onKeyPress(code) {
   const s = game.state;
@@ -11646,14 +11671,21 @@ function onKeyPress(code) {
   }
 }
 
+// Brug den valgte evne (venstreklik eller EVNE-knappen på touch-skærme)
+function pressAbility() {
+  if (player.skate) return; // ingen evner på skateboardet
+  const hadRope = !!abilities.rope;
+  useAbility();
+  input.leftHeld = !hadRope && !!abilities.rope; // samme tryk: hold for at hale ind
+}
+// Efter en berøring sender browsere "falske" musehændelser – dem ignorerer vi
+const fromTouch = () => performance.now() - touch.lastTouch < 1000;
+
 canvas.addEventListener('mousedown', (e) => {
   audio.init();
-  if (game.state !== 'playing') return;
+  if (game.state !== 'playing' || fromTouch()) return;
   if (e.button === 0) {
-    if (player.skate) return; // ingen evner på skateboardet
-    const hadRope = !!abilities.rope;
-    useAbility();
-    input.leftHeld = !hadRope && !!abilities.rope; // samme klik: hold for at hale ind
+    pressAbility();
   } else if (e.button === 2) {
     input.rightHeld = true;
     setLooking(true);
@@ -11664,6 +11696,7 @@ canvas.addEventListener('mousedown', (e) => {
   }
 });
 window.addEventListener('mouseup', (e) => {
+  if (fromTouch()) return;
   if (e.button === 0) input.leftHeld = false;
   if (e.button === 2) releasePointer();
 });
@@ -11684,6 +11717,285 @@ canvas.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 /* =====================================================================
+   12b. BERØRING (telefon og tablet)
+   Venstre del af skærmen: et joystick, der dukker op, hvor tommelfingeren
+   rører. Resten af skærmen: træk for at dreje kameraet. Knapper: HOP,
+   EVNE og pause. Hotbarens ikoner kan trykkes på for at skifte evne.
+   Joysticket er analogt (lidt udslag = gå, fuldt udslag = løb) og sætter
+   samtidig de virtuelle W/A/S/D-taster, så klatring, stænger og
+   skateboard virker præcis som med tastaturet.
+   ===================================================================== */
+const touch = {
+  active: false,        // touch-styringen vises (touch-skærm eller første berøring)
+  stickId: null, x0: 0, y0: 0,
+  lookId: null, lookX: 0, lookY: 0,
+  lastTouch: 0,         // tidspunkt for seneste berøring (browsere sender bagefter "falske" musehændelser)
+};
+input.stick = { active: false, x: 0, y: 0 };
+input.touchLook = false;
+const STICK_R = 56;         // joystickets radius i px
+const STICK_DEAD = 0.16;    // dødzone (andel af radius)
+const STICK_ZONE = 0.42;    // venstre del af skærmen, hvor joysticket kan startes
+
+// Tastatur- og musetekster omskrevet til touch (bruges på banetips og andre tekster)
+const TOUCH_TEXT = [
+  [/WASD/g, 'Joysticket'],
+  [/[Mm]ellemrum \+ W/g, 'HOP + joystick frem'],
+  [/W\/[Mm]ellemrum/g, 'Joystick frem/HOP'],
+  [/([Tt])ryk på mellemrum/g, '$1ryk på HOP'],
+  [/[Mm]ellemrum/g, 'HOP'],
+  [/([Hh])old venstreklik/g, '$1old EVNE'],
+  [/\(venstreklik\)/g, '(EVNE-knappen)'],
+  [/Venstreklik/g, 'Tryk på EVNE'],
+  [/venstreklik/g, 'tryk på EVNE'],
+  [/[Hh]øjreklik/g, 'træk i højre side'],
+  [/\(scroll\)/g, '(tryk på ikonet forneden)'],
+  [/med scrollhjulet/g, 'forneden på skærmen'],
+  [/Tryk B for at åbne butikken/g, 'Åbn butikken i pausemenuen'],
+  [/ \(B\)/g, ' (i pausemenuen)'],
+  [/\((\d)\)/g, '(tryk på ikonet forneden)'],
+  [/A\/D/g, 'joysticket til siden'],
+  [/Tryk W\b/g, 'Skub joysticket frem'],
+  [/tryk W\b/g, 'skub joysticket frem'],
+  [/([Hh])old W\b/g, '$1old joysticket frem'],
+  [/Tryk S\b/g, 'Træk joysticket tilbage'],
+  [/tryk S\b/g, 'træk joysticket tilbage'],
+  [/(^|[\s(·!.–-])W:/g, '$1Joystick frem:'],
+  [/(^|[\s(·!.–-])S:/g, '$1Joystick tilbage:'],
+  [/(^|[\s(·!.–-])W(?=[\s).,!]|$)/g, '$1joysticket frem'],
+  [/(^|[\s(·!.–-])S(?=[\s).,!]|$)/g, '$1joysticket tilbage'],
+  [/Klik igen/g, 'Tryk igen'],
+];
+function forTouch(s) {
+  if (!touch.active || typeof s !== 'string') return s;
+  for (const [re, to] of TOUCH_TEXT) s = s.replace(re, to);
+  return s;
+}
+
+// Spillets faste tekster i en touch-udgave (skrevet i hånden; resten oversættes af forTouch)
+const T_KEYBOARD = {};
+function useTouchTexts(on) {
+  for (const k of Object.keys(T_TOUCH)) {
+    if (!(k in T_KEYBOARD)) T_KEYBOARD[k] = T[k];
+    T[k] = on ? T_TOUCH[k] : T_KEYBOARD[k];
+  }
+}
+
+function prefersTouch() {
+  const mm = (q) => !!(window.matchMedia && window.matchMedia(q).matches);
+  return mm('(pointer: coarse)') || ((navigator.maxTouchPoints || 0) > 0 && mm('(hover: none)'));
+}
+
+function setTouchMode(on) {
+  if (touch.active === on) return;
+  touch.active = on;
+  document.body.classList.toggle('touch', on);
+  useTouchTexts(on);
+  if (on) {
+    // Telefoner og tablets: lavere opløsning og mindre skyggekort; resten styres løbende af updateQuality
+    resetQualityFloor();
+    quality.pr = Math.min(window.devicePixelRatio || 1, quality.max);
+    renderer.setPixelRatio(quality.pr);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    if (sun.shadow.mapSize.x > 1024) {
+      sun.shadow.mapSize.set(1024, 1024);
+      if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
+    }
+  }
+  if (typeof renderHotbar === 'function' && level) renderHotbar();
+}
+
+// ---- Joystick ----
+function placeStick(x, y) {
+  $('touch-stick').style.transform = `translate(${x - STICK_R}px, ${y - STICK_R}px)`;
+}
+function setKnob(dx, dy) {
+  $('touch-knob').style.transform = `translate(${dx}px, ${dy}px)`;
+}
+function restStick() {
+  $('touch-stick').classList.remove('on');
+  $('touch-stick').style.transform = '';
+  setKnob(0, 0);
+}
+function startStick(e) {
+  touch.stickId = e.pointerId;
+  // Joystickets midte er der, hvor tommelfingeren rører (så der ikke kommer udslag af sig selv
+  // tæt ved kanten); kun ringen tegnes flyttet ind, så den er helt på skærmen
+  touch.x0 = e.clientX; touch.y0 = e.clientY;
+  const bx = clamp(e.clientX, STICK_R + 8, window.innerWidth - STICK_R - 8);
+  const by = clamp(e.clientY, STICK_R + 8, window.innerHeight - STICK_R - 8);
+  touch.ox = touch.x0 - bx; touch.oy = touch.y0 - by;
+  $('touch-stick').classList.add('on');
+  placeStick(bx, by);
+  moveStick(e);
+}
+function moveStick(e) {
+  let dx = e.clientX - touch.x0, dy = e.clientY - touch.y0;
+  const len = Math.hypot(dx, dy);
+  if (len > STICK_R) { dx *= STICK_R / len; dy *= STICK_R / len; }
+  setKnob(dx + touch.ox, dy + touch.oy);
+  let x = dx / STICK_R, y = dy / STICK_R;
+  const m = Math.hypot(x, y);
+  if (m < STICK_DEAD) { x = 0; y = 0; } else { const k = (m - STICK_DEAD) / (1 - STICK_DEAD) / m; x *= k; y *= k; }
+  const st = input.stick;
+  st.active = true; st.x = x; st.y = y;
+  applyStickKeys();
+}
+// Virtuelle taster til klatring (frem = op, tilbage = giv slip), stænger og skateboard
+function applyStickKeys() {
+  const st = input.stick, k = input.keys;
+  if (!st.active) return;
+  k.KeyW = st.y < -0.5; k.KeyS = st.y > 0.5; k.KeyA = st.x < -0.5; k.KeyD = st.x > 0.5;
+}
+function endStick() {
+  touch.stickId = null;
+  const st = input.stick, k = input.keys;
+  st.active = false; st.x = 0; st.y = 0;
+  k.KeyW = k.KeyS = k.KeyA = k.KeyD = false;
+  restStick();
+}
+
+// ---- Kamera: træk med fingeren ----
+function lookMove(e) {
+  const k = 5 / Math.max(window.innerWidth, window.innerHeight); // én skærmbredde ≈ 290°
+  cam.yaw -= (e.clientX - touch.lookX) * k;
+  cam.pitch = clamp(cam.pitch + (e.clientY - touch.lookY) * k, CFG.camera.minPitch, CFG.camera.maxPitch);
+  touch.lookX = e.clientX; touch.lookY = e.clientY;
+}
+
+function resetTouch() {
+  if (touch.stickId !== null) endStick();
+  touch.lookId = null;
+  input.touchLook = false;
+  input.stick.active = false;
+  for (const id of ['btn-touch-jump', 'btn-touch-ability']) $(id).classList.remove('down');
+}
+// Kort død i lavaen: fingrene, der rører skærmen, følges stadig (så joysticket virker igen efter genstart),
+// men alle udslag nulstilles, indtil fingeren flyttes
+function pauseTouchOutputs() {
+  input.stick.x = 0; input.stick.y = 0;
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'touch') return;
+  touch.lastTouch = performance.now();
+  setTouchMode(true);
+  audio.init();
+  if (game.state !== 'playing' && game.state !== 'dead') return;
+  e.preventDefault();
+  if (e.clientX < window.innerWidth * STICK_ZONE) {
+    if (touch.stickId !== null) return;
+    startStick(e);
+  } else {
+    if (touch.lookId !== null) return;
+    touch.lookId = e.pointerId; touch.lookX = e.clientX; touch.lookY = e.clientY;
+    input.touchLook = true;
+  }
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ældre browsere */ }
+});
+window.addEventListener('pointermove', (e) => {
+  if (e.pointerType !== 'touch') return;
+  if (e.pointerId === touch.stickId) moveStick(e);
+  else if (e.pointerId === touch.lookId && game.state === 'playing') lookMove(e);
+});
+function endTouchPointer(e) {
+  if (e.pointerId === touch.stickId) endStick();
+  if (e.pointerId === touch.lookId) { touch.lookId = null; input.touchLook = false; }
+}
+window.addEventListener('pointerup', endTouchPointer);
+window.addEventListener('pointercancel', endTouchPointer);
+
+// ---- Knapper, der kan holdes nede ----
+function holdButton(id, down, up) {
+  const el = $(id);
+  el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.pointerType === 'touch') { touch.lastTouch = performance.now(); setTouchMode(true); }
+    audio.init();
+    el.classList.add('down');
+    try { el.setPointerCapture(e.pointerId); } catch (err) { /* ældre browsere */ }
+    down();
+  });
+  const release = () => {
+    if (!el.classList.contains('down')) return;
+    el.classList.remove('down');
+    up();
+  };
+  el.addEventListener('pointerup', release);
+  el.addEventListener('pointercancel', release);
+  el.addEventListener('lostpointercapture', release);
+  el.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+holdButton('btn-touch-jump', () => {
+  if (game.state !== 'playing') return;
+  input.keys.Space = true;   // holdes nede = højere hop (som mellemrum)
+  onKeyPress('Space');       // hop, dobbelthop, klatr op, spring fra stang, slip rebet
+}, () => { input.keys.Space = false; });
+holdButton('btn-touch-ability', () => {
+  if (game.state === 'playing') pressAbility();
+}, () => { input.leftHeld = false; });
+holdButton('btn-touch-pause', () => {
+  if (game.state === 'playing') pauseGame();
+}, () => {});
+
+// Tryk på et ikon i hotbaren for at vælge evnen
+$('hotbar').addEventListener('pointerdown', (e) => {
+  const slot = e.target.closest('[data-slot]');
+  if (!slot || game.state !== 'playing') return;
+  e.preventDefault();
+  e.stopPropagation();
+  selectAbility(slot.dataset.slot);
+});
+
+// Ingen zoom, rulning eller "gummibånd" midt i spillet (menuerne må stadig rulles)
+document.addEventListener('touchmove', (e) => {
+  if (!(e.target.closest && e.target.closest('.screen'))) e.preventDefault();
+}, { passive: false });
+document.addEventListener('gesturestart', (e) => { if (touch.active) e.preventDefault(); }); // ikke knib-zoom på Mac-trackpads
+
+// Lodret telefon: foreslå at dreje den – men lad spilleren fortsætte alligevel.
+// Drejes telefonen midt i en bane, sættes spillet på pause, så man ikke dør bag beskeden.
+$('btn-rotate-ok').addEventListener('click', () => document.body.classList.add('rotate-ok'));
+const portraitMq = window.matchMedia ? window.matchMedia('(orientation: portrait) and (max-width: 600px)') : null;
+function onPortraitChange() {
+  if (portraitMq && portraitMq.matches && touch.active && game.state === 'playing' && !document.body.classList.contains('rotate-ok')) pauseGame();
+}
+if (portraitMq) {
+  if (portraitMq.addEventListener) portraitMq.addEventListener('change', onPortraitChange);
+  else if (portraitMq.addListener) portraitMq.addListener(onPortraitChange); // ældre Safari
+  window.addEventListener('resize', onPortraitChange);
+}
+
+// ---- Billedkvalitet på telefon og tablet ----
+// Opløsningen sænkes, hvis billedraten falder under ca. 40, og hæves igen, når der er luft.
+// En sænkning beholdes kun, hvis den hjalp: er billedraten låst (fx 30 i iOS' strømsparetilstand),
+// gør færre pixels ingen forskel, og så går den tilbage og prøver ikke lavere igen på banen.
+const quality = { pr: 1, max: 1.5, min: 0.75, floor: 0.75, trial: null, t: 0, n: 0 };
+function resetQualityFloor() { quality.floor = quality.min; quality.trial = null; }
+function updateQuality(dt) {
+  if (!touch.active || game.state !== 'playing' || debug.freeze) { quality.t = 0; quality.n = 0; return; }
+  quality.t += dt; quality.n++;
+  if (quality.t < 2) return;
+  const fps = quality.n / quality.t;
+  quality.t = 0; quality.n = 0;
+  const cap = Math.min(window.devicePixelRatio || 1, quality.max);
+  let pr = quality.pr;
+  if (quality.trial) {
+    if (fps < quality.trial.fps * 1.1) { pr = quality.trial.pr; quality.floor = quality.trial.pr; } // hjalp ikke
+    quality.trial = null;
+  } else if (fps < 40 && pr > quality.floor) {
+    quality.trial = { fps, pr };
+    pr = Math.max(quality.floor, pr - 0.25);
+  } else if (fps > 56) pr = Math.min(cap, pr + 0.125);
+  if (pr !== quality.pr) {
+    quality.pr = pr;
+    renderer.setPixelRatio(pr);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+}
+
+/* =====================================================================
    13. KAMERA (tredjeperson, roteres med højreklik)
    ===================================================================== */
 const cam = { yaw: 0, pitch: 0.32, target: new THREE.Vector3(), curDist: CFG.camera.dist, shake: 0 };
@@ -11694,8 +12006,8 @@ function updateCamera(dt) {
   if (game.state === 'playing') {
     if (k.KeyQ) cam.yaw += 2.2 * dt;
     if (k.KeyE) cam.yaw -= 2.2 * dt;
-    // På skateboardet følger kameraet automatisk brættet (medmindre man selv drejer med højreklik)
-    if (player.skate && !input.rightHeld && !k.KeyQ && !k.KeyE) {
+    // På skateboardet følger kameraet automatisk brættet (medmindre man selv drejer med højreklik/fingeren)
+    if (player.skate && !input.rightHeld && !input.touchLook && !k.KeyQ && !k.KeyE) {
       cam.yaw = angleDamp(cam.yaw, -player.skate.heading, 3.2, dt);
       cam.pitch = damp(cam.pitch, 0.24, 2, dt);
     }
@@ -12097,6 +12409,11 @@ function renderHotbar() {
     return `<div class="${cls}" data-slot="${id}"><span class="slot-key">${i + 1}</span>${ICONS[id]}<span class="slot-name">${T.abilityNames[id]}</span><div class="slot-cd"></div></div>`;
   }).join('');
   ui.chalkCd = $('hotbar').querySelector('[data-slot="chalk"] .slot-cd');
+  // EVNE-knappen på touch-skærme viser den valgte evne (og er væk på skateboardet)
+  const ab = $('btn-touch-ability');
+  ab.classList.toggle('hidden', !!(level && level.def.skate));
+  ab.classList.toggle('empty', abilities.selected === 'none');
+  ab.innerHTML = `${ICONS[abilities.selected]}<span>EVNE</span>`;
 }
 
 const ui = { chalkCd: null, crosshairState: '' };
@@ -12113,7 +12430,7 @@ function toast(msg, kind = '', dur = 2400) {
   }
   const el = document.createElement('div');
   el.className = `toast ${kind}`;
-  el.textContent = msg;
+  el.textContent = forTouch(msg);
   el._msg = msg;
   box.appendChild(el);
   while (box.children.length > 4) box.removeChild(box.firstChild);
@@ -12201,8 +12518,10 @@ function setState(s) {
   $('hud').classList.toggle('hidden', !(s === 'playing' || s === 'dead' || s === 'portal'));
   if (s !== 'playing') {
     releasePointer();
+    if (s === 'dead') pauseTouchOutputs(); else resetTouch();
     input.keys = Object.create(null);
   } else {
+    applyStickKeys(); // en tommelfinger, der stadig holder joysticket efter døden, virker med det samme
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     canvas.focus({ preventScroll: true });
   }
@@ -12220,7 +12539,7 @@ function renderShop() {
     else if (!reqOk) btn = `<button class="btn" disabled>${T.shopRequires(nameOf(it.requires))}</button>`;
     else if (!afford) btn = `<button class="btn" disabled><span class="si-price"><span class="coin-icon"></span>${it.price} · ${T.shopMissing(it.price - game.coins)}</span></button>`;
     else btn = `<button class="btn btn-primary" data-buy="${it.id}"><span class="si-price">${T.shopBuy} · <span class="coin-icon"></span>${it.price}</span></button>`;
-    return `<div class="shop-item ${owned ? 'owned' : ''}"><div class="si-icon">${ICONS[it.icon]}</div><div class="si-kind">${it.kind}</div><h3>${it.name}</h3><p>${it.desc}</p>${btn}</div>`;
+    return `<div class="shop-item ${owned ? 'owned' : ''}"><div class="si-icon">${ICONS[it.icon]}</div><div class="si-kind">${it.kind}</div><h3>${it.name}</h3><p>${forTouch(it.desc)}</p>${btn}</div>`;
   }).join('');
 }
 
@@ -12352,6 +12671,8 @@ function loadLevel(i) {
   cam.yaw = -level.data.startHeading;
   cam.pitch = 0.3;
   cam.curDist = CFG.camera.dist;
+  renderHotbar(); // skjules på skateboardbanen
+  resetQualityFloor();
 }
 
 function startLevel(i) {
@@ -12512,6 +12833,7 @@ function frame(now) {
   const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000));
   lastT = now;
   elapsed += dt;
+  updateQuality(dt);
   const s = game.state;
   const simulate = simulateStates.has(s) || (s === 'shop' && (game.shopReturn === 'menu' || game.shopReturn === 'complete'));
   if (simulate && level && !debug.freeze) {
@@ -12583,7 +12905,7 @@ click('btn-new', () => {
   const hasProgress = s && (s.level > 0 || s.coins > 0 || Object.values(s.owned || {}).some(Boolean));
   if (hasProgress && !newGameArmed) {
     newGameArmed = 1;
-    $('btn-new').textContent = 'Sikker? Klik igen – alt nulstilles';
+    $('btn-new').textContent = forTouch('Sikker? Klik igen – alt nulstilles');
     setTimeout(() => { if (newGameArmed) refreshMenu(); }, 3500);
     return;
   }
@@ -12671,8 +12993,8 @@ function boot() {
   audio.enabled = game.sound;
   loadLevel(clamp(game.savedLevel, 0, LEVELS.length - 1));
   refreshMenu();
-  // Spillet kræver tastatur og mus – sig det på rene touch-enheder
-  if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) $('touch-note').classList.remove('hidden');
+  // Telefon og tablet: touch-styring (joystick, HOP, EVNE og pause) i stedet for tastatur og mus
+  if (prefersTouch()) setTouchMode(true);
   $('screen-loading').classList.add('hidden');
   setState('menu');
   requestAnimationFrame((t) => { lastT = t; frame(t); });
@@ -12686,6 +13008,7 @@ function boot() {
       useAbility, selectAbility, openShop, setState, renderShop, renderHotbar, toast, saveGame, applySave,
       fixedStep, respawnPlayer, onKeyPress, updateCamera, camera, renderer, scene, world, debug, particles,
       emitChalk, enterPortal, restartLevel, tryGrab, releaseHang, hangFrame, WORLD_KITS, renderLevelSelect,
+      touch, setTouchMode, forTouch, quality, T,
       get CHARACTER() { return CHARACTER; },
       setLevelDef(i, def) { LEVELS[i] = def; },
       showcaseDef,

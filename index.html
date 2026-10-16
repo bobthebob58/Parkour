@@ -2,7 +2,12 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Skyhøj">
+  <meta name="theme-color" content="#05070d">
   <title>Skyhøj Parkour</title>
   <meta name="description" content="Skyhøj Parkour – et 3D-parkourspil i skyerne over et hav af lava. 15 baner i 15 verdener: grib kanter med hænderne, dobbelthop, skateboard, kridt og reb.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,15 +15,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Biblioteker hentes fra CDN: Three.js (grafik) og cannon-es (fysik) -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
-      }
-    }
-  </script>
 </head>
 <body>
   <canvas id="game-canvas" tabindex="0"></canvas>
@@ -79,6 +75,14 @@
       <b>WASD</b> bevæg · <b>Mellemrum</b> hop · <b>Højreklik</b> (hold) kamera · <b>Venstreklik</b> evne · <b>Scroll</b> skift evne · <b>B</b> butik · <b>P</b> pause · <b>H</b> skjul<br>
       Hænger du: <b>W</b>/<b>Mellemrum</b> klatr op · <b>A</b>/<b>D</b> flyt dig · <b>S</b> giv slip
     </div>
+
+    <!-- Touch-styring (kun på telefon og tablet): joystick til venstre, knapper til højre -->
+    <div id="touch-controls">
+      <div id="touch-stick"><div id="touch-knob"></div></div>
+      <button id="btn-touch-pause" class="touch-btn" aria-label="Pause"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></svg></button>
+      <button id="btn-touch-ability" class="touch-btn" aria-label="Brug evne"></button>
+      <button id="btn-touch-jump" class="touch-btn" aria-label="Hop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l6-6 6 6"/></svg><span>HOP</span></button>
+    </div>
   </div>
 
   <div id="flash"></div>
@@ -111,7 +115,7 @@
         <button id="btn-levels" class="btn hidden">Vælg bane</button>
         <button id="btn-menu-shop" class="btn">Butik</button>
       </div>
-      <div class="controls-grid">
+      <div class="controls-grid no-touch">
         <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div><div>Bevæg dig</div>
         <div><kbd class="wide">Mellemrum</kbd></div><div>Hop (hold for højere hop) – med dobbelthop også i luften</div>
         <div>Hop mod en kant</div><div>Du griber automatisk fat med hænderne. <kbd>W</kbd> klatr op · <kbd>A</kbd><kbd>D</kbd> flyt dig · <kbd>S</kbd> slip</div>
@@ -120,8 +124,16 @@
         <div><kbd class="wide">Scrollhjul</kbd> <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></div><div>Skift evne</div>
         <div><kbd>B</kbd> <kbd>P</kbd> <kbd>R</kbd> <kbd>M</kbd></div><div>Butik · Pause · Genstart bane · Lyd</div>
       </div>
+      <div class="controls-grid touch-only">
+        <div><kbd class="wide">Joystick</kbd></div><div>Sæt tommelfingeren hvor som helst i venstre side og bevæg dig – lidt udslag går, fuldt udslag løber</div>
+        <div><kbd class="wide">HOP</kbd></div><div>Hop (hold for højere hop) – med dobbelthop også i luften</div>
+        <div>Hop mod en kant</div><div>Du griber automatisk fat med hænderne. Joystick frem eller <kbd>HOP</kbd>: klatr op · til siden: flyt dig · tilbage: slip</div>
+        <div><kbd class="wide">Træk</kbd> højre side</div><div>Drej kameraet / se dig omkring</div>
+        <div><kbd class="wide">EVNE</kbd></div><div>Brug den valgte evne – tryk på ikonerne forneden for at skifte</div>
+        <div><kbd>❚❚</kbd></div><div>Pause, butik, genstart bane og lyd</div>
+      </div>
       <p class="fineprint">Tjen mønter ved at nå portalen for enden af hver bane. Rør du lavaen, starter banen forfra.</p>
-      <p id="touch-note" class="fineprint touch-note hidden">Skyhøj Parkour spilles med tastatur og mus – åbn spillet på en computer.</p>
+      <p id="touch-note" class="fineprint touch-only">Spil helst med skærmen på langs.</p>
     </div>
   </div>
 
@@ -195,6 +207,16 @@
     </div>
   </div>
 
+  <!-- Telefon på højkant: foreslå at dreje den (kan springes over) -->
+  <div id="rotate-hint">
+    <div class="card card-narrow">
+      <svg class="rotate-ico" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="42" rx="4"/><path d="M46 54c6-3 10-9 10-16"/><path d="M52 40l4-3 3 4"/></svg>
+      <h2>Drej skærmen</h2>
+      <p>Skyhøj Parkour spilles bedst med telefonen på langs.</p>
+      <button id="btn-rotate-ok" class="btn">Spil alligevel</button>
+    </div>
+  </div>
+
   <!-- Indlæser bibliotekerne som ES-moduler, og starter derefter game.js.
        game.js er et klassisk script, så spillet også virker, når index.html
        åbnes direkte fra disken (file://). -->
@@ -206,7 +228,11 @@
       if (msg) document.getElementById('error-text').textContent = msg;
     };
     try {
-      const [THREE, CANNON] = await Promise.all([import('three'), import('cannon-es')]);
+      // Bibliotekerne hentes fra CDN'en med faste versioner. Fulde adresser i stedet for et import map,
+      // så spillet også starter i Safari før 16.4 (ældre iPhones og iPads).
+      const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+      const CANNON_URL = 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
+      const [THREE, CANNON] = await Promise.all([import(THREE_URL), import(CANNON_URL)]);
       window.THREE = THREE;
       window.CANNON = CANNON;
       status.textContent = 'Bygger verdenen…';

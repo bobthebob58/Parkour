@@ -77,7 +77,7 @@ function byg() {
     motor('05-hjaelpefunktioner.js'), motor('06-teksturer.js'), motor('07-scene.js'), motor('08-fysik.js'),
     motor('09-banebygger.js'), motor('09b-verdenssaet.js'), verdenerJs,
     motor('10-baneobjekter.js'), motor('11a-spilleren.js'), figurJs, motor('11b-spilleren.js'),
-    motor('12-input.js'), motor('13-kamera.js'), motor('14-evner.js'), motor('15-lyd.js'),
+    motor('12-input.js'), motor('12b-beroering.js'), motor('13-kamera.js'), motor('14-evner.js'), motor('15-lyd.js'),
     motor('16-brugerflade.js'), motor('17-gem.js'), motor('18-spiltilstand.js'),
   ].join('');
 }

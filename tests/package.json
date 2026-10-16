@@ -5,7 +5,8 @@
   "scripts": {
     "baner": "node run.js alle-baner.js",
     "e2e": "node run.js e2e.js",
-    "test": "node run.js alle-baner.js && node run.js e2e.js",
+    "touch": "TOUCH=telefon node run.js beroering.js && TOUCH=ipad node run.js beroering.js",
+    "test": "node run.js alle-baner.js && node run.js e2e.js && TOUCH=telefon node run.js beroering.js",
     "bot": "node run.js bot.js",
     "billeder": "node run.js levels.js",
     "skaerme": "node run.js skaerme.js",
