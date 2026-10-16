@@ -177,11 +177,24 @@ module.exports = async (page, h) => {
   await frozen(async () => { await down(1, sx, sy); await move(1, sx, sy - 60); });
   await simWait(0.15);
   await frozen(() => down(5, cj.x, cj.y));
+  // En vagt i siden noterer hvert billede, om han har grebet og stået oppe på kanten. Testen kigger kun
+  // sjældent (langsom software-WebGL), og med joysticket frem løber han videre ud over platformen bagefter.
+  await ev(() => {
+    const S = skyhoj, g = window.__greb = { grabbed: false, climbed: false };
+    const f = () => {
+      const P = S.player;
+      if (P.hang) g.grabbed = true;
+      if (g.grabbed && P.grounded && P.groundPlat === S.level.platforms[1]) g.climbed = true;
+      if (!g.climbed) requestAnimationFrame(f);
+    };
+    requestAnimationFrame(f);
+  });
   let grabbed = false, climbed = false;
   const tg = await ev(() => skyhoj.level.time);
   while ((await ev(() => skyhoj.level.time)) < tg + 3) {
-    if (!grabbed && await ev(() => !!skyhoj.player.hang)) { grabbed = true; await up(5); }
-    if (grabbed && await ev(() => skyhoj.player.grounded && skyhoj.player.groundPlat === skyhoj.level.platforms[1])) { climbed = true; break; }
+    const g = await ev(() => window.__greb);
+    if (g.grabbed && !grabbed) { grabbed = true; await up(5); }
+    if (g.climbed) { climbed = true; break; }
   }
   if (fingers.has(5)) await up(5);
   await up(1);
