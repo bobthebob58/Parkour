@@ -170,13 +170,13 @@ module.exports = async (page, h) => {
     skyhoj.playDef({ name: 'Greb', kit: 'sten', theme: 'day', reward: 0, segs: [
       { t: 'start', w: 10, d: 10 }, { g: 0.5, w: 6, d: 6, dy: 3.2 }, { t: 'finish', g: 3, w: 10, d: 10 }] });
     const S = skyhoj, L = S.level, wall = L.platforms[1], b = S.player.body;
-    b.position.set(wall.body.position.x, L.platforms[0].def.top + 0.45, wall.body.position.z + wall.def.d / 2 + 2.2);
+    b.position.set(wall.body.position.x, L.platforms[0].def.top + 0.45, wall.body.position.z + wall.def.d / 2 + 1.4);
     b.velocity.set(0, 0, 0); S.cam.yaw = 0; S.cam.pitch = 0.2;
   });
   await simWait(0.3);
-  await frozen(async () => { await down(1, sx, sy); await move(1, sx, sy - 60); });
-  await simWait(0.15);
-  await frozen(() => down(5, cj.x, cj.y));
+  // Joystick frem og HOP i samme øjeblik, mens fysikken står stille: hoppet bliver det samme, uanset
+  // billedraten (med et tilløb afhang afsættet af, hvornår testen nåede at trykke)
+  await ev(() => { skyhoj.debug.freeze = true; });
   // En vagt i siden noterer hvert billede, om han har grebet og stået oppe på kanten. Testen kigger kun
   // sjældent (langsom software-WebGL), og med joysticket frem løber han videre ud over platformen bagefter.
   await ev(() => {
@@ -188,12 +188,14 @@ module.exports = async (page, h) => {
       // Spor til fejlsøgning: hvad sker der, mens han hænger?
       if (P.hang && g.log.length < 40) {
         const h = P.hang, st = S.input.stick, k = S.input.keys;
-        g.log.push(`t${S.level.time.toFixed(2)} ${h.kind} age${(h.age || 0).toFixed(2)} climb${h.climb ? h.climb.t.toFixed(2) : '-'} grip${P.grip.toFixed(2)} stick${st.active ? st.y.toFixed(2) : 'off'} W${k.KeyW ? 1 : 0} yaw${S.cam.yaw.toFixed(2)} ${S.game.state}`);
+        g.log.push(`t${S.level.time.toFixed(2)} ${h.kind}${S.level.platforms.indexOf(h.plat)} age${(h.age || 0).toFixed(2)} climb${h.climb ? h.climb.t.toFixed(2) : '-'} grip${P.grip.toFixed(2)} stick${st.active ? st.y.toFixed(2) : 'off'} W${k.KeyW ? 1 : 0} yaw${S.cam.yaw.toFixed(2)} ${S.game.state}`);
       }
       if (!g.climbed) requestAnimationFrame(f);
     };
     requestAnimationFrame(f);
   });
+  await down(1, sx, sy); await move(1, sx, sy - 60); await down(5, cj.x, cj.y);
+  await ev(() => { skyhoj.debug.freeze = false; });
   let grabbed = false, climbed = false;
   const tg = await ev(() => skyhoj.level.time);
   while ((await ev(() => skyhoj.level.time)) < tg + 3) {
