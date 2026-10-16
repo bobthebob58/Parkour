@@ -180,11 +180,16 @@ module.exports = async (page, h) => {
   // En vagt i siden noterer hvert billede, om han har grebet og stået oppe på kanten. Testen kigger kun
   // sjældent (langsom software-WebGL), og med joysticket frem løber han videre ud over platformen bagefter.
   await ev(() => {
-    const S = skyhoj, g = window.__greb = { grabbed: false, climbed: false };
+    const S = skyhoj, g = window.__greb = { grabbed: false, climbed: false, log: [] };
     const f = () => {
       const P = S.player;
       if (P.hang) g.grabbed = true;
       if (g.grabbed && P.grounded && P.groundPlat === S.level.platforms[1]) g.climbed = true;
+      // Spor til fejlsøgning: hvad sker der, mens han hænger?
+      if (P.hang && g.log.length < 40) {
+        const h = P.hang, st = S.input.stick, k = S.input.keys;
+        g.log.push(`t${S.level.time.toFixed(2)} ${h.kind} age${(h.age || 0).toFixed(2)} climb${h.climb ? h.climb.t.toFixed(2) : '-'} grip${P.grip.toFixed(2)} stick${st.active ? st.y.toFixed(2) : 'off'} W${k.KeyW ? 1 : 0} yaw${S.cam.yaw.toFixed(2)} ${S.game.state}`);
+      }
       if (!g.climbed) requestAnimationFrame(f);
     };
     requestAnimationFrame(f);
@@ -199,7 +204,8 @@ module.exports = async (page, h) => {
   if (fingers.has(5)) await up(5);
   await up(1);
   check('Hænderne griber kanten', grabbed);
-  check('Joysticket frem klatrer op over kanten', climbed);
+  const greb = await ev(() => { const P = skyhoj.player; return { log: window.__greb.log.slice(-8).join(' | '), pos: [P.body.position.x, P.body.position.y, P.body.position.z].map((v) => v.toFixed(1)).join(','), plat: skyhoj.level.platforms.indexOf(P.groundPlat), state: skyhoj.game.state }; });
+  check('Joysticket frem klatrer op over kanten', climbed, climbed ? '' : `(${greb.state}, pos ${greb.pos}, plat ${greb.plat}; ${greb.log})`);
 
   // 9. Skateboardbanen: joysticket giver fart og styrer trinløst
   const skateIdx = await ev(() => skyhoj.LEVELS.findIndex((d) => d.skate));
